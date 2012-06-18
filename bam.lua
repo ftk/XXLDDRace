@@ -350,8 +350,8 @@ release_settings.optimize = 0
 release_settings.cc.defines:Add("CONF_RELEASE")
 release_settings.cc.flags:Add("-Ofast", "-march=native", "-flto", "-fomit-frame-pointer", "-mfpmath=sse,387", "-msse", "-msse2", "-msse3", "-pipe")
 release_settings.link.flags:Add("-Ofast", "-march=native", "-flto", "-fomit-frame-pointer", "-mfpmath=sse,387", "-msse", "-msse2", "-msse3", "-pipe")
-release_settings.cc.flags:Add("-fprofile-use") -- compile with -fprofile-generate first
-release_settings.link.flags:Add("-fprofile-use")
+release_settings.cc.flags:Add("-fprofile-generate") -- compile with -fprofile-generate first
+release_settings.link.flags:Add("-fprofile-generate")
 
 release_sql_settings = NewSettings()
 release_sql_settings.config_name = "sql_release"
