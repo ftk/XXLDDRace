@@ -33,6 +33,8 @@ CHAT_COMMAND("login", "r", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLogin, this, "Login t
 CHAT_COMMAND("helper", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConHelper, this, "Calls a helper./Authenticates player v to the level of 1")
 CHAT_COMMAND("logout", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLogOut, this, "Logout of rcon and membertile")
 
+CHAT_COMMAND("solo", "", CFGFLAG_CHAT|CFGFLAG_SERVER, ConSolo, this, "Activate solo mode")
+
 #if defined(CONF_SQL)
 CHAT_COMMAND("times", "?s?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConTimes, this, "/times ?s?i shows last 5 times of the server or of a player beginning with name s starting with time i (i = 1 by default)")
 #endif

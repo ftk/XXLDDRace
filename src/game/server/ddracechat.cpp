@@ -538,6 +538,8 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 		}
 		else
 		{
+            CGameTeams& teams = ((CGameControllerDDRace*) pSelf->m_pController)->m_Teams;
+            int team = pResult->GetInteger(0);
 			if (pPlayer->m_Last_Team
 					+ pSelf->Server()->TickSpeed()
 					* g_Config.m_SvTeamChangeDelay
@@ -546,20 +548,22 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
 						"You can\'t change teams that fast!");
 			}
-			else if (((CGameControllerDDRace*) pSelf->m_pController)->m_Teams.SetCharacterTeam(
-					pPlayer->GetCID(), pResult->GetInteger(0)))
+			else if (teams.SetCharacterTeam(
+					pPlayer->GetCID(), team))
 			{
 				char aBuf[512];
 				str_format(aBuf, sizeof(aBuf), "%s joined team %d",
 						pSelf->Server()->ClientName(pPlayer->GetCID()),
-						pResult->GetInteger(0));
+						team);
 				pSelf->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 				pPlayer->m_Last_Team = pSelf->Server()->Tick();
 			}
 			else
 			{
-				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-						"You cannot join this team at this time");
+                if(team < 0 || team >= MAX_CLIENTS || teams.GetTeamState(team) > CGameTeams::TEAMSTATE_OPEN)
+                    pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
+                else
+                    pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
 			}
 		}
 	}
@@ -873,9 +877,9 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 
 	if(pChr)
 	{
-		if (!pChr->m_LastRescue){
+		if (!pChr->m_LastRescue || !(pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)){
 
-			float RescueDelay = 1.25;
+			float RescueDelay = g_Config.m_SvFreezeDelay;
 			if (pChr->m_FreezeTime == 0)
 				pSelf->SendChatTarget(pResult->m_ClientID, "You are not freezed!");
 			else if (pChr->m_DeepFreeze)
@@ -913,12 +917,14 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				pChr->m_LastRescue = RescueDelay * pSelf->Server()->TickSpeed();
 				//Teleport player
 				pChr->Core()->m_Pos = pChr->m_RescuePos;
-			}
+                pChr->Core()->m_Vel = vec2(0, 0); // reset momentum
+            }
 		}
 		else
 		{
-			if (pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE)
-				pChr->UnFreeze();
+			//if (pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)
+            pChr->UnFreeze();
+            pChr->m_LastRescue = 0;
 		}
 	}
 	else
@@ -1069,5 +1075,26 @@ void CGameContext::ConLogOut(IConsole::IResult *pResult, void *pUserData)
 		str_format(aBuf, sizeof(aBuf), "ClientID=%d logged out", Victim);
 		pServer->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 	}
+}
+
+void CGameContext::ConSolo(IConsole::IResult *pResult, void *pUserData)
+{
+    CGameContext *pSelf = (CGameContext *) pUserData;
+    
+    if (!CheckClientID(pResult->m_ClientID))
+        return;
+
+    CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+    if (!pPlayer)
+        return;
+    CCharacter* pChr = pPlayer->GetCharacter();
+    if (!pChr)
+        return;
+    if (pChr)
+    {
+        bool insolo = pChr->Teams()->m_Core.GetSolo(pResult->m_ClientID);
+        pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, !insolo);
+        pSelf->SendChatTarget(pResult->m_ClientID, insolo ? "You are now out of solo" : "You are now in solo");
+    }
 }
 

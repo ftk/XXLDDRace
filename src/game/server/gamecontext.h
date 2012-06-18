@@ -210,6 +210,8 @@ private:
 	static void ConUnWeapons(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddWeapon(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemoveWeapon(IConsole::IResult *pResult, void *pUserData);
+    
+    static void ConSolo(IConsole::IResult *pResult, void *pUserData);
 
 	void ModifyWeapons(IConsole::IResult *pResult, void *pUserData, int Weapon, bool Remove);
 	void MoveCharacter(int ClientID, int X, int Y, bool Raw = false);
