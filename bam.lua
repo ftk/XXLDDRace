@@ -332,6 +332,8 @@ debug_settings.config_ext = "_d"
 debug_settings.debug = 1
 debug_settings.optimize = 0
 debug_settings.cc.defines:Add("CONF_DEBUG")
+debug_settings.cc.flags:Add("-pg")
+debug_settings.link.flags:Add("-pg")
 
 debug_sql_settings = NewSettings()
 debug_sql_settings.config_name = "sql_debug"
@@ -344,8 +346,12 @@ release_settings = NewSettings()
 release_settings.config_name = "release"
 release_settings.config_ext = ""
 release_settings.debug = 0
-release_settings.optimize = 1
+release_settings.optimize = 0
 release_settings.cc.defines:Add("CONF_RELEASE")
+release_settings.cc.flags:Add("-Ofast", "-march=native", "-flto", "-fomit-frame-pointer", "-mfpmath=sse,387", "-msse", "-msse2", "-msse3", "-pipe")
+release_settings.link.flags:Add("-Ofast", "-march=native", "-flto", "-fomit-frame-pointer", "-mfpmath=sse,387", "-msse", "-msse2", "-msse3", "-pipe")
+release_settings.cc.flags:Add("-fprofile-use") -- compile with -fprofile-generate first
+release_settings.link.flags:Add("-fprofile-use")
 
 release_sql_settings = NewSettings()
 release_sql_settings.config_name = "sql_release"
