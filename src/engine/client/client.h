@@ -3,6 +3,8 @@
 #ifndef ENGINE_CLIENT_CLIENT_H
 #define ENGINE_CLIENT_CLIENT_H
 
+#include <cstdio>
+
 class CGraph
 {
 public:
@@ -53,6 +55,8 @@ public:
 
 class CClient : public IClient, public CDemoPlayer::IListner
 {
+    char * quit_message;
+    
 	// needed interfaces
 	IEngine *m_pEngine;
 	IEditor *m_pEditor;
@@ -181,6 +185,17 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	static void GraphicsThreadProxy(void *pThis) { ((CClient*)pThis)->GraphicsThread(); }
 	void GraphicsThread();
 
+    static void ConfigSaveCallback(IConfig *pConfig, void *pUserData)
+    {
+      CClient *pSelf = (CClient *)pUserData;
+      if(pSelf->quit_message)
+      {
+        char buf[256];
+        snprintf(buf, sizeof(buf), "quitmessage \"%s\"", pSelf->quit_message);
+        pConfig->WriteLine(buf);
+      }
+    }
+
 public:
 	IEngine *Engine() { return m_pEngine; }
 	IEngineGraphics *Graphics() { return m_pGraphics; }
@@ -277,7 +292,8 @@ public:
 
 
 	static void Con_Connect(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
+    static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
+    static void Con_SetQMsg(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Quit(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Minimize(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Ping(IConsole::IResult *pResult, void *pUserData);

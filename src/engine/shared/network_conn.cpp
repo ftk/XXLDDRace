@@ -221,7 +221,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 						str_copy(Str, (char *)pPacket->m_aChunkData, pPacket->m_DataSize);
 					else
 						str_copy(Str, (char *)pPacket->m_aChunkData, sizeof(Str));
-					str_sanitize_strong(Str);
+					//str_sanitize_strong(Str);
 
 					// set the error string
 					SetError(Str);
