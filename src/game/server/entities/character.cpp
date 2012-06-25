@@ -1324,6 +1324,7 @@ void CCharacter::HandleTiles(int Index)
 		{
 			Teams()->OnCharacterStart(m_pPlayer->GetCID());
 			m_CpActive = -2;
+			m_RescuePos = vec2(0,0);
 		} else {
 
 		}
