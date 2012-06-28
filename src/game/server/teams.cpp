@@ -155,6 +155,12 @@ bool CGameTeams::SetCharacterTeam(int ClientID, int Team)
 		else if (Team != TEAM_SUPER)
 			return false;
 	}
+	for (int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if (m_Core.Team(i) == Team)
+          return false;
+    }
+	
 	SetForceCharacterTeam(ClientID, Team);
 
 	//GameServer()->CreatePlayerSpawn(Character(id)->m_Core.m_Pos, TeamMask());
