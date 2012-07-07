@@ -26,8 +26,11 @@ class RGBTile:
   end = (0, 64, 0)
   spawn = (255, 255, 0)
   kill = (255, 0, 0)
+  shotgun = (1, 255, 255)
+  grenade = (2, 255, 255)
+  rifle = (3, 255, 255)
 
-# 0x56 = tile at 5th row and 6th column in tileset
+# 0x59 = tile at 6th row and 10th column in tileset
 color_to_tile = dict(
 {
   # (r, g, b) : [game, tile]
@@ -42,10 +45,15 @@ color_to_tile = dict(
   RGBTile.start : [0x21, 0x0e], # start
   RGBTile.end : [0x22, 0x0e], # end
   RGBTile.spawn : [0xc0, 0x00], # spawn
-  RGBTile.kill : [0x2, 0x1e], # kill
+  RGBTile.kill : [0x02, 0x1e], # kill
   
   (1,2,3) : [0x15, 0x0e], # solo in
-  (4,5,6) : [0x16, 0x0e] # solo out
+  (4,5,6) : [0x16, 0x0e], # solo out
+
+  RGBTile.shotgun : [0xc7, 0x00],
+  RGBTile.grenade : [0xc8, 0x00],
+  RGBTile.rifle : [0xca, 0x00]
+
   # TODO: add more
 })
 
@@ -97,7 +105,10 @@ txt_to_color = dict(
   's' : RGBTile.start,
   'e' : RGBTile.end,
   '-' : RGBTile.freeze,
-  '.' : RGBTile.unfreeze
+  '.' : RGBTile.unfreeze,
+  'h' : RGBTile.shotgun,
+  'g' : RGBTile.grenade,
+  'r' : RGBTile.rifle
 })
 
 def txt2rgb(ch):
