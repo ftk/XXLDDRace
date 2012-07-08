@@ -80,6 +80,22 @@ static void ConKeyInputNextPrevWeapon(IConsole::IResult *pResult, void *pUserDat
 	pSet->m_pControls->m_InputData.m_WantedWeapon = 0;
 }
 
+static void ConMousePos(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	pSelf->m_MousePos = vec2(pResult->GetFloat(0), pResult->GetFloat(1));
+	pSelf->m_TargetPos = pSelf->m_MousePos;
+}
+
+static void ConMouseAngle(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	const float pi = 3.1415926535f;
+	const float dist = 200.f;
+	pSelf->m_MousePos = vec2(cosf(pResult->GetFloat(0) * pi / 180) * dist, sinf(pResult->GetFloat(0) * pi / 180) * -dist);
+	pSelf->m_TargetPos = pSelf->m_MousePos;
+}
+
 void CControls::OnConsoleInit()
 {
 	// game commands
@@ -88,6 +104,9 @@ void CControls::OnConsoleInit()
 	Console()->Register("+jump", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputData.m_Jump, "Jump");
 	Console()->Register("+hook", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputData.m_Hook, "Hook");
 	Console()->Register("+fire", "", CFGFLAG_CLIENT, ConKeyInputCounter, &m_InputData.m_Fire, "Fire");
+
+	Console()->Register("mouse", "ff", CFGFLAG_CLIENT, ConMousePos, this, "Set mouse position");
+	Console()->Register("mouse_angle", "f", CFGFLAG_CLIENT, ConMouseAngle, this, "Set mouse angle in degree");
 
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
