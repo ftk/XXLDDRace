@@ -4,10 +4,10 @@
 #include <ctime>
 
 #define SIZE_X 30 // amount of cells horizontally
-#define SIZE_Y 40 
+#define SIZE_Y 30 
 
-#define CELL_X 15
-#define CELL_Y 15 // amount of tiles in each cell vertically
+#define CELL_X 11
+#define CELL_Y 11 // amount of tiles in each cell vertically
 
 enum direction
 {
@@ -17,7 +17,7 @@ enum direction
   left = 8
 };
 
-#define RANDOM_BLOCK ((!(rand()%(15 + (SIZE_Y - self_y))))?'X':' ')
+#define RANDOM_BLOCK ((!(rand()%(25 + (SIZE_Y - self_y))))?'X':' ')
 
 struct cell
 {
