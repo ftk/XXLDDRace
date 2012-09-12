@@ -16,7 +16,7 @@
 
 #include "controls.h"
 
-CControls::CControls()
+CControls::CControls() : auto_hit(false)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -96,6 +96,11 @@ static void ConMouseAngle(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_TargetPos = pSelf->m_MousePos;
 }
 
+static void ConAutoHit(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	pSelf->auto_hit = !!pResult->GetInteger(0);
+}
 void CControls::OnConsoleInit()
 {
 	// game commands
@@ -107,6 +112,9 @@ void CControls::OnConsoleInit()
 
 	Console()->Register("mouse", "ff", CFGFLAG_CLIENT, ConMousePos, this, "Set mouse position");
 	Console()->Register("mouse_angle", "f", CFGFLAG_CLIENT, ConMouseAngle, this, "Set mouse angle in degree");
+
+	Console()->Register("autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
+	Console()->Register("+autohit", "", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
@@ -133,6 +141,8 @@ int CControls::SnapInput(int *pData)
 	static int64 LastSendTime = 0;
 	bool Send = false;
 
+	
+
 	// update player state
 	if(m_pClient->m_pChat->IsActive())
 		m_InputData.m_PlayerFlags = PLAYERFLAG_CHATTING;
@@ -148,6 +158,9 @@ int CControls::SnapInput(int *pData)
 		Send = true;
 
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
+
+	if(auto_hit)
+		m_InputData.m_Fire = (m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
 
 	// we freeze the input if chat or menu is activated
 	if(!(m_InputData.m_PlayerFlags&PLAYERFLAG_PLAYING))

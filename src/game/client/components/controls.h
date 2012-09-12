@@ -28,5 +28,7 @@ public:
 
 	int SnapInput(int *pData);
 	void ClampMousePos();
+
+	bool auto_hit;
 };
 #endif
