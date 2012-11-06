@@ -30,6 +30,11 @@ public:
 	virtual void ListDirectory(int Types, const char *pPath, FS_LISTDIR_CALLBACK pfnCallback, void *pUser);
 	
 	virtual IOHANDLE OpenFile(const char *pFilename, int Flags, char *pBuffer = 0, int BufferSize = 0);
+
+	virtual void CloseFile(IOHANDLE fd)
+	{
+		io_close(fd);
+	}
 	
 	static IStorage *Create(const char *pApplicationName, const char *pArgv0)
 	{

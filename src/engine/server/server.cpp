@@ -493,7 +493,7 @@ const char *CServer::ClientName(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
 		return "(invalid)";
-	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)
+	if((m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME || m_aClients[ClientID].m_State == CServer::CClient::STATE_READY) && m_aClients[ClientID].m_aName[0])
 		return m_aClients[ClientID].m_aName;
 	else
 		return "(connecting)";
@@ -1868,6 +1868,7 @@ char *CServer::GetAnnouncementLine(char const *pFileName)
 			if(str_length(pLine))
 				if(pLine[0]!='#')
 					v.push_back(pLine);
+		io_close(File);
 		if(v.size() == 1)
 		{
 			m_AnnouncementLastLine = 0;
