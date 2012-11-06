@@ -30,5 +30,8 @@ public:
 	void ClampMousePos();
 
 	bool auto_hit;
+	int64 hit_interval;
+	bool auto_hook;
+	int64 hook_interval;
 };
 #endif

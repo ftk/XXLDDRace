@@ -16,7 +16,7 @@
 
 #include "controls.h"
 
-CControls::CControls() : auto_hit(false)
+CControls::CControls() : auto_hit(false), auto_hook(false), hit_interval(0), hook_interval(0)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -100,7 +100,21 @@ static void ConAutoHit(IConsole::IResult *pResult, void *pUserData)
 {
 	CControls *pSelf = (CControls *)pUserData;
 	pSelf->auto_hit = !!pResult->GetInteger(0);
+	if(!pSelf->auto_hit)
+		if(pSelf->m_InputData.m_Fire & 1 != 0)
+			pSelf->m_InputData.m_Fire = (pSelf->m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
+	pSelf->hit_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
 }
+
+static void ConAutoHook(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	pSelf->auto_hook = !!pResult->GetInteger(0);
+	if(!pSelf->auto_hook)
+		pSelf->m_InputData.m_Hook = 0;
+	pSelf->hook_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
+}
+
 void CControls::OnConsoleInit()
 {
 	// game commands
@@ -113,8 +127,10 @@ void CControls::OnConsoleInit()
 	Console()->Register("mouse", "ff", CFGFLAG_CLIENT, ConMousePos, this, "Set mouse position");
 	Console()->Register("mouse_angle", "f", CFGFLAG_CLIENT, ConMouseAngle, this, "Set mouse angle in degree");
 
-	Console()->Register("autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
-	Console()->Register("+autohit", "", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
+	Console()->Register("autohit", "ii", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
+	Console()->Register("+autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
+	Console()->Register("autohook", "ii", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
+	Console()->Register("+autohook", "i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
 
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
@@ -141,6 +157,10 @@ int CControls::SnapInput(int *pData)
 	static int64 LastSendTime = 0;
 	bool Send = false;
 
+	static int64 last_hit_time = 0;
+	static int64 last_hook_time = 0;
+
+	int64 time = time_get();
 	
 
 	// update player state
@@ -159,18 +179,40 @@ int CControls::SnapInput(int *pData)
 
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
 
-	if(auto_hit)
+	if(auto_hit && last_hit_time + hit_interval < time)
+	{
 		m_InputData.m_Fire = (m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
+		last_hit_time = time;
+		Send = true;
+	}
+	if(auto_hook) // rehook
+	{
+		if(m_InputData.m_Hook)
+		{
+			if(last_hook_time + hook_interval < time)
+			{
+				m_InputData.m_Hook = 0;
+				Send = true;
+			}
+		}
+		else
+		{
+			m_InputData.m_Hook = 1;
+			last_hook_time = time;
+			Send = true;
+		}
+	}
+
 
 	// we freeze the input if chat or menu is activated
-	if(!(m_InputData.m_PlayerFlags&PLAYERFLAG_PLAYING))
+	if(m_InputData.m_PlayerFlags&PLAYERFLAG_IN_MENU)
 	{
 		OnReset();
 
 		mem_copy(pData, &m_InputData, sizeof(m_InputData));
 
 		// send once a second just to be sure
-		if(time_get() > LastSendTime + time_freq())
+		if(time > LastSendTime + time_freq())
 			Send = true;
 	}
 	else
@@ -206,18 +248,21 @@ int CControls::SnapInput(int *pData)
 			m_InputData.m_TargetY = (int)(cosf(t*3)*100.0f);
 		}
 
-		// check if we need to send input
-		if(m_InputData.m_Direction != m_LastData.m_Direction) Send = true;
-		else if(m_InputData.m_Jump != m_LastData.m_Jump) Send = true;
-		else if(m_InputData.m_Fire != m_LastData.m_Fire) Send = true;
-		else if(m_InputData.m_Hook != m_LastData.m_Hook) Send = true;
-		else if(m_InputData.m_WantedWeapon != m_LastData.m_WantedWeapon) Send = true;
-		else if(m_InputData.m_NextWeapon != m_LastData.m_NextWeapon) Send = true;
-		else if(m_InputData.m_PrevWeapon != m_LastData.m_PrevWeapon) Send = true;
-
-		// send at at least 10hz
-		if(time_get() > LastSendTime + time_freq()/25)
-			Send = true;
+		if(!Send)
+		{
+			// check if we need to send input
+			if(m_InputData.m_Direction != m_LastData.m_Direction) Send = true;
+			else if(m_InputData.m_Jump != m_LastData.m_Jump) Send = true;
+			else if(m_InputData.m_Fire != m_LastData.m_Fire) Send = true;
+			else if(m_InputData.m_Hook != m_LastData.m_Hook) Send = true;
+			else if(m_InputData.m_WantedWeapon != m_LastData.m_WantedWeapon) Send = true;
+			else if(m_InputData.m_NextWeapon != m_LastData.m_NextWeapon) Send = true;
+			else if(m_InputData.m_PrevWeapon != m_LastData.m_PrevWeapon) Send = true;
+	
+			// send at at least 10hz
+			if(time > LastSendTime + time_freq()/25)
+				Send = true;
+		}
 	}
 
 	// copy and return size
@@ -226,7 +271,7 @@ int CControls::SnapInput(int *pData)
 	if(!Send)
 		return 0;
 
-	LastSendTime = time_get();
+	LastSendTime = time;
 	mem_copy(pData, &m_InputData, sizeof(m_InputData));
 	return sizeof(m_InputData);
 }
