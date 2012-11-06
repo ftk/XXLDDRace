@@ -1914,6 +1914,7 @@ void CCharacter::DDRaceInit()
 	m_EndlessHook = g_Config.m_SvEndlessDrag;
 	m_Hit = g_Config.m_SvHit ? HIT_ALL : DISABLE_HIT_GRENADE|DISABLE_HIT_HAMMER|DISABLE_HIT_RIFLE|DISABLE_HIT_SHOTGUN;
 	Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), false);
+	Teams()->SetForceCharacterTeam(m_pPlayer->GetCID(), 0);
 }
 
 void CCharacter::XXLDDRaceInit()
