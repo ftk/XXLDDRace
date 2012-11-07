@@ -561,7 +561,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 			else
 			{
                 if(team < 0 || team >= MAX_CLIENTS || teams.GetTeamState(team) > CGameTeams::TEAMSTATE_OPEN || 
-                        teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID())) != CGameTeams::TEAMSTATE_EMPTY ||
+                        //teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID())) != CGameTeams::TEAMSTATE_EMPTY ||
                         pPlayer->GetCharacter()->m_DDRaceState != DDRACE_STARTED)
                 {
                     pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
@@ -887,7 +887,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 
 			float RescueDelay = g_Config.m_SvFreezeDelay;
 			if (pChr->m_FreezeTime == 0)
-				pSelf->SendChatTarget(pResult->m_ClientID, "You are not freezed!");
+				/*pSelf->SendChatTarget(pResult->m_ClientID, "You are not freezed!");*/(void)0;
 			else if (pChr->m_DeepFreeze)
 				pSelf->SendChatTarget(pResult->m_ClientID, "You are deepfreezed, undeepfreeze first!");
 			else if (!pChr->IsAlive())
