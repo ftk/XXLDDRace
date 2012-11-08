@@ -564,7 +564,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
                // if(team < 0 || team >= MAX_CLIENTS || teams.GetTeamState(team) > CGameTeams::TEAMSTATE_OPEN || 
                     //    (t && t != CGameTeams::TEAMSTATE_EMPTY) ||
                     //    pPlayer->GetCharacter()->m_DDRaceState != DDRACE_STARTED)
-				if(team >= 0 && team < MAX_CLIENTS && !teams.Count(team) && (t && !teams.Count(t)))
+				if(team >= 0 && team < MAX_CLIENTS && !teams.Count(team) && (!t || !teams.Count(t)))
                 {
                     pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
                 }
