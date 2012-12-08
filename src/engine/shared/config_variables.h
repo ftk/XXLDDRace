@@ -142,11 +142,11 @@ MACRO_CONFIG_INT(SvVoteKickTimeDelay, sv_vote_kick_delay, 0, 0, 9999, CFGFLAG_SE
 MACRO_CONFIG_INT(SvVoteYesPercentage, sv_vote_yes_percentage, 50, 1, 100, CFGFLAG_SERVER, "The percent of people that need to agree or deny for the vote to succeed/fail")
 MACRO_CONFIG_INT(SvVoteMajority, sv_vote_majority, 0, 0, 1, CFGFLAG_SERVER, "Whether No. of Yes is compared to No. of No votes or to number of total Players ( Default is 0 Y compare N)")
 MACRO_CONFIG_INT(SvSpectatorVotes, sv_spectator_votes, 1, 0, 1, CFGFLAG_SERVER, "Choose if spectators are allowed to start votes")
-MACRO_CONFIG_INT(SvKillDelay, sv_kill_delay,3,0,9999,CFGFLAG_SERVER, "The minimum time in seconds between kills")
+MACRO_CONFIG_INT(SvKillDelay, sv_kill_delay,1,0,9999,CFGFLAG_SERVER, "The minimum time in seconds between kills")
 MACRO_CONFIG_INT(SvSuicidePenalty, sv_suicide_penalty,0,0,9999,CFGFLAG_SERVER, "The minimum time in seconds between kill or /kills and respawn")
 
-MACRO_CONFIG_INT(SvMapWindow, sv_map_window, 15, 0, 100, CFGFLAG_SERVER, "Map downloading send-ahead window")
-MACRO_CONFIG_INT(SvFastDownload, sv_fast_download, 0, 0, 1, CFGFLAG_SERVER, "Enables fast download of maps")
+MACRO_CONFIG_INT(SvMapWindow, sv_map_window, 30, 0, 100, CFGFLAG_SERVER, "Map downloading send-ahead window")
+MACRO_CONFIG_INT(SvFastDownload, sv_fast_download, 1, 0, 1, CFGFLAG_SERVER, "Enables fast download of maps")
 
 MACRO_CONFIG_INT(SvShotgunBulletSound, sv_shotgun_bullet_sound, 0, 0, 1, CFGFLAG_SERVER, "Crazy shotgun bullet sound on/off")
 
@@ -227,7 +227,7 @@ MACRO_CONFIG_STR(SvRconHelperPassword, sv_rcon_helper_password, 32, "", CFGFLAG_
 MACRO_CONFIG_INT(SvDmgBlood, sv_dmg_blood, 0, 0, 1, CFGFLAG_SERVER, "Turns blood on damage on/off")
 MACRO_CONFIG_INT(SvRescue, sv_rescue, 0, 0, 1, CFGFLAG_SERVER, "Turns rescue /r on/off")
 MACRO_CONFIG_INT(SvRescueEffects, sv_rescue_effect, 0, 0, 1, CFGFLAG_SERVER, "Turns rescue effects on/off")
-MACRO_CONFIG_INT(SvLolFilter, sv_lol_filter, 1, 0, 1, CFGFLAG_SERVER, "Turns 'lol' filter on/off")
+MACRO_CONFIG_INT(SvLolFilter, sv_lol_filter, 0, 0, 1, CFGFLAG_SERVER, "Turns 'lol' filter on/off")
 MACRO_CONFIG_INT(SvHelper, sv_helper, 1, 0, 1, CFGFLAG_SERVER, "Turns /helper on/off")
 MACRO_CONFIG_INT(SvSilentXXL, sv_silent_xxl, 0, 0, 1, CFGFLAG_SERVER, "Makes XXL silent.")
 MACRO_CONFIG_INT(SvRconScore, sv_rcon_score, 0, 0, 1, CFGFLAG_SERVER, "Shows the rcon lvl in scoreboard.")
