@@ -548,31 +548,46 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
 						"You can\'t change teams that fast!");
 			}
-			else if (teams.SetCharacterTeam(
-					pPlayer->GetCID(), team))
+			else 
 			{
-				char aBuf[512];
-				str_format(aBuf, sizeof(aBuf), "%s joined team %d",
-						pSelf->Server()->ClientName(pPlayer->GetCID()),
-						team);
-				pSelf->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
-				pPlayer->m_Last_Team = pSelf->Server()->Tick();
-			}
-			else
-			{
-				int t = teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID()));
-               // if(team < 0 || team >= MAX_CLIENTS || teams.GetTeamState(team) > CGameTeams::TEAMSTATE_OPEN || 
-                    //    (t && t != CGameTeams::TEAMSTATE_EMPTY) ||
-                    //    pPlayer->GetCharacter()->m_DDRaceState != DDRACE_STARTED)
-				if(team >= 0 && team < MAX_CLIENTS && (!t || (!teams.Count(t) && !teams.Count(team) )))
-                {
-                    pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
-                }
+				if(team < 10)
+				{
+					if(team == 0 && teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID())) == CGameTeams::TEAMSTATE_EMPTY)
+					{
+						pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
+					}
+					else if (teams.SetCharacterTeam(
+							pPlayer->GetCID(), team))
+					{
+						char aBuf[512];
+						str_format(aBuf, sizeof(aBuf), "%s joined team %d",
+								pSelf->Server()->ClientName(pPlayer->GetCID()),
+								team);
+						pSelf->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+						pPlayer->m_Last_Team = pSelf->Server()->Tick();
+					}
+					else
+					{
+						/*
+						int t = teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID()));
+		               // if(team < 0 || team >= MAX_CLIENTS || teams.GetTeamState(team) > CGameTeams::TEAMSTATE_OPEN || 
+		                    //    (t && t != CGameTeams::TEAMSTATE_EMPTY) ||
+		                    //    pPlayer->GetCharacter()->m_DDRaceState != DDRACE_STARTED)
+						if(team >= 0 && team < MAX_CLIENTS && (!t || (!teams.Count(t) && !teams.Count(team) )))
+		                {
+		                    pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
+		                }
+						else*/
+		                {
+		                    pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
+		                }
+		  			}
+				}
 				else
-                {
-                    pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
-                }
-  			}
+				{
+					pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
+				}
+			}
 		}
 	}
 	else

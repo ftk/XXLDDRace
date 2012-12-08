@@ -138,8 +138,6 @@ bool CGameTeams::SetCharacterTeam(int ClientID, int Team)
 	//You can join to TEAM_SUPER at any time, but any other group you cannot if it started
 	if (Team != TEAM_SUPER && m_TeamState[Team] > TEAMSTATE_OPEN)
 		return false;
-    if(Team == TEAM_FLOCK && GetTeamState(m_Core.Team(ClientID)) == TEAMSTATE_EMPTY)
-        return false;
 	//No need to switch team if you there
 	if (m_Core.Team(ClientID) == Team)
 		return false;
@@ -155,12 +153,6 @@ bool CGameTeams::SetCharacterTeam(int ClientID, int Team)
 		else if (Team != TEAM_SUPER)
 			return false;
 	}
-	for (int i = 0; i < MAX_CLIENTS; i++)
-    {
-        if (m_Core.Team(i) == Team)
-          return false;
-    }
-	
 	SetForceCharacterTeam(ClientID, Team);
 
 	//GameServer()->CreatePlayerSpawn(Character(id)->m_Core.m_Pos, TeamMask());
