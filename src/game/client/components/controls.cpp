@@ -181,7 +181,7 @@ int CControls::SnapInput(int *pData)
 
 	if(auto_hit && last_hit_time + hit_interval < time)
 	{
-		m_InputData.m_Fire = (m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
+		m_InputData.m_Fire = (m_InputData.m_Fire + 31) & INPUT_STATE_MASK;
 		last_hit_time = time;
 		Send = true;
 	}
