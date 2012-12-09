@@ -552,7 +552,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 			{
 				if(team < 10)
 				{
-					if(team == 0 && teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID())) == CGameTeams::TEAMSTATE_EMPTY)
+					if(team == 0 && teams.m_Core.Team(pPlayer->GetCID()) >= 10)
 					{
 						pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
 					}
@@ -583,10 +583,14 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 		                }
 		  			}
 				}
-				else
+				else if(team < MAX_CLIENTS && (teams.m_Core.Team(pPlayer->GetCID()) >= 10 || teams.m_Core.Team(pPlayer->GetCID()) == 0))
 				{
 					pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
 				}
+				else
+                {
+                    pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
+                }
 			}
 		}
 	}
