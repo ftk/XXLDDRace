@@ -755,11 +755,13 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 
 static int lastsent[MAX_CLIENTS];
 static int lastask[MAX_CLIENTS];
+static int lastasktick[MAX_CLIENTS];
 
 void CServer::SendMap(int ClientID)
 {
 	lastsent[ClientID] = 0;
 	lastask[ClientID] = 0;
+	lastasktick[ClientID] = Tick();
 	CMsgPacker Msg(NETMSG_MAP_CHANGE);
 	Msg.AddString(GetMapName(), 0);
 	Msg.AddInt(m_CurrentMapCrc);
@@ -887,6 +889,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			int Last = 0;
 
 			lastask[ClientID] = Chunk;
+			lastasktick[ClientID] = Tick();
 			if (Chunk == 0)
 			{
 				lastsent[ClientID] = 0;
@@ -904,7 +907,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				Last = 1;
 			}
 
-			if (lastsent[ClientID]+ChunkSize < m_CurrentMapSize && lastsent[ClientID] < Chunk+g_Config.m_SvMapWindow && g_Config.m_SvFastDownload)
+			if (lastsent[ClientID] < Chunk+g_Config.m_SvMapWindow && g_Config.m_SvFastDownload)
 				return;
 
 			CMsgPacker Msg(NETMSG_MAP_DATA);
@@ -913,7 +916,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			Msg.AddInt(Chunk);
 			Msg.AddInt(ChunkSize);
 			Msg.AddRaw(&m_pCurrentMapData[Offset], ChunkSize);
-			SendMsgEx(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID, true);
+			SendMsgEx(&Msg, MSGFLAG_FLUSH, ClientID, true);
 
 			if(g_Config.m_Debug)
 			{
@@ -1308,6 +1311,11 @@ void CServer::PumpNetwork()
 		{
 			if (m_aClients[i].m_State != CClient::STATE_CONNECTING)
 				continue;
+			if (lastasktick[i] < Tick()-TickSpeed())
+			{
+				lastsent[i] = lastask[i];
+				lastasktick[i] = Tick();
+			}
 			if (lastask[i]<lastsent[i]-g_Config.m_SvMapWindow)
 				continue;
 	
@@ -1333,7 +1341,7 @@ void CServer::PumpNetwork()
 			Msg.AddInt(Chunk);
 			Msg.AddInt(ChunkSize);
 			Msg.AddRaw(&m_pCurrentMapData[Offset], ChunkSize);
-			SendMsgEx(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, i, true);
+			SendMsgEx(&Msg, MSGFLAG_FLUSH, i, true);
 	
 			if(g_Config.m_Debug)
 			{

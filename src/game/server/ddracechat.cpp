@@ -1075,7 +1075,7 @@ void CGameContext::ConLogOut(IConsole::IResult *pResult, void *pUserData)
 	else
 		Victim = pResult->GetInteger(0);
 
-	if(!CheckClientID(Victim)) return;
+	if(!CheckRights(pResult->m_ClientID, Victim, (CGameContext *)pUserData)) return;
 
 	if (g_Config.m_SvRconScore)
 		pSelf->m_apPlayers[Victim]->m_Score = 0;
