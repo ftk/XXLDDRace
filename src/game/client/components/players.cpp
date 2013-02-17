@@ -497,6 +497,15 @@ void CPlayers::RenderPlayer(
 		Graphics()->QuadsDraw(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 	}
+	else if(Player.m_PlayerFlags&PLAYERFLAG_IN_MENU)
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GUIICONS].m_Id);
+		Graphics()->QuadsBegin();
+		RenderTools()->SelectSprite(SPRITE_GUIICON_MUTE);
+		IGraphics::CQuadItem QuadItem(Position.x, Position.y - 24, 64,32);
+		Graphics()->QuadsDraw(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
 
 	if (m_pClient->m_aClients[pInfo.m_ClientID].m_EmoticonStart != -1 && m_pClient->m_aClients[pInfo.m_ClientID].m_EmoticonStart + 2 * Client()->GameTickSpeed() > Client()->GameTick())
 	{

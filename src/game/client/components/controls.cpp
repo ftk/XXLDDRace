@@ -6,6 +6,7 @@
 #include <base/math.h>
 
 #include <engine/shared/config.h>
+#include <engine/graphics.h>
 
 #include <game/collision.h>
 #include <game/client/gameclient.h>
@@ -166,7 +167,7 @@ int CControls::SnapInput(int *pData)
 	// update player state
 	if(m_pClient->m_pChat->IsActive())
 		m_InputData.m_PlayerFlags = PLAYERFLAG_CHATTING;
-	else if(m_pClient->m_pMenus->IsActive())
+	else if(m_pClient->m_pMenus->IsActive() || !(static_cast<IEngineGraphics *>(Graphics())->WindowActive()))
 		m_InputData.m_PlayerFlags = PLAYERFLAG_IN_MENU;
 	else
 		m_InputData.m_PlayerFlags = PLAYERFLAG_PLAYING;
