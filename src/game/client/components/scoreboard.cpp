@@ -309,6 +309,18 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		m_pClient->m_pCountryFlags->Render(m_pClient->m_aClients[pInfo->m_ClientID].m_Country, &Color,
 											CountryOffset, y+(Spacing+TeeSizeMod*5.0f)/2.0f, CountryLength, LineHeight-Spacing-TeeSizeMod*5.0f);
 
+		// afk
+		const CNetObj_Character& Char = (m_pClient->m_Snap.m_aCharacters[pInfo->m_ClientID].m_Cur);
+		if(Char.m_PlayerFlags & PLAYERFLAG_IN_MENU)
+		{
+			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GUIICONS].m_Id);
+			Graphics()->QuadsBegin();
+			RenderTools()->SelectSprite(SPRITE_GUIICON_MUTE);
+			IGraphics::CQuadItem QuadItem(CountryOffset-24, y+(Spacing+TeeSizeMod*5.0f)/2.0f+16, 64,32);
+			Graphics()->QuadsDraw(&QuadItem, 1);
+			Graphics()->QuadsEnd();
+		}
+		
 		// ping
 		str_format(aBuf, sizeof(aBuf), "%d", clamp(pInfo->m_Latency, 0, 1000));
 		tw = TextRender()->TextWidth(0, FontSize, aBuf, -1);
