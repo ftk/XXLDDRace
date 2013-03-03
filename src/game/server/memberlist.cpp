@@ -59,7 +59,7 @@ void CMemberList::Init()
 		{
 			std::getline(f, TmpPass);
 			std::getline(f, TmpAuthLvl);
-			m_List.add(*new CPlayerMember(TmpName.c_str(), TmpPass.c_str(), atoi(TmpAuthLvl.c_str())));
+			m_List.add(CPlayerMember(TmpName.c_str(), TmpPass.c_str(), atoi(TmpAuthLvl.c_str())));
 		}
 	}
 	f.close();
@@ -142,7 +142,7 @@ void CMemberList::UpdatePlayer(int ClientID, const char* pPass, int AuthLvl)
 		sort(m_List.all());
 	}
 	else
-		m_List.add(*new CPlayerMember(pName, pPass, AuthLvl));
+		m_List.add(CPlayerMember(pName, pPass, AuthLvl));
 
 	lock_release(gs_MemberLock);
 	Save();

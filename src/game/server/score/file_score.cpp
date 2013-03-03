@@ -121,8 +121,7 @@ void CFileScore::Init()
 					i++;
 				}
 			}
-			m_Top.add(
-					*new CPlayerScore(TmpName.c_str(), atof(TmpScore.c_str()),
+			m_Top.add(CPlayerScore(TmpName.c_str(), atof(TmpScore.c_str()),
 							aTmpCpTime));
 		}
 	}
@@ -186,7 +185,7 @@ void CFileScore::UpdatePlayer(int ID, float Score,
 		sort(m_Top.all());
 	}
 	else
-		m_Top.add(*new CPlayerScore(pName, Score, aCpTime));
+		m_Top.add(CPlayerScore(pName, Score, aCpTime));
 
 	lock_release(gs_ScoreLock);
 	Save();

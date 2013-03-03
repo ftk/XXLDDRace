@@ -80,6 +80,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_LastRainbow = 0;
 	m_Helped = 0;
 	m_Invisible = false;
+	m_LastLogin = 0;
 }
 
 CPlayer::~CPlayer()
