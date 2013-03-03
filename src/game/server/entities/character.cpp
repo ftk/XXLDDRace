@@ -1406,10 +1406,6 @@ void CCharacter::HandleTiles(int Index)
 
 
 	//XXLmod
-	//~ char aBuf[256];
-	//~ str_format(aBuf, sizeof(aBuf), "I:%i FI:%i", m_TileIndex,m_TileFIndex);
-	//~ GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
-
 	if(((m_TileIndex == TILE_RAINBOW) || (m_TileFIndex == TILE_RAINBOW)))
 	{
 		if (m_LastIndexTile == TILE_RAINBOW || m_LastIndexFrontTile == TILE_RAINBOW)
@@ -1419,12 +1415,12 @@ void CCharacter::HandleTiles(int Index)
 		if (m_pPlayer->m_Rainbow)
 		{
 			m_pPlayer->m_Rainbow = false;
-			str_format(aBuf, sizeof(aBuf), "Rainbow is OFF!!");
+			str_format(aBuf, sizeof(aBuf), "Rainbow disabled");
 		}
 		else
 		{
 			m_pPlayer->m_Rainbow = true;
-			str_format(aBuf, sizeof(aBuf), "Rainbow is ON!!!");
+			str_format(aBuf, sizeof(aBuf), "Rainbow enabled");
 		}
 
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
@@ -1439,13 +1435,13 @@ void CCharacter::HandleTiles(int Index)
 		{
 			m_FastReload = false;
 			m_ReloadMultiplier = 1000;
-			str_format(aBuf, sizeof(aBuf), "XXL is OFF!!");
+			str_format(aBuf, sizeof(aBuf), "XXL disabled");
 		}
 		else
 		{
 			m_FastReload = true;
 			m_ReloadMultiplier = 10000;
-			str_format(aBuf, sizeof(aBuf), "XXL is ON!!!");
+			str_format(aBuf, sizeof(aBuf), "XXL enabled");
 		}
 
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
@@ -1457,7 +1453,7 @@ void CCharacter::HandleTiles(int Index)
 		{
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "Admins only! Your rank:%i", GetPlayer()->m_Authed);
+			str_format(aBuf, sizeof(aBuf), "Admins only! Your rank: %i", GetPlayer()->m_Authed);
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		}
 	}
@@ -1473,7 +1469,7 @@ void CCharacter::HandleTiles(int Index)
 		if (m_pPlayer->m_IsLoggedIn && !m_pPlayer->m_IsMember)
 		{
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
-			str_format(aBuf, sizeof(aBuf), "Members only!!! (You are logged in, but not Member)", GetPlayer()->m_Authed);
+			str_format(aBuf, sizeof(aBuf), "Members only! (You are logged in, but not a Member)", GetPlayer()->m_Authed);
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		}
 	}
@@ -1486,7 +1482,7 @@ void CCharacter::HandleTiles(int Index)
 		if (m_Super){
 			m_Super = false;
 			Teams()->SetForceCharacterTeam(m_pPlayer->GetCID(), m_TeamBeforeSuper);
-			str_format(aBuf, sizeof(aBuf), "Super is OFF!!");
+			str_format(aBuf, sizeof(aBuf), "Super disabled");
 		}
 		else
 		{
@@ -1496,7 +1492,7 @@ void CCharacter::HandleTiles(int Index)
 			dbg_msg("Teamb4super","%d",m_TeamBeforeSuper = Team());
 			Teams()->SetCharacterTeam(m_pPlayer->GetCID(), TEAM_SUPER);
 			m_DDRaceState = DDRACE_CHEAT;
-			str_format(aBuf, sizeof(aBuf), "Super is ON!!!");
+			str_format(aBuf, sizeof(aBuf), "Super enabled");
 		}
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 	}
@@ -1510,10 +1506,10 @@ void CCharacter::HandleTiles(int Index)
 		if (m_HammerType == 3)
 		{
 			m_HammerType = 0;
-			str_format(aBuf, sizeof(aBuf), "HeavyHammer is OFF!!");
+			str_format(aBuf, sizeof(aBuf), "HeavyHammer disabled");
 		}else{
 			m_HammerType = 3;
-			str_format(aBuf, sizeof(aBuf), "HeavyHammer is ON!!!");
+			str_format(aBuf, sizeof(aBuf), "HeavyHammer enabled");
 		}
 
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
@@ -1528,11 +1524,11 @@ void CCharacter::HandleTiles(int Index)
 		if (m_pPlayer->m_Invisible)
 		{
 			m_pPlayer->m_Invisible = false;
-			str_format(aBuf, sizeof(aBuf), "Invisible is OFF!!");
+			str_format(aBuf, sizeof(aBuf), "Invisible disabled");
 		}
 		else{
 			m_pPlayer->m_Invisible = true;
-			str_format(aBuf, sizeof(aBuf), "Invisible is ON!!!");
+			str_format(aBuf, sizeof(aBuf), "Invisible enabled");
 		}
 
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
@@ -1547,12 +1543,12 @@ void CCharacter::HandleTiles(int Index)
 		if (m_Bloody)
 		{
 			m_Bloody = false;
-			str_format(aBuf, sizeof(aBuf), "Bloody is OFF!!");
+			str_format(aBuf, sizeof(aBuf), "Bloody disabled");
 		}
 		else
 		{
 			m_Bloody = true;
-			str_format(aBuf, sizeof(aBuf), "Bloody is ON!!!");
+			str_format(aBuf, sizeof(aBuf), "Bloody enabled");
 		}
 
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
@@ -1572,7 +1568,7 @@ void CCharacter::HandleTiles(int Index)
 		m_Bloody = false;
 		m_pPlayer->m_Invisible = false;
 		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "ALL extras are OFF!!!");
+		str_format(aBuf, sizeof(aBuf), "ALL extras disabled");
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 	}
 	
@@ -1591,7 +1587,7 @@ void CCharacter::HandleTiles(int Index)
 		if (g_Config.m_SvRMNinjaResetVel)
 			m_Core.m_Vel = vec2 (0,0);
 
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You lost ninja!!!");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You lost ninja!");
 	}
 
     //jDDRace

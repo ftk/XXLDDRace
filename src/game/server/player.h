@@ -172,6 +172,7 @@ public:
 	//XXLmod
 	bool m_Invisible;
 	bool m_RconFreeze;
+	int m_LastLogin;
 };
 
 #endif

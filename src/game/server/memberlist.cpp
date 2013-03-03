@@ -199,7 +199,7 @@ void CMemberList::SaveList(int ClientID, const char* pPass, CGameContext *pSelf,
 	UpdatePlayer(ClientID, pPass, SetAuthLvl);
 }
 
-void CMemberList::Register(IConsole::IResult *pResult, int ClientID, const char* pPass, CGameContext *pSelf)
+void CMemberList::Register(int ClientID, const char* pPass, CGameContext *pSelf)
 {
 	CPlayerMember *pPlayer = SearchList(ClientID, 0);
 	char aBuf[256];
@@ -215,7 +215,7 @@ void CMemberList::Register(IConsole::IResult *pResult, int ClientID, const char*
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "member", aBuf);
 }
 
-void CMemberList::Login(IConsole::IResult *pResult, int ClientID, const char* pPass, CGameContext *pSelf)
+void CMemberList::Login(int ClientID, const char* pPass, CGameContext *pSelf)
 {
 	CPlayerMember *pPlayer = SearchList(ClientID, 0);
 	char aBuf[256];
