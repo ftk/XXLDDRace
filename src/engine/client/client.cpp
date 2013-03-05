@@ -1946,10 +1946,13 @@ void CClient::Run()
 			break;
 
 		// beNice
-		if(g_Config.m_DbgStress)
+
+		if(g_Config.m_ClCpuThrottle)
+			thread_sleep(g_Config.m_ClCpuThrottle);
+		else if(g_Config.m_DbgStress)
 			thread_sleep(5);
-		else if(g_Config.m_ClCpuThrottle || !m_pGraphics->WindowActive())
-			thread_sleep(1);
+		else if(!m_pGraphics->WindowActive())
+			thread_sleep(20);
 
 		if(g_Config.m_DbgHitch)
 		{
