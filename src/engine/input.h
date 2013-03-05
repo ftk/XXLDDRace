@@ -75,6 +75,8 @@ public:
 	virtual int MouseDoubleClick() = 0;
 
 	virtual void MouseRelative(float *x, float *y) = 0;
+	
+	int m_Modifier;
 };
 
 

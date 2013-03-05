@@ -18,8 +18,12 @@
 #include <game/client/components/sounds.h>
 #include <game/localization.h>
 
-#include "chat.h"
+#if defined(CONF_FAMILY_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
+#include "chat.h"
 
 CChat::CChat()
 {
@@ -233,6 +237,62 @@ bool CChat::OnInput(IInput::CEvent Event)
 		else
 			m_Input.Clear();
 	}
+	// emacs
+	else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_u && (Input()->m_Modifier & (KEYMOD_LCTRL|KEYMOD_RCTRL)))
+	{
+		char aBuf[256];
+		str_copy(aBuf, m_Input.GetString() + m_Input.GetCursorOffset(), static_cast<int>(sizeof(aBuf)));
+		m_Input.Set(aBuf);
+		m_Input.SetCursorOffset(0);
+	}
+	else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_w && (Input()->m_Modifier & (KEYMOD_LCTRL|KEYMOD_RCTRL)))
+	{
+		const char * str = m_Input.GetString();
+		int offset = m_Input.GetCursorOffset();
+		int len = offset;
+		while(--len >= 0 && (str[len] == ' ' || str[len] == '\t'))
+			continue;
+		while(--len >= 0 && (str[len] != ' ' && str[len] != '\t'))
+			continue;
+		++len;
+		//if(len > 0)
+		{
+			
+			char aBuf[256];
+			aBuf[0] = '\0';
+			if(len > 0)
+				str_copy(aBuf, str, min(static_cast<int>(sizeof(aBuf)), len+1));
+			str_append(aBuf, str + offset, sizeof(aBuf));
+			m_Input.Set(aBuf);
+			m_Input.SetCursorOffset(min(static_cast<int>(sizeof(aBuf)), len));
+		}
+		//else
+			//m_Input.Clear();
+	}
+	#if defined(CONF_FAMILY_WINDOWS)
+	else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_v && (Input()->m_Modifier & (KEYMOD_LCTRL|KEYMOD_RCTRL)))
+	//else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_v && (Input()->KeyPressed(KEYMOD_LCTRL)))
+	{
+		if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(NULL))
+		{
+			HANDLE hnd = GetClipboardData(CF_TEXT);
+			if(hnd)
+			{
+				LPTSTR str = static_cast<LPTSTR>(GlobalLock(hnd));
+				char aBuf[256];
+				int offset = m_Input.GetCursorOffset();
+				
+				str_copy(aBuf, m_Input.GetString(), min(static_cast<int>(sizeof(aBuf)), offset+1));
+				str_append(aBuf, (str), sizeof(aBuf));
+				str_append(aBuf, m_Input.GetString() + offset, sizeof(aBuf));
+				m_Input.Set(aBuf);
+				m_Input.SetCursorOffset(offset + str_length(str));
+				GlobalUnlock(hnd);
+			}
+			CloseClipboard();
+		}
+	}
+	#endif
 
 	return true;
 }

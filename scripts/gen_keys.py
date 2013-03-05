@@ -37,6 +37,12 @@ print >>f, "\tKEY_MOUSE_8 = %d,"%(highestid+8); keynames[highestid+8] = "mouse8"
 print >>f, "\tKEY_MOUSE_WHEEL_UP = %d,"%(highestid+9); keynames[highestid+9] = "mousewheelup"
 print >>f, "\tKEY_MOUSE_WHEEL_DOWN = %d,"%(highestid+10); keynames[highestid+10] = "mousewheeldown"
 print >>f, "\tKEY_LAST,"
+for line in open("scripts/SDL_keysym.h"):
+	l = line.strip().split("=")
+	if len(l) == 2 and "MODK_" in line:
+		key = l[0].strip().replace("MODK_", "KEYMOD_"
+		value = int(l[1].split(",")[0].strip())
+		print >>f, "\t%s = %d,"%(key, value)
 
 print >>f, "};"
 print >>f, ""

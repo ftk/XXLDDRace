@@ -155,10 +155,12 @@ int CInput::Update()
 					if(Event.key.keysym.unicode < 0xE000 || Event.key.keysym.unicode > 0xF8FF)	// ignore_convention
 						AddEvent(Event.key.keysym.unicode, 0, 0); // ignore_convention
 					Key = Event.key.keysym.sym; // ignore_convention
+					m_Modifier = Event.key.keysym.mod;
 					break;
 				case SDL_KEYUP:
 					Action = IInput::FLAG_RELEASE;
 					Key = Event.key.keysym.sym; // ignore_convention
+					m_Modifier = Event.key.keysym.mod;
 					break;
 
 				// handle mouse buttons
