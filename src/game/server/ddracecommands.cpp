@@ -524,7 +524,7 @@ void CGameContext::ConFreeze(IConsole::IResult *pResult, void *pUserData)
 	if(pSelf->m_apPlayers[Victim])
 	{
 		pChr->Freeze(Seconds);
-		pChr->GetPlayer()->m_RconFreeze = Seconds != -2;
+		pChr->GetPlayer()->m_RconFreeze = Seconds < 0;
 		CServer* pServ = (CServer*)pSelf->Server();
 		if(Seconds >= 0)
 			str_format(aBuf, sizeof(aBuf), "'%s' ClientID=%d has been Frozen for %d.", pServ->ClientName(Victim), Victim, Seconds);
