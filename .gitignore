@@ -27,7 +27,6 @@ build server.bat
 buildlog.txt
 autoexec.cfg
 bam.exe
-*.bat
 *.cmd
 .cproject
 .project

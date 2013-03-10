@@ -114,7 +114,7 @@ server_link_other = {}
 server_sql_depends = {}
 
 if family == "windows" then
-	if platform == "win32" then
+	if platform == "win32" or config.compiler.driver == "gcc" then
 		table.insert(client_depends, CopyToDirectory(".", "other\\freetype\\lib32\\freetype.dll"))
 		table.insert(client_depends, CopyToDirectory(".", "other\\sdl\\lib32\\SDL.dll"))
 	else
@@ -353,8 +353,18 @@ release_settings = NewSettings()
 release_settings.config_name = "release"
 release_settings.config_ext = ""
 release_settings.debug = 0
-release_settings.optimize = 1
 release_settings.cc.defines:Add("CONF_RELEASE")
+
+if config.compiler.driver == "gcc" then
+	release_settings.optimize = 0
+	release_settings.cc.flags:Add("-O3", "-flto")
+	release_settings.link.flags:Add("-O3", "-flto")
+	if family == "windows" then
+		release_settings.link.flags:Add("-static-libstdc++", "-static-libgcc")
+	end
+else
+	release_settings.optimize = 1
+end
 
 release_sql_settings = NewSettings()
 release_sql_settings.config_name = "sql_release"
@@ -507,5 +517,5 @@ else
 	build(debug_sql_settings)
 	build(release_settings)
 	build(release_sql_settings)
-	DefaultTarget("game_debug")
+	DefaultTarget("release")
 end
