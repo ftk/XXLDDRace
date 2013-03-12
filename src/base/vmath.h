@@ -5,6 +5,8 @@
 
 #include <math.h>
 
+#include "math.h"	// mix
+
 // ------------------------------------
 
 template<typename T>
@@ -43,6 +45,14 @@ public:
 	operator const T* () { return &x; }
 };
 
+template<typename T>
+inline vector2_base<T> rotate(const vector2_base<T> &a, float angle)
+{
+	angle = angle * pi / 180.0f;
+	float s = sin(angle);
+	float c = cos(angle);
+	return vector2_base<T>((T)(c*a.x - s*a.y), (T)(s*a.x + c*a.y));
+}
 
 template<typename T>
 inline T length(const vector2_base<T> &a)

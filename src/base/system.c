@@ -526,18 +526,20 @@ void lock_release(LOCK lock)
 #endif
 }
 
-#if defined(CONF_FAMILY_UNIX)
-void semaphore_init(SEMAPHORE *sem) { sem_init(sem, 0, 0); }
-void semaphore_wait(SEMAPHORE *sem) { sem_wait(sem); }
-void semaphore_signal(SEMAPHORE *sem) { sem_post(sem); }
-void semaphore_destroy(SEMAPHORE *sem) { sem_destroy(sem); }
-#elif defined(CONF_FAMILY_WINDOWS)
-void semaphore_init(SEMAPHORE *sem) { *sem = CreateSemaphore(0, 0, 10000, 0); }
-void semaphore_wait(SEMAPHORE *sem) { WaitForSingleObject((HANDLE)*sem, INFINITE); }
-void semaphore_signal(SEMAPHORE *sem) { ReleaseSemaphore((HANDLE)*sem, 1, NULL); }
-void semaphore_destroy(SEMAPHORE *sem) { CloseHandle((HANDLE)*sem); }
-#else
-	#error not implemented on this platform
+#if !defined(CONF_PLATFORM_MACOSX)
+	#if defined(CONF_FAMILY_UNIX)
+	void semaphore_init(SEMAPHORE *sem) { sem_init(sem, 0, 0); }
+	void semaphore_wait(SEMAPHORE *sem) { sem_wait(sem); }
+	void semaphore_signal(SEMAPHORE *sem) { sem_post(sem); }
+	void semaphore_destroy(SEMAPHORE *sem) { sem_destroy(sem); }
+	#elif defined(CONF_FAMILY_WINDOWS)
+	void semaphore_init(SEMAPHORE *sem) { *sem = CreateSemaphore(0, 0, 10000, 0); }
+	void semaphore_wait(SEMAPHORE *sem) { WaitForSingleObject((HANDLE)*sem, INFINITE); }
+	void semaphore_signal(SEMAPHORE *sem) { ReleaseSemaphore((HANDLE)*sem, 1, NULL); }
+	void semaphore_destroy(SEMAPHORE *sem) { CloseHandle((HANDLE)*sem); }
+	#else
+		#error not implemented on this platform
+	#endif
 #endif
 
 
@@ -924,6 +926,7 @@ NETSOCKET net_udp_create(NETADDR bindaddr)
 	NETSOCKET sock = invalid_socket;
 	NETADDR tmpbindaddr = bindaddr;
 	int broadcast = 1;
+	int recvsize = 65536;
 
 	if(bindaddr.type&NETTYPE_IPV4)
 	{
@@ -938,13 +941,13 @@ NETSOCKET net_udp_create(NETADDR bindaddr)
 		{
 			sock.type |= NETTYPE_IPV4;
 			sock.ipv4sock = socket;
+
+			/* set broadcast */
+			setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (const char*)&broadcast, sizeof(broadcast));
+
+			/* set receive buffer size */
+			setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char*)&recvsize, sizeof(recvsize));
 		}
-
-		/* set non-blocking */
-		net_set_non_blocking(sock);
-
-		/* set boardcast */
-		setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (const char*)&broadcast, sizeof(broadcast));
 	}
 
 	if(bindaddr.type&NETTYPE_IPV6)
@@ -960,14 +963,17 @@ NETSOCKET net_udp_create(NETADDR bindaddr)
 		{
 			sock.type |= NETTYPE_IPV6;
 			sock.ipv6sock = socket;
+
+			/* set broadcast */
+			setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (const char*)&broadcast, sizeof(broadcast));
+
+			/* set receive buffer size */
+			setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (char*)&recvsize, sizeof(recvsize));
 		}
-
-		/* set non-blocking */
-		net_set_non_blocking(sock);
-
-		/* set boardcast */
-		setsockopt(socket, SOL_SOCKET, SO_BROADCAST, (const char*)&broadcast, sizeof(broadcast));
 	}
+
+	/* set non-blocking */
+	net_set_non_blocking(sock);
 
 	/* return */
 	return sock;
@@ -1702,10 +1708,10 @@ int str_comp_filenames(const char *a, const char *b)
 				return result;
 		}
 
-		if(*a != *b)
+		if(tolower(*a) != tolower(*b))
 			break;
 	}
-	return *a - *b;
+	return tolower(*a) - tolower(*b);
 }
 
 const char *str_find_nocase(const char *haystack, const char *needle)

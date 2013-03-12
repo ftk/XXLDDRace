@@ -6,7 +6,7 @@
 #include <base/system.h>
 #include <algorithm>
 
-inline void assert(bool statement)
+inline void tl_assert(bool statement)
 {
 	dbg_assert(statement, "assert!");
 }
