@@ -354,16 +354,11 @@ release_settings.config_name = "release"
 release_settings.config_ext = ""
 release_settings.debug = 0
 release_settings.cc.defines:Add("CONF_RELEASE")
-
+release_settings.optimize = 1
 if config.compiler.driver == "gcc" then
-	release_settings.optimize = 0
-	release_settings.cc.flags:Add("-O3", "-flto")
-	release_settings.link.flags:Add("-O3", "-flto")
 	if family == "windows" then
 		release_settings.link.flags:Add("-static-libstdc++", "-static-libgcc")
 	end
-else
-	release_settings.optimize = 1
 end
 
 release_sql_settings = NewSettings()
