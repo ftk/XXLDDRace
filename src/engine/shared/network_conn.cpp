@@ -244,6 +244,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 					Reset();
 					m_State = NET_CONNSTATE_PENDING;
 					m_PeerAddr = *pAddr;
+					mem_zero(m_ErrorString, sizeof(m_ErrorString));
 					m_LastSendTime = Now;
 					m_LastRecvTime = Now;
 					m_LastUpdateTime = Now;

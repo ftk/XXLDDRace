@@ -44,6 +44,11 @@ enum
 CEditorImage::~CEditorImage()
 {
 	m_pEditor->Graphics()->UnloadTexture(m_TexID);
+	if(m_pData)
+	{
+		mem_free(m_pData);
+		m_pData = 0;
+	}
 }
 
 CLayerGroup::CLayerGroup()
@@ -2486,11 +2491,17 @@ void CEditor::ReplaceImage(const char *pFileName, int StorageType, void *pUser)
 	CEditorImage *pImg = pEditor->m_Map.m_lImages[pEditor->m_SelectedImage];
 	int External = pImg->m_External;
 	pEditor->Graphics()->UnloadTexture(pImg->m_TexID);
+	if(pImg->m_pData)
+	{
+		mem_free(pImg->m_pData);
+		pImg->m_pData = 0;
+	}
 	*pImg = ImgInfo;
 	pImg->m_External = External;
 	pEditor->ExtractName(pFileName, pImg->m_aName, sizeof(pImg->m_aName));
 	pImg->m_AutoMapper.Load(pImg->m_aName);
 	pImg->m_TexID = pEditor->Graphics()->LoadTextureRaw(ImgInfo.m_Width, ImgInfo.m_Height, ImgInfo.m_Format, ImgInfo.m_pData, CImageInfo::FORMAT_AUTO, 0);
+	ImgInfo.m_pData = 0;
 	pEditor->SortImages();
 	for(int i = 0; i < pEditor->m_Map.m_lImages.size(); ++i)
 	{
@@ -2519,6 +2530,7 @@ void CEditor::AddImage(const char *pFileName, int StorageType, void *pUser)
 	CEditorImage *pImg = new CEditorImage(pEditor);
 	*pImg = ImgInfo;
 	pImg->m_TexID = pEditor->Graphics()->LoadTextureRaw(ImgInfo.m_Width, ImgInfo.m_Height, ImgInfo.m_Format, ImgInfo.m_pData, CImageInfo::FORMAT_AUTO, 0);
+	ImgInfo.m_pData = 0;
 	pImg->m_External = 1;	// external by default
 	str_copy(pImg->m_aName, aBuf, sizeof(pImg->m_aName));
 	pImg->m_AutoMapper.Load(pImg->m_aName);

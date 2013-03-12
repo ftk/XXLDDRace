@@ -498,7 +498,7 @@ int lock_try(LOCK lock)
 #if defined(CONF_FAMILY_UNIX)
 	return pthread_mutex_trylock((LOCKINTERNAL *)lock);
 #elif defined(CONF_FAMILY_WINDOWS)
-	return TryEnterCriticalSection((LPCRITICAL_SECTION)lock);
+	return !TryEnterCriticalSection((LPCRITICAL_SECTION)lock);
 #else
 	#error not implemented on this platform
 #endif
@@ -533,7 +533,7 @@ void semaphore_signal(SEMAPHORE *sem) { sem_post(sem); }
 void semaphore_destroy(SEMAPHORE *sem) { sem_destroy(sem); }
 #elif defined(CONF_FAMILY_WINDOWS)
 void semaphore_init(SEMAPHORE *sem) { *sem = CreateSemaphore(0, 0, 10000, 0); }
-void semaphore_wait(SEMAPHORE *sem) { WaitForSingleObject((HANDLE)*sem, 0L); }
+void semaphore_wait(SEMAPHORE *sem) { WaitForSingleObject((HANDLE)*sem, INFINITE); }
 void semaphore_signal(SEMAPHORE *sem) { ReleaseSemaphore((HANDLE)*sem, 1, NULL); }
 void semaphore_destroy(SEMAPHORE *sem) { CloseHandle((HANDLE)*sem); }
 #else
