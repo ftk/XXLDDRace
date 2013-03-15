@@ -119,11 +119,34 @@ public:
 // takes care of opengl related rendering
 class CCommandProcessorFragment_OpenGL
 {
-	GLuint m_aTextures[CCommandBuffer::MAX_TEXTURES];
+	struct CTexture
+	{
+		GLuint m_Tex;
+		int m_MemSize;
+	};
+	CTexture m_aTextures[CCommandBuffer::MAX_TEXTURES];
+	volatile int *m_pTextureMemoryUsage;
+
+public:
+	enum
+	{
+		CMD_INIT = CCommandBuffer::CMDGROUP_PLATFORM_OPENGL,
+	};
+
+	struct SCommand_Init : public CCommandBuffer::SCommand
+	{
+		SCommand_Init() : SCommand(CMD_INIT) {}
+		volatile int *m_pTextureMemoryUsage;
+	};
+
+private:
 	static int TexFormatToOpenGLFormat(int TexFormat);
+	static unsigned char Sample(int w, int h, const unsigned char *pData, int u, int v, int Offset, int ScaleW, int ScaleH, int Bpp);
+	static void *Rescale(int Width, int Height, int NewWidth, int NewHeight, int Format, const unsigned char *pData);
 
 	void SetState(const CCommandBuffer::SState &State);
 
+	void Cmd_Init(const SCommand_Init *pCommand);
 	void Cmd_Texture_Update(const CCommandBuffer::SCommand_Texture_Update *pCommand);
 	void Cmd_Texture_Destroy(const CCommandBuffer::SCommand_Texture_Destroy *pCommand);
 	void Cmd_Texture_Create(const CCommandBuffer::SCommand_Texture_Create *pCommand);
@@ -145,7 +168,7 @@ class CCommandProcessorFragment_SDL
 public:
 	enum
 	{
-		CMD_INIT = CCommandBuffer::CMDGROUP_PLATFORM,
+		CMD_INIT = CCommandBuffer::CMDGROUP_PLATFORM_SDL,
 		CMD_SHUTDOWN,
 	};
 
@@ -184,13 +207,17 @@ class CCommandProcessor_SDL_OpenGL : public CGraphicsBackend_Threaded::ICommandP
 // graphics backend implemented with SDL and OpenGL
 class CGraphicsBackend_SDL_OpenGL : public CGraphicsBackend_Threaded
 {
-	SDL_Surface *m_pScreenSurface;
+ 	SDL_Surface *m_pScreenSurface;
 	ICommandProcessor *m_pProcessor;
 	SGLContext m_GLContext;
+	volatile int m_TextureMemoryUsage;
+	
 public:
 	virtual int Init(const char *pName, int Width, int Height, int FsaaSamples, int Flags);
 	virtual int Shutdown();
 
+	virtual int MemoryUsage() const;
+	
 	virtual void Minimize();
 	virtual void Maximize();
 	virtual int WindowActive();
