@@ -1493,7 +1493,7 @@ void CEditor::DoQuadEnvelopes(const array<CQuad> &lQuads, int TexID)
 	Graphics()->LinesEnd();
 
 	//Draw Quads
-	Graphics()->TextureSet(Texture);
+	Graphics()->TextureSet(TexID);
 	Graphics()->QuadsBegin();
 	
 	for(int j = 0; j < Num; j++)
@@ -1554,7 +1554,7 @@ void CEditor::DoQuadEnvelopes(const array<CQuad> &lQuads, int TexID)
 		}
 	}
 	Graphics()->QuadsEnd();
-	Graphics()->TextureClear();
+	Graphics()->TextureSet(-1);
 	Graphics()->QuadsBegin();
 
 	// Draw QuadPoints
