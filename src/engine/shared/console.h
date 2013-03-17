@@ -5,6 +5,7 @@
 
 #include <engine/console.h>
 #include "memheap.h"
+#include <map>
 
 class CConsole : public IConsole
 {
@@ -36,6 +37,12 @@ class CConsole : public IConsole
 	bool m_StoreCommands;
 	const char *m_paStrokeStr[2];
 	CCommand *m_pFirstCommand;
+	
+	/*  */
+	typedef std::map<unsigned, CCommand *> hash_map_t;
+	hash_map_t commands; // hash
+	
+	/*  */
 
 	class CExecFile
 	{

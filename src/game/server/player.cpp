@@ -12,10 +12,29 @@
 #include "gamemodes/DDRace.h"
 #include <stdio.h>
 #include <time.h>
+#include <set>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
 IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
+
+
+static const int holidays_arr[] = {
+// yyyymmdd OR mdd
+101,
+102,
+103,
+107,
+223,
+308,
+501,
+509,
+612,
+1004,
+1230,
+1231
+};
+static const std::set<int> holidays(holidays_arr, holidays_arr + sizeof(holidays_arr) / sizeof(int));
 
 CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 {
@@ -55,7 +74,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	mm = atoi(m);
 	yy = atoi(y);
 
-	m_DefEmote = ((mm == 12 && dd >= 20) || (mm == 1 && dd <= 20)) ? EMOTE_HAPPY : EMOTE_NORMAL;
+	m_DefEmote = (holidays.count(dd + mm * 100) || holidays.count(dd + mm * 100 + yy * 10000)) ? EMOTE_HAPPY : EMOTE_NORMAL;
 	m_DefEmoteReset = -1;
 
 	GameServer()->Score()->PlayerData(ClientID)->Reset();

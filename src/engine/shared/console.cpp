@@ -411,16 +411,21 @@ void CConsole::PossibleCommands(const char *pStr, int FlagMask, bool Temp, FPoss
 
 CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 {
+	/*
 	for(CCommand *pCommand = m_pFirstCommand; pCommand; pCommand = pCommand->m_pNext)
 	{
 		if(pCommand->m_Flags&FlagMask)
 		{
-			if(str_comp_nocase(pCommand->m_pName, pName) == 0)
+			int comp = str_comp_nocase(pCommand->m_pName, pName);
+			if(comp == 0)
 				return pCommand;
+			else if(comp > 0) // assume list is sorted
+				return 0x0;
 		}
 	}
-
-	return 0x0;
+	*/
+	hash_map_t::const_iterator it = commands.find(str_quickhash(pName));
+	return (it != commands.end() && (it->second->m_Flags&FlagMask)) ? (it->second) : 0x0;
 }
 
 void CConsole::ExecuteLine(const char *pStr, int ClientID)
@@ -810,6 +815,7 @@ void CConsole::AddCommandSorted(CCommand *pCommand)
 			}
 		}
 	}
+	commands[str_quickhash(pCommand->m_pName)] = pCommand;
 }
 
 void CConsole::Register(const char *pName, const char *pParams,
@@ -903,6 +909,8 @@ void CConsole::DeregisterTemp(const char *pName)
 		pRemoved->m_pNext = m_pRecycleList;
 		m_pRecycleList = pRemoved;
 	}
+	
+	commands.erase(str_quickhash(pName));
 }
 
 void CConsole::DeregisterTempAll()
