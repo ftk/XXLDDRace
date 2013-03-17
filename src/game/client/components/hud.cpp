@@ -99,6 +99,7 @@ void CHud::RenderSuddenDeath()
 void CHud::RenderScoreHud()
 {
 	// render small score hud
+	/*
 	if(!(m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_GAMEOVER))
 	{
 		int GameFlags = m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags;
@@ -248,6 +249,7 @@ void CHud::RenderScoreHud()
 			}
 		}
 	}
+	*/
 }
 
 void CHud::RenderWarmupTimer()

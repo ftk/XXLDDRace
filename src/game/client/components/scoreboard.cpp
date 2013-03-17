@@ -237,6 +237,8 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		if(!pInfo || pInfo->m_Team != Team)
 			continue;
 
+		const CNetObj_Character& Char = (m_pClient->m_Snap.m_aCharacters[pInfo->m_ClientID].m_Cur);
+
 		// background so it's easy to find the local player or the followed one in spectator mode
 		if(pInfo->m_Local || (m_pClient->m_Snap.m_SpecInfo.m_Active && pInfo->m_ClientID == m_pClient->m_Snap.m_SpecInfo.m_SpectatorID))
 		{
@@ -280,7 +282,8 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 		// avatar
 		CTeeRenderInfo TeeInfo = m_pClient->m_aClients[pInfo->m_ClientID].m_RenderInfo;
 		TeeInfo.m_Size *= TeeSizeMod;
-		RenderTools()->RenderTee(CAnimState::GetIdle(), &TeeInfo, EMOTE_NORMAL, vec2(1.0f, 0.0f), vec2(TeeOffset+TeeLength/2, y+LineHeight/2));
+		float angle = Char.m_Angle / 256.f;
+		RenderTools()->RenderTee(CAnimState::GetIdle(), &TeeInfo, Char.m_Emote, vec2(cos(angle), sin(angle)), vec2(TeeOffset+TeeLength/2, y+LineHeight/2));
 
 		// name
 		TextRender()->SetCursor(&Cursor, NameOffset, y+Spacing, FontSize, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
@@ -310,7 +313,6 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 											CountryOffset, y+(Spacing+TeeSizeMod*5.0f)/2.0f, CountryLength, LineHeight-Spacing-TeeSizeMod*5.0f);
 
 		// afk
-		const CNetObj_Character& Char = (m_pClient->m_Snap.m_aCharacters[pInfo->m_ClientID].m_Cur);
 		if(Char.m_PlayerFlags & PLAYERFLAG_IN_MENU)
 		{
 			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GUIICONS].m_Id);

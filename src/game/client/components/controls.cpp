@@ -93,8 +93,26 @@ static void ConMouseAngle(IConsole::IResult *pResult, void *pUserData)
 	CControls *pSelf = (CControls *)pUserData;
 	const float pi = 3.1415926535f;
 	const float dist = 200.f;
-	pSelf->m_MousePos = vec2(cosf(pResult->GetFloat(0) * pi / 180) * dist, sinf(pResult->GetFloat(0) * pi / 180) * -dist);
+	pSelf->m_MousePos = vec2(cosf(pResult->GetFloat(0) * pi / 180.f) * dist, sinf(pResult->GetFloat(0) * pi / 180.f) * -dist);
 	pSelf->m_TargetPos = pSelf->m_MousePos;
+}
+
+struct CMouseGet
+{
+	vec2 *m_MousePos;
+	IConsole *m_pConsole;
+};
+
+static void ConMouseGet(IConsole::IResult *pResult, void *pUserData)
+{
+	CMouseGet *pSelf = (CMouseGet *)pUserData;
+	const float pi = 3.1415926535f;
+	float x = pSelf->m_MousePos->x, y = pSelf->m_MousePos->y;
+	float angle = atan2(y, x) / pi * 180.f;
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "a: %.4f  x: %.4f  y: %.4f", angle, x, y);
+	pSelf->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
+
 }
 
 static void ConAutoHit(IConsole::IResult *pResult, void *pUserData)
@@ -102,8 +120,10 @@ static void ConAutoHit(IConsole::IResult *pResult, void *pUserData)
 	CControls *pSelf = (CControls *)pUserData;
 	pSelf->auto_hit = !!pResult->GetInteger(0);
 	if(!pSelf->auto_hit)
+	{
 		if(pSelf->m_InputData.m_Fire & 1 != 0)
 			pSelf->m_InputData.m_Fire = (pSelf->m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
+	}
 	pSelf->hit_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
 }
 
@@ -127,7 +147,8 @@ void CControls::OnConsoleInit()
 
 	Console()->Register("mouse", "ff", CFGFLAG_CLIENT, ConMousePos, this, "Set mouse position");
 	Console()->Register("mouse_angle", "f", CFGFLAG_CLIENT, ConMouseAngle, this, "Set mouse angle in degree");
-
+	{ static CMouseGet s_Set = {&m_MousePos, Console()}; Console()->Register("mouse_get", "", CFGFLAG_CLIENT, ConMouseGet, (void *)&s_Set, "Get mouse position and angle"); }
+	
 	Console()->Register("autohit", "ii", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 	Console()->Register("+autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 	Console()->Register("autohook", "ii", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
@@ -205,8 +226,8 @@ int CControls::SnapInput(int *pData)
 	}
 
 
-	// we freeze the input if chat or menu is activated
-	if(m_InputData.m_PlayerFlags&PLAYERFLAG_IN_MENU)
+	// we freeze the input if menu is activated
+	if(m_pClient->m_pMenus->IsActive())
 	{
 		OnReset();
 
