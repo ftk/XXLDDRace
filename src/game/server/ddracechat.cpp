@@ -772,10 +772,11 @@ bool CheckClientID(int ClientID)
 	return true;
 }
 
-char* TimerType(int TimerType)
+static char msg[4][128] = {"game/round timer.", "broadcast.", "both game/round timer and broadcast.", "???"};
+
+char* TimerType(int type)
 {
-	char msg[3][128] = {"game/round timer.", "broadcast.", "both game/round timer and broadcast."};
-	return msg[TimerType];
+	return (type >= 0 && type < 3) ? msg[type] : msg[3];
 }
 void CGameContext::ConSayTime(IConsole::IResult *pResult, void *pUserData)
 {
@@ -862,7 +863,7 @@ void CGameContext::ConSetTimerType(IConsole::IResult *pResult, void *pUserData)
 
 	char aBuf[128];
 	if(pPlayer->m_TimerType <= 2 && pPlayer->m_TimerType >= 0)
-		str_format(aBuf, sizeof(aBuf), "Timer is displayed in", TimerType(pPlayer->m_TimerType));
+		str_format(aBuf, sizeof(aBuf), "Timer is displayed in %s", TimerType(pPlayer->m_TimerType));
 	else if(pPlayer->m_TimerType == 3)
 		str_format(aBuf, sizeof(aBuf), "Timer isn't displayed.");
 
@@ -895,7 +896,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter* pChr = pSelf->m_apPlayers[pResult->m_ClientID]->GetCharacter();
-	char aBuf[256];
+	//char aBuf[256];
 
 	if (!g_Config.m_SvRescue){
 		pSelf->SendChatTarget(pResult->m_ClientID, "Rescue is not activated.");

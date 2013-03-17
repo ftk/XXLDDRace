@@ -1048,9 +1048,9 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 							break;
 
 				if (Censor == 1)
-					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='login ***'", ClientID, pCmd);
+					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='login ***'", ClientID);
 				else if(Censor == 2)
-					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='register ***'", ClientID, pCmd);
+					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='register ***'", ClientID);
 				else
 					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='%s'", ClientID, pCmd);
 
@@ -1181,7 +1181,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			CMsgPacker Msg(NETMSG_PING_REPLY);
 			SendMsgEx(&Msg, 0, ClientID, true);
 		}
-		else
+		/*else
 		{
 			if(g_Config.m_Debug)
 			{
@@ -1201,7 +1201,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				//Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBufMsg);
 				//Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 			}
-		}
+		}*/
 	}
 	else
 	{

@@ -1463,13 +1463,13 @@ void CCharacter::HandleTiles(int Index)
 		if (!m_pPlayer->m_IsLoggedIn)
 		{
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
-			str_format(aBuf, sizeof(aBuf), "Login first with /login <pass>", GetPlayer()->m_Authed);
+			str_format(aBuf, sizeof(aBuf), "Login first with /login <pass>");
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		}
 		if (m_pPlayer->m_IsLoggedIn && !m_pPlayer->m_IsMember)
 		{
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
-			str_format(aBuf, sizeof(aBuf), "Members only! (You are logged in, but not a Member)", GetPlayer()->m_Authed);
+			str_format(aBuf, sizeof(aBuf), "Members only! (You are logged in, but not a Member)");
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		}
 	}

@@ -40,6 +40,10 @@ void dbg_assert_imp(const char *filename, int line, int test, const char *msg);
 #define dbg_assert(test,msg) assert(test)
 #endif
 
+#ifndef __GNUC__
+#define __attribute__(a) 
+#endif
+
 /*
 	Function: dbg_break
 		Breaks into the debugger.
@@ -774,7 +778,7 @@ int str_length(const char *str);
 		- The strings are treated as zero-termineted strings.
 		- Garantees that dst string will contain zero-termination.
 */
-void str_format(char *buffer, int buffer_size, const char *format, ...);
+void str_format(char *buffer, int buffer_size, const char *format, ...) __attribute__(( format(printf, 3, 4) ));
 
 /*
 	Function: str_sanitize_strong
