@@ -424,8 +424,15 @@ CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 		}
 	}
 	*/
-	hash_map_t::const_iterator it = commands.find(str_quickhash(pName));
-	return (it != commands.end() && (it->second->m_Flags&FlagMask)) ? (it->second) : 0x0;
+	unsigned hash = str_quickhash(pName);
+	hash_map_t::const_iterator it = commands.lower_bound(hash), end = commands.upper_bound(hash);
+	while(it != end)
+	{
+		if(it->second->m_Flags&FlagMask && str_comp_nocase(it->second->m_pName, pName) == 0)
+			return it->second;
+		++it;
+	}
+	return 0x0;
 }
 
 void CConsole::ExecuteLine(const char *pStr, int ClientID)
@@ -815,7 +822,7 @@ void CConsole::AddCommandSorted(CCommand *pCommand)
 			}
 		}
 	}
-	commands[str_quickhash(pCommand->m_pName)] = pCommand;
+	commands.insert(std::make_pair(str_quickhash(pCommand->m_pName), pCommand));
 }
 
 void CConsole::Register(const char *pName, const char *pParams,
@@ -910,7 +917,18 @@ void CConsole::DeregisterTemp(const char *pName)
 		m_pRecycleList = pRemoved;
 	}
 	
-	commands.erase(str_quickhash(pName));
+	unsigned hash = str_quickhash(pName);
+	hash_map_t::iterator it = commands.lower_bound(hash), end = commands.upper_bound(hash);
+	while(it != end)
+	{
+		if(it->second->m_Temp && str_comp(it->second->m_pName, pName) == 0)
+		{
+			commands.erase(it);
+			break;
+		}
+		++it;
+	}
+	
 }
 
 void CConsole::DeregisterTempAll()

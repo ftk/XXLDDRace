@@ -39,7 +39,7 @@ class CConsole : public IConsole
 	CCommand *m_pFirstCommand;
 	
 	/*  */
-	typedef std::map<unsigned, CCommand *> hash_map_t;
+	typedef std::multimap<unsigned, CCommand *> hash_map_t;
 	hash_map_t commands; // hash
 	
 	/*  */
