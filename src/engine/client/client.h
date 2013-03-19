@@ -60,7 +60,6 @@ public:
 
 class CClient : public IClient, public CDemoPlayer::IListner
 {
-    char * quit_message;
     
 	// needed interfaces
 	IEngine *m_pEngine;
@@ -189,6 +188,8 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	volatile int m_GfxState;
 	static void GraphicsThreadProxy(void *pThis) { ((CClient*)pThis)->GraphicsThread(); }
 	void GraphicsThread();
+	
+	char * quit_message;
 
     static void ConfigSaveCallback(IConfig *pConfig, void *pUserData)
     {

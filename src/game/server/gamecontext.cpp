@@ -934,7 +934,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					if(!m_apPlayers[ClientID]->m_Authed && (strncmp(pOption->m_aCommand, "sv_map ", 7) == 0 || strncmp(pOption->m_aCommand, "change_map ", 11) == 0) && time_get() < LastMapVote + (time_freq() * g_Config.m_SvVoteMapTimeDelay))
 					{
 						char chatmsg[512] = {0};
-						str_format(chatmsg, sizeof(chatmsg), "There's a %d second delay between map-votes,Please wait %lld Second(s)", g_Config.m_SvVoteMapTimeDelay,((LastMapVote+(g_Config.m_SvVoteMapTimeDelay * time_freq()))/time_freq())-(time_get()/time_freq()));
+						str_format(chatmsg, sizeof(chatmsg), "There's a %d second delay between map-votes,Please wait %I64d Second(s)", g_Config.m_SvVoteMapTimeDelay,((LastMapVote+(g_Config.m_SvVoteMapTimeDelay * time_freq()))/time_freq())-(time_get()/time_freq()));
 						SendChatTarget(ClientID, chatmsg);
 
 						return;
@@ -976,7 +976,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			else if(!m_apPlayers[ClientID]->m_Authed && time_get() < m_apPlayers[ClientID]->m_Last_KickVote + (time_freq() * g_Config.m_SvVoteKickTimeDelay))
 			{
 				char chatmsg[512] = {0};
-				str_format(chatmsg, sizeof(chatmsg), "There's a %d second wait time between kick votes for each player please wait %lld second(s)",
+				str_format(chatmsg, sizeof(chatmsg), "There's a %d second wait time between kick votes for each player please wait %I64d second(s)",
 				g_Config.m_SvVoteKickTimeDelay,
 				((m_apPlayers[ClientID]->m_Last_KickVote + (m_apPlayers[ClientID]->m_Last_KickVote*time_freq()))/time_freq())-(time_get()/time_freq())
 				);

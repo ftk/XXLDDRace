@@ -17,7 +17,7 @@
 
 #include "controls.h"
 
-CControls::CControls() : auto_hit(false), auto_hook(false), hit_interval(0), hook_interval(0)
+CControls::CControls() : auto_hit(false), hit_interval(0), auto_hook(false), hook_interval(0)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -121,7 +121,7 @@ static void ConAutoHit(IConsole::IResult *pResult, void *pUserData)
 	pSelf->auto_hit = !!pResult->GetInteger(0);
 	if(!pSelf->auto_hit)
 	{
-		if(pSelf->m_InputData.m_Fire & 1 != 0)
+		if(pSelf->m_InputData.m_Fire & 1)
 			pSelf->m_InputData.m_Fire = (pSelf->m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
 	}
 	pSelf->hit_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
