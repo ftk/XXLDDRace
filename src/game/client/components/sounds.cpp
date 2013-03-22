@@ -130,7 +130,7 @@ void CSounds::OnRender()
 
 void CSounds::ClearQueue()
 {
-	std::queue<QueueEntry>().swap(m_Queue);
+	m_Queue = std::queue<QueueEntry>();
 }
 
 void CSounds::Enqueue(int Channel, int SetId)
