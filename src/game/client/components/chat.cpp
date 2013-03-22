@@ -118,13 +118,25 @@ bool CChat::OnInput(IInput::CEvent Event)
 	{
 		if(m_Input.GetString()[0])
 		{
+			bool AddEntry = false;
+
 			if(m_LastChatSend+time_freq() < time_get())
+			{
 				Say(m_Mode == MODE_ALL ? 0 : 1, m_Input.GetString());
-			else
+				AddEntry = true;
+			}
+			else if(m_PendingChatCounter < 3)
+			{
 				++m_PendingChatCounter;
-			CHistoryEntry *pEntry = m_History.Allocate(sizeof(CHistoryEntry)+m_Input.GetLength());
-			pEntry->m_Team = m_Mode == MODE_ALL ? 0 : 1;
-			mem_copy(pEntry->m_aText, m_Input.GetString(), m_Input.GetLength()+1);
+				AddEntry = true;
+			}
+
+			if(AddEntry)
+			{
+				CHistoryEntry *pEntry = m_History.Allocate(sizeof(CHistoryEntry)+m_Input.GetLength());
+				pEntry->m_Team = m_Mode == MODE_ALL ? 0 : 1;
+				mem_copy(pEntry->m_aText, m_Input.GetString(), m_Input.GetLength()+1);
+			}
 		}
 		m_pHistoryEntry = 0x0;
 		m_Mode = MODE_NONE;
@@ -269,25 +281,43 @@ bool CChat::OnInput(IInput::CEvent Event)
 		//else
 			//m_Input.Clear();
 	}
-	#if defined(CONF_FAMILY_WINDOWS)
+	#if defined(CONF_FAMILY_WINDOWS) // ctrl + v
 	else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_v && (Input()->m_Modifier & (KEYMOD_LCTRL|KEYMOD_RCTRL)))
 	//else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_v && (Input()->KeyPressed(KEYMOD_LCTRL)))
 	{
-		if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(NULL))
+		if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(NULL))
 		{
-			HANDLE hnd = GetClipboardData(CF_TEXT);
+			HANDLE hnd = GetClipboardData(CF_UNICODETEXT);
 			if(hnd)
 			{
-				LPTSTR str = static_cast<LPTSTR>(GlobalLock(hnd));
 				char aBuf[256];
 				int offset = m_Input.GetCursorOffset();
 				
 				str_copy(aBuf, m_Input.GetString(), min(static_cast<int>(sizeof(aBuf)), offset+1));
-				str_append(aBuf, (str), sizeof(aBuf));
-				str_append(aBuf, m_Input.GetString() + offset, sizeof(aBuf));
+				
+				// utf-16 to utf-8
+				{
+					wchar_t * str = static_cast<wchar_t *>(GlobalLock(hnd));
+					char ch[4];
+					while(*str)
+					{
+						int Size = str_utf8_encode(ch, static_cast<int>(*str++));
+						if(offset + Size < static_cast<int>(sizeof(aBuf)))
+						{
+							mem_copy(aBuf+offset, &ch, Size);
+							offset += Size;
+						}
+						else
+							break;
+					}
+					aBuf[offset] = '\0';
+					GlobalUnlock(hnd);
+				}
+
+				str_append(aBuf, m_Input.GetString() + m_Input.GetCursorOffset(), sizeof(aBuf));
 				m_Input.Set(aBuf);
-				m_Input.SetCursorOffset(offset + str_length(str));
-				GlobalUnlock(hnd);
+				m_Input.SetCursorOffset(offset);
+
 			}
 			CloseClipboard();
 		}
@@ -497,7 +527,7 @@ void CChat::OnRender()
 
 	int64 Now = time_get();
 	float LineWidth = m_pClient->m_pScoreboard->Active() ? 90.0f : 200.0f;
-	float HeightLimit = m_pClient->m_pScoreboard->Active() ? 230.0f : m_Show ? 50.0f : 200.0f;
+	float HeightLimit = m_pClient->m_pScoreboard->Active() ? 230.0f : m_Show ? 50.0f : 250.0f;
 	float Begin = x;
 	float FontSize = 6.0f;
 	CTextCursor Cursor;
