@@ -116,40 +116,32 @@ void CSounds::OnRender()
 			return;
 	}
 
-	// set listner pos
-	Sound()->SetListenerPos(m_pClient->m_pCamera->m_Center.x, m_pClient->m_pCamera->m_Center.y);
 
 	// play sound from queue
-	if(m_QueuePos > 0)
+	if(!m_Queue.empty())
 	{
-		int64 Now = time_get();
-		if(m_QueueWaitTime <= Now)
-		{
-			Play(m_aQueue[0].m_Channel, m_aQueue[0].m_SetId, 1.0f);
-			m_QueueWaitTime = Now+time_freq()*3/10; // wait 300ms before playing the next one
-			if(--m_QueuePos > 0)
-				mem_move(m_aQueue, m_aQueue+1, m_QueuePos*sizeof(QueueEntry));
-		}
+		// set listner pos
+		Sound()->SetListenerPos(m_pClient->m_pCamera->m_Center.x, m_pClient->m_pCamera->m_Center.y);
+		
+		Play(m_Queue.front().m_Channel, m_Queue.front().m_SetId, 1.0f);
+		m_Queue.pop();
 	}
 }
 
 void CSounds::ClearQueue()
 {
-	mem_zero(m_aQueue, sizeof(m_aQueue));
-	m_QueuePos = 0;
-	m_QueueWaitTime = time_get();
+	std::queue<QueueEntry>().swap(m_Queue);
 }
 
 void CSounds::Enqueue(int Channel, int SetId)
 {
 	// add sound to the queue
-	if(m_QueuePos < QUEUE_SIZE)
+	if(Channel == CHN_MUSIC || !g_Config.m_ClEditor)
 	{
-		if(Channel == CHN_MUSIC || !g_Config.m_ClEditor)
-		{
-			m_aQueue[m_QueuePos].m_Channel = Channel;
-			m_aQueue[m_QueuePos++].m_SetId = SetId;
-		}
+		QueueEntry q;
+		q.m_Channel = Channel;
+		q.m_SetId = SetId;
+		m_Queue.push(q);
 	}
 }
 

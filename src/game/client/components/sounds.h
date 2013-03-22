@@ -3,20 +3,16 @@
 #ifndef GAME_CLIENT_COMPONENTS_SOUNDS_H
 #define GAME_CLIENT_COMPONENTS_SOUNDS_H
 #include <game/client/component.h>
+#include <queue>
 
 class CSounds : public CComponent
 {
-	enum
-	{
-		QUEUE_SIZE = 32,
-	};
 	struct QueueEntry
 	{
 		int m_Channel;
 		int m_SetId;
-	} m_aQueue[QUEUE_SIZE];
-	int m_QueuePos;
-	int64 m_QueueWaitTime;
+	};
+	std::queue<QueueEntry> m_Queue;
 	class CJob m_SoundJob;
 	bool m_WaitForSoundJob;
 	
