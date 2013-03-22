@@ -71,7 +71,7 @@ void dbg_break();
 	See Also:
 		<dbg_assert>
 */
-void dbg_msg(const char *sys, const char *fmt, ...);
+void dbg_msg(const char *sys, const char *fmt, ...) __attribute__(( format(printf, 2, 3) ));;
 
 /* Group: Memory */
 

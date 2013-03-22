@@ -122,7 +122,7 @@ static void logger_stdout(const char *line)
 	wchar_t wline[1024*8] = {0};
 	wchar_t * p_wline = wline;
 	const char * p_line = line;
-	while (*p_wline++ = str_utf8_decode(&p_line));
+	while ((*p_wline++ = str_utf8_decode(&p_line)));
 	*p_wline++ = L'\n';
 	WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), wline, p_wline - wline, NULL, NULL);
 #else
@@ -568,8 +568,9 @@ int64 time_freq()
 #if defined(CONF_FAMILY_UNIX)
 	return 1000000;
 #elif defined(CONF_FAMILY_WINDOWS)
-	int64 t;
-	QueryPerformanceFrequency((PLARGE_INTEGER)&t);
+	static int64 t = 0;
+	if(!t)
+		dbg_assert(QueryPerformanceFrequency((PLARGE_INTEGER)&t), "QueryPerformanceFrequency returned 0");
 	return t;
 #else
 	#error not implemented
