@@ -116,13 +116,13 @@ void CSounds::OnRender()
 			return;
 	}
 
+	// set listner pos
+	Sound()->SetListenerPos(m_pClient->m_pCamera->m_Center.x, m_pClient->m_pCamera->m_Center.y);
+
 
 	// play sound from queue
 	if(!m_Queue.empty())
-	{
-		// set listner pos
-		Sound()->SetListenerPos(m_pClient->m_pCamera->m_Center.x, m_pClient->m_pCamera->m_Center.y);
-		
+	{		
 		Play(m_Queue.front().m_Channel, m_Queue.front().m_SetId, 1.0f);
 		m_Queue.pop();
 	}
