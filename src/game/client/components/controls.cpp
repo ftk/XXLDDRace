@@ -17,7 +17,7 @@
 
 #include "controls.h"
 
-CControls::CControls() : auto_hit(false), hit_interval(0), auto_hook(false), hook_interval(0)
+CControls::CControls() : auto_hit(false), hit_interval(0), auto_hook(false), hook_interval(0), aimbot(-1), aimbot_predict(0.f)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -93,7 +93,7 @@ static void ConMouseAngle(IConsole::IResult *pResult, void *pUserData)
 	CControls *pSelf = (CControls *)pUserData;
 	const float pi = 3.1415926535f;
 	const float dist = 200.f;
-	pSelf->m_MousePos = vec2(cosf(pResult->GetFloat(0) * pi / 180.f) * dist, sinf(pResult->GetFloat(0) * pi / 180.f) * -dist);
+	pSelf->m_MousePos = vec2(cosf(pResult->GetFloat(0) * pi / 180.f) * dist, sinf(pResult->GetFloat(0) * pi / 180.f) * dist);
 	pSelf->m_TargetPos = pSelf->m_MousePos;
 }
 
@@ -136,6 +136,60 @@ static void ConAutoHook(IConsole::IResult *pResult, void *pUserData)
 	pSelf->hook_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
 }
 
+static void ConAimbotLock(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	bool online = pResult->GetInteger(0);
+	pSelf->aimbot = online ? pResult->GetInteger(1) : (-1);
+}
+
+struct CAimbot
+{
+	CGameClient *pClient;
+	CControls *pControls;
+};
+
+static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
+{
+	CAimbot *pSelf = (CAimbot *)pUserData;
+	if(!pResult->GetInteger(0))
+	{
+		pSelf->pControls->aimbot = (-1);
+		return;
+	}
+	else if(pSelf->pControls->aimbot != -1)
+		return;
+	
+	int64 mindist = 1000000000LL;
+	int id = -1;
+	
+	int xl = pSelf->pClient->m_Snap.m_aCharacters[pSelf->pClient->m_Snap.m_LocalClientID].m_Cur.m_X;
+	int yl = pSelf->pClient->m_Snap.m_aCharacters[pSelf->pClient->m_Snap.m_LocalClientID].m_Cur.m_Y;
+	
+	xl += int(pSelf->pControls->m_MousePos.x);
+	yl += int(pSelf->pControls->m_MousePos.y);
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(!pSelf->pClient->m_Snap.m_aCharacters[i].m_Active || i == pSelf->pClient->m_Snap.m_LocalClientID)
+			continue;
+		int x = pSelf->pClient->m_Snap.m_aCharacters[i].m_Cur.m_X;
+		int y = pSelf->pClient->m_Snap.m_aCharacters[i].m_Cur.m_Y;
+		int64 dist = (x-xl)*(x-xl) + (y-yl)*(y-yl);
+		if(dist < mindist)
+		{
+			mindist = dist;
+			id = i;
+		}
+	}
+	
+	pSelf->pControls->aimbot = id;
+}
+static void ConAimbotPredict(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	pSelf->aimbot_predict = pResult->GetFloat(0);
+}
+
 void CControls::OnConsoleInit()
 {
 	// game commands
@@ -153,7 +207,10 @@ void CControls::OnConsoleInit()
 	Console()->Register("+autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 	Console()->Register("autohook", "ii", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
 	Console()->Register("+autohook", "i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
-
+	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
+	{ static CAimbot s_Set = {m_pClient, this}; Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, (void *)&s_Set, "Aimbot lock to the nearest player"); }
+	Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
+		
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 3}; Console()->Register("+weapon3", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to shotgun"); }
@@ -224,6 +281,33 @@ int CControls::SnapInput(int *pData)
 			Send = true;
 		}
 	}
+	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
+	{
+		int localid = m_pClient->m_Snap.m_LocalClientID;
+		const CNetObj_Character& Prev = m_pClient->m_Snap.m_aCharacters[aimbot].m_Prev;
+		const CNetObj_Character& Cur = m_pClient->m_Snap.m_aCharacters[aimbot].m_Cur;
+		const CNetObj_Character& PrevLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Prev;
+		const CNetObj_Character& CurLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Cur;
+		
+		float IntraTick = Client()->IntraGameTick();
+		
+		vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
+		vec2 pos_local = mix(vec2(PrevLocal.m_X, PrevLocal.m_Y), vec2(CurLocal.m_X, CurLocal.m_Y), IntraTick);
+		
+		vec2 vel = mix(vec2(Prev.m_VelX/256.f, Prev.m_VelY/256.f), vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f), IntraTick);
+		vec2 vel_local = mix(vec2(PrevLocal.m_VelX/256.f, PrevLocal.m_VelY/256.f), vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f), IntraTick);
+		
+		//char aBuf[128];
+		//str_format(aBuf, sizeof(aBuf), "vel %.2f %.2f", vel_local.x, vel_local.y);
+		//Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "aim", aBuf);
+		
+		pos += vel * aimbot_predict;
+		pos_local += vel_local * aimbot_predict;
+		
+		m_MousePos = pos - pos_local;
+		ClampMousePos();
+		Send = true;
+	}
 
 
 	// we freeze the input if menu is activated
@@ -245,7 +329,6 @@ int CControls::SnapInput(int *pData)
 		if(!m_InputData.m_TargetX && !m_InputData.m_TargetY)
 		{
 			m_InputData.m_TargetX = 1;
-			m_MousePos.x = 1;
 		}
 
 		// set direction

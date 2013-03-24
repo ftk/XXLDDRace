@@ -33,5 +33,8 @@ public:
 	int64 hit_interval;
 	bool auto_hook;
 	int64 hook_interval;
+	
+	int aimbot;
+	float aimbot_predict;
 };
 #endif
