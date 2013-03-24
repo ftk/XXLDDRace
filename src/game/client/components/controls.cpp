@@ -292,17 +292,16 @@ int CControls::SnapInput(int *pData)
 		float IntraTick = Client()->IntraGameTick();
 		
 		vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
-		vec2 pos_local = mix(vec2(PrevLocal.m_X, PrevLocal.m_Y), vec2(CurLocal.m_X, CurLocal.m_Y), IntraTick);
+		vec2 pos_local = m_pClient->m_LocalCharacterPos;
 		
-		vec2 vel = mix(vec2(Prev.m_VelX/256.f, Prev.m_VelY/256.f), vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f), IntraTick);
-		vec2 vel_local = mix(vec2(PrevLocal.m_VelX/256.f, PrevLocal.m_VelY/256.f), vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f), IntraTick);
-		
-		//char aBuf[128];
-		//str_format(aBuf, sizeof(aBuf), "vel %.2f %.2f", vel_local.x, vel_local.y);
-		//Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "aim", aBuf);
-		
-		pos += vel * aimbot_predict;
-		pos_local += vel_local * aimbot_predict;
+		if(aimbot_predict != 0.f)
+		{
+			vec2 vel = mix(vec2(Prev.m_VelX/256.f, Prev.m_VelY/256.f), vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f), IntraTick);
+			vec2 vel_local = mix(vec2(PrevLocal.m_VelX/256.f, PrevLocal.m_VelY/256.f), vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f), IntraTick);
+			
+			pos += vel * aimbot_predict;
+			pos_local += vel_local * aimbot_predict;
+		}
 		
 		m_MousePos = pos - pos_local;
 		ClampMousePos();
@@ -323,9 +322,12 @@ int CControls::SnapInput(int *pData)
 	}
 	else
 	{
+		float c = 1.f;
+		if(!m_pClient->m_Snap.m_SpecInfo.m_Active)
+			c = 256.f;
+		m_InputData.m_TargetX = (int)(m_MousePos.x * c);
+		m_InputData.m_TargetY = (int)(m_MousePos.y * c);
 
-		m_InputData.m_TargetX = (int)m_MousePos.x;
-		m_InputData.m_TargetY = (int)m_MousePos.y;
 		if(!m_InputData.m_TargetX && !m_InputData.m_TargetY)
 		{
 			m_InputData.m_TargetX = 1;
@@ -353,6 +355,10 @@ int CControls::SnapInput(int *pData)
 			m_InputData.m_TargetY = (int)(cosf(t*3)*100.0f);
 		}
 
+		// send at at least 10hz
+		if(time > LastSendTime + time_freq()/25)
+			Send = true;
+		
 		if(!Send)
 		{
 			// check if we need to send input
@@ -363,10 +369,6 @@ int CControls::SnapInput(int *pData)
 			else if(m_InputData.m_WantedWeapon != m_LastData.m_WantedWeapon) Send = true;
 			else if(m_InputData.m_NextWeapon != m_LastData.m_NextWeapon) Send = true;
 			else if(m_InputData.m_PrevWeapon != m_LastData.m_PrevWeapon) Send = true;
-	
-			// send at at least 10hz
-			if(time > LastSendTime + time_freq()/25)
-				Send = true;
 		}
 	}
 

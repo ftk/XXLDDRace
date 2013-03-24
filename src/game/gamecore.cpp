@@ -141,6 +141,7 @@ void CCharacterCore::Tick(bool UseInput)
 		m_Direction = m_Input.m_Direction;
 
 		// setup angle
+		/*
 		float a = 0;
 		if(m_Input.m_TargetX == 0)
 			a = atanf((float)m_Input.m_TargetY);
@@ -149,8 +150,9 @@ void CCharacterCore::Tick(bool UseInput)
 
 		if(m_Input.m_TargetX < 0)
 			a = a+pi;
-
-		m_Angle = (int)(a*256.0f);
+		*/
+		double a = atan2((double)m_Input.m_TargetY,(double)m_Input.m_TargetX);
+		m_Angle = (int)(a*256.0);
 
 		// handle jump
 		if(m_Input.m_Jump)
