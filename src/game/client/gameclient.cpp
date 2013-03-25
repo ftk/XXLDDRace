@@ -600,11 +600,13 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		m_Teams.Team(13, pMsg->m_Tee13);
 		m_Teams.Team(14, pMsg->m_Tee14);
 		m_Teams.Team(15, pMsg->m_Tee15);
+		m_IsDDRace = true;
 	}
 	else if(MsgId == NETMSGTYPE_SV_PLAYERTIME)
 	{
 		CNetMsg_Sv_PlayerTime *pMsg = (CNetMsg_Sv_PlayerTime *)pRawMsg;
 		m_aClients[pMsg->m_ClientID].m_Score = pMsg->m_Time;
+		m_IsDDRace = true;
 	}
 	else if(MsgId == NETMSGTYPE_SV_RECORD)
 	{

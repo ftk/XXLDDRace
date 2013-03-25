@@ -325,8 +325,8 @@ int CControls::SnapInput(int *pData)
 		float c = 1.f;
 		if(!m_pClient->m_Snap.m_SpecInfo.m_Active)
 			c = 256.f;
-		m_InputData.m_TargetX = (int)(m_MousePos.x * c);
-		m_InputData.m_TargetY = (int)(m_MousePos.y * c);
+		m_InputData.m_TargetX = round(m_MousePos.x * c);
+		m_InputData.m_TargetY = round(m_MousePos.y * c);
 
 		if(!m_InputData.m_TargetX && !m_InputData.m_TargetY)
 		{
