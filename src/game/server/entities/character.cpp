@@ -1760,7 +1760,7 @@ void CCharacter::HandleTiles(int Index)
 
 void CCharacter::DDRaceTick()
 {
-	m_Armor=(m_FreezeTime >= 0)?10-(m_FreezeTime/15):0;
+	m_Armor=(m_FreezeTime >= 0)?10-((m_FreezeTime+14)/15):0;
 	if(m_Input.m_Direction != 0 || m_Input.m_Jump != 0)
 		m_LastMove = Server()->Tick();
 

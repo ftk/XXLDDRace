@@ -286,6 +286,7 @@ void CGameClient::OnInit()
 
 	m_DDRaceMsgSent = false;
 	m_ShowOthers = -1;
+	m_IsDDRace = false;
 
 	// Set free binds to DDRace binds if it's active
 	if(!g_Config.m_ClDDRaceBindsSet && g_Config.m_ClDDRaceBinds)
@@ -374,6 +375,7 @@ void CGameClient::OnReset()
 	m_Teams.Reset();
 	m_DDRaceMsgSent = false;
 	m_ShowOthers = -1;
+	m_IsDDRace = false;
 }
 
 
@@ -603,6 +605,10 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	{
 		CNetMsg_Sv_PlayerTime *pMsg = (CNetMsg_Sv_PlayerTime *)pRawMsg;
 		m_aClients[pMsg->m_ClientID].m_Score = pMsg->m_Time;
+	}
+	else if(MsgId == NETMSGTYPE_SV_RECORD)
+	{
+		m_IsDDRace = true;
 	}
 }
 
@@ -1036,7 +1042,8 @@ void CGameClient::OnPredict()
 				int *pInput = Client()->GetInput(Tick);
 				if(pInput)
 					World.m_apCharacters[c]->m_Input = *((CNetObj_PlayerInput*)pInput);
-				World.m_apCharacters[c]->Tick(true);
+				bool freezed = m_IsDDRace && m_Snap.m_aCharacters[c].m_Cur.m_Armor != 10;
+				World.m_apCharacters[c]->Tick(true, freezed);
 			}
 			else
 				World.m_apCharacters[c]->Tick(false);

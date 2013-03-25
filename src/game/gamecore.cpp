@@ -79,7 +79,7 @@ void CCharacterCore::Reset()
 	m_TriggeredEvents = 0;
 }
 
-void CCharacterCore::Tick(bool UseInput)
+void CCharacterCore::Tick(bool UseInput, bool Freezed)
 {
 	float PhysSize = 28.0f;
 	int MapIndex = Collision()->GetPureMapIndex(m_Pos);;
@@ -152,10 +152,10 @@ void CCharacterCore::Tick(bool UseInput)
 			a = a+pi;
 		*/
 		double a = atan2((double)m_Input.m_TargetY,(double)m_Input.m_TargetX);
-		m_Angle = (int)(a*256.0);
+		m_Angle = round(a*256.0);
 
 		// handle jump
-		if(m_Input.m_Jump)
+		if(m_Input.m_Jump && !Freezed)
 		{
 			if(!(m_Jumped&1))
 			{
@@ -196,6 +196,14 @@ void CCharacterCore::Tick(bool UseInput)
 			m_HookState = HOOK_IDLE;
 			m_HookPos = m_Pos;
 		}
+	}
+	
+	if(Freezed)
+	{
+		m_Direction = 0;
+		m_HookedPlayer = -1;
+		m_HookState = HOOK_IDLE;
+		m_HookPos = m_Pos;
 	}
 
 	// add the speed modification according to players wanted direction

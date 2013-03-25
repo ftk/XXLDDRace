@@ -261,6 +261,7 @@ private:
 	class CTeamsCore m_Teams;
 	bool m_DDRaceMsgSent;
 	int m_ShowOthers;
+	bool m_IsDDRace;
 };
 
 

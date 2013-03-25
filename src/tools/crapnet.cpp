@@ -44,7 +44,7 @@ static int m_ConfigReorder = 0;
 
 void Run(int Port, NETADDR Dest)
 {
-	NETADDR Src = {NETTYPE_IPV4, {0,0,0,0}, Port};
+	NETADDR Src = {NETTYPE_IPV4, {0,0,0,0}, (short unsigned int)(Port)};
 	NETSOCKET Socket = net_udp_create(Src);
 
 	char aBuffer[1024*2];
