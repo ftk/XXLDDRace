@@ -645,12 +645,11 @@ void *CClient::SnapFindItem(int SnapID, int Type, int ID)
 	if(!m_aSnapshots[SnapID])
 		return 0x0;
 
-	for(i = 0; i < m_aSnapshots[SnapID]->m_pSnap->NumItems(); i++)
-	{
-		CSnapshotItem *pItem = m_aSnapshots[SnapID]->m_pAltSnap->GetItem(i);
-		if(pItem->Type() == Type && pItem->ID() == ID)
-			return (void *)pItem->Data();
-	}
+	int key = (Type << 16) | (ID & 0xffff);
+	
+	i = m_aSnapshots[SnapID]->m_pAltSnap->GetItemIndex(key);
+	if(i != -1)
+		return m_aSnapshots[SnapID]->m_pAltSnap->GetItem(i)->Data();
 	return 0x0;
 }
 
