@@ -1044,7 +1044,7 @@ void CGameClient::OnPredict()
 				int *pInput = Client()->GetInput(Tick);
 				if(pInput)
 					World.m_apCharacters[c]->m_Input = *((CNetObj_PlayerInput*)pInput);
-				bool freezed = m_IsDDRace && m_Snap.m_aCharacters[c].m_Cur.m_Armor != 10;
+				bool freezed = m_IsDDRace && (m_Snap.m_aCharacters[c].m_Cur.m_Armor != 10 || m_Snap.m_SpecInfo.m_Active);
 				World.m_apCharacters[c]->Tick(true, freezed);
 			}
 			else

@@ -36,5 +36,6 @@ public:
 	
 	int aimbot;
 	float aimbot_predict;
+	float aimbot_predict_dist;
 };
 #endif
