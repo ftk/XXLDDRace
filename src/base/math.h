@@ -4,6 +4,7 @@
 #define BASE_MATH_H
 
 #include <stdlib.h>
+#include <cmath> // conflicts with std::round
 
 template <typename T>
 inline T clamp(T val, T min, T max)

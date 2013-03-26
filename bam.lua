@@ -356,6 +356,7 @@ release_settings.debug = 0
 release_settings.cc.defines:Add("CONF_RELEASE")
 release_settings.optimize = 1
 if config.compiler.driver == "gcc" then
+	release_settings.cc.flags:Add("-std=gnu++0x", "-fno-exceptions")
 	if family == "windows" then
 		release_settings.link.flags:Add("-static-libstdc++", "-static-libgcc")
 	end
