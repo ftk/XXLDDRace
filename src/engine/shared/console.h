@@ -5,7 +5,8 @@
 
 #include <engine/console.h>
 #include "memheap.h"
-#include <map>
+//#include <map>
+#include <unordered_map>
 
 class CConsole : public IConsole
 {
@@ -39,7 +40,8 @@ class CConsole : public IConsole
 	CCommand *m_pFirstCommand;
 	
 	/*  */
-	typedef std::multimap<unsigned, CCommand *> hash_map_t;
+	//typedef std::multimap<unsigned, CCommand *> hash_map_t;
+	typedef std::unordered_multimap<unsigned, CCommand *> hash_map_t;
 	hash_map_t commands; // hash
 	
 	/*  */

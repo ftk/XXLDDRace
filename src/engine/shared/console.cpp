@@ -425,7 +425,9 @@ CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 	}
 	*/
 	unsigned hash = str_quickhash(pName);
-	hash_map_t::const_iterator it = commands.lower_bound(hash), end = commands.upper_bound(hash);
+	std::pair<hash_map_t::const_iterator, hash_map_t::const_iterator> range = commands.equal_range(hash);
+	//hash_map_t::const_iterator it = commands.lower_bound(hash), end = commands.upper_bound(hash);
+	hash_map_t::const_iterator it = range.first, end = range.second;
 	while(it != end)
 	{
 		if(it->second->m_Flags&FlagMask && str_comp_nocase(it->second->m_pName, pName) == 0)
@@ -739,6 +741,9 @@ CConsole::CConsole(int FlagMask)
 	m_NumPrintCB = 0;
 
 	m_pStorage = 0;
+	
+	commands.max_load_factor(0.75f);
+	commands.reserve(512);
 
 	// register some basic commands
 	Register("echo", "r", CFGFLAG_SERVER|CFGFLAG_CLIENT, Con_Echo, this, "Echo the text");
@@ -752,7 +757,16 @@ CConsole::CConsole(int FlagMask)
 	Register("mod_status", "", CFGFLAG_SERVER, ConModCommandStatus, this, "List all commands which are accessible for moderators");
 	Register("user_status", "", CFGFLAG_SERVER, ConUserCommandStatus, this, "List all commands which are accessible for users");
 	Register("cmdlist", "", CFGFLAG_SERVER|CFGFLAG_CHAT, ConUserCommandStatus, this, "List all commands which are accessible for users");
-
+	
+	/*Register("commands_size", "", CFGFLAG_SERVER|CFGFLAG_CLIENT, 
+		([](IConsole::IResult *, void * ptr) 
+		{
+			CConsole * self = (CConsole *)ptr;
+			char buf[128];
+			str_format(buf, sizeof(buf), "size: %u load: %f", self->commands.size(), self->commands.load_factor());
+			self->Print(IConsole::OUTPUT_LEVEL_STANDARD, "test", buf);
+		}), this, "Total amount of commands");*/
+	
 	// TODO: this should disappear
 	#define MACRO_CONFIG_INT(Name,ScriptName,Def,Min,Max,Flags,Desc) \
 	{ \
@@ -918,7 +932,10 @@ void CConsole::DeregisterTemp(const char *pName)
 	}
 	
 	unsigned hash = str_quickhash(pName);
-	hash_map_t::iterator it = commands.lower_bound(hash), end = commands.upper_bound(hash);
+	std::pair<hash_map_t::const_iterator, hash_map_t::const_iterator> range = commands.equal_range(hash);
+	//hash_map_t::const_iterator it = commands.lower_bound(hash), end = commands.upper_bound(hash);
+	hash_map_t::const_iterator it = range.first, end = range.second;
+	
 	while(it != end)
 	{
 		if(it->second->m_Temp && str_comp(it->second->m_pName, pName) == 0)
