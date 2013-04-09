@@ -216,7 +216,7 @@ void CSpectator::OnRender()
 	float x = -270.0f, y = StartY;
 	for(int i = 0, Count = 0; i < MAX_CLIENTS; ++i)
 	{
-		if(!m_pClient->m_Snap.m_paPlayerInfos[i] || m_pClient->m_Snap.m_paPlayerInfos[i]->m_Team == TEAM_SPECTATORS)
+		if(!m_pClient->m_Snap.m_paPlayerInfos[i] /*|| m_pClient->m_Snap.m_paPlayerInfos[i]->m_Team == TEAM_SPECTATORS*/)
 			continue;
 
 		if(++Count%9 == 0)
@@ -225,11 +225,15 @@ void CSpectator::OnRender()
 			y = StartY;
 		}
 
-		if(m_pClient->m_Snap.m_SpecInfo.m_SpectatorID == i)
+		if(m_pClient->m_Snap.m_SpecInfo.m_SpectatorID == i || m_pClient->m_Snap.m_paPlayerInfos[i]->m_Team == TEAM_SPECTATORS)
 		{
 			Graphics()->TextureSet(-1);
 			Graphics()->QuadsBegin();
-			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.25f);
+			if(m_pClient->m_Snap.m_SpecInfo.m_SpectatorID == i)
+				Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.25f); // white
+			else
+				Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.45f); // black
+							
 			RenderTools()->DrawRoundRect(Width/2.0f+x-10.0f, Height/2.0f+y-10.0f, 270.0f, 60.0f, 20.0f);
 			Graphics()->QuadsEnd();
 		}

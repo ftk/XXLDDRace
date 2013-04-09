@@ -298,6 +298,7 @@ int CControls::SnapInput(int *pData)
 	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
 	{
 		int localid = m_pClient->m_Snap.m_LocalClientID;
+		
 		const CNetObj_Character& Prev = m_pClient->m_Snap.m_aCharacters[aimbot].m_Prev;
 		const CNetObj_Character& Cur = m_pClient->m_Snap.m_aCharacters[aimbot].m_Cur;
 		const CNetObj_Character& PrevLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Prev;
@@ -306,8 +307,15 @@ int CControls::SnapInput(int *pData)
 		//float IntraTick = Client()->IntraGameTick();
 		
 		//vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
-		vec2 pos = vec2(Cur.m_X, Cur.m_Y);
+		//vec2 pos = vec2(Cur.m_X, Cur.m_Y);
+		vec2 pos = m_pClient->m_Snap.m_aCharacters[aimbot].m_Position;
 		vec2 pos_local = m_pClient->m_LocalCharacterPos;
+		// spectating
+		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
+		{
+			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			pos_local = m_pClient->m_Snap.m_aCharacters[specid].m_Position;
+		}
 		
 		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
 		{
