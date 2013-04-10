@@ -63,16 +63,20 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	//New Year
 	time_t rawtime;
 	struct tm* timeinfo;
-	char d[16], m[16], y[16];
+	//char d[16], m[16], y[16];
 	int dd, mm, yy;
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
+	/*
 	strftime (d,sizeof(y),"%d",timeinfo);
 	strftime (m,sizeof(m),"%m",timeinfo);
 	strftime (y,sizeof(y),"%Y",timeinfo);
 	dd = atoi(d);
 	mm = atoi(m);
-	yy = atoi(y);
+	yy = atoi(y);*/
+	dd = timeinfo->tm_mday;
+	mm = timeinfo->tm_mon + 1;
+	yy = 1900 + timeinfo->tm_year;
 
 	m_DefEmote = (holidays.count(dd + mm * 100) || holidays.count(dd + mm * 100 + yy * 10000)) ? EMOTE_HAPPY : EMOTE_NORMAL;
 	m_DefEmoteReset = -1;

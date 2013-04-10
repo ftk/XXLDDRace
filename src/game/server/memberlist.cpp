@@ -15,9 +15,7 @@ static LOCK gs_MemberLock = 0;
 
 std::string SaveMemberFile()
 {
-	std::ostringstream oss;
-	oss << "MemberList.dtb";
-	return oss.str();
+	return "MemberList.dtb";
 }
 
 CMemberList::CPlayerMember::CPlayerMember(const char *pName, const char *pPass, int AuthLvl)
@@ -48,8 +46,7 @@ CMemberList::~CMemberList()
 void CMemberList::Init()
 {
 	lock_wait(gs_MemberLock);
-	std::fstream f;
-	f.open(SaveMemberFile().c_str(), std::ios::in);
+	std::ifstream f("MemberList.dtb");
 
 	while(!f.eof() && !f.fail())
 	{
@@ -70,8 +67,7 @@ void CMemberList::SaveListThread(void *pUser)
 {
 	CMemberList *pSelf = (CMemberList *)pUser;
 	lock_wait(gs_MemberLock);
-	std::fstream f;
-	f.open(SaveMemberFile().c_str(), std::ios::out);
+	std::ofstream f("MemberList.dtb");
 
 	if(!f.fail())
 	{
@@ -80,8 +76,8 @@ void CMemberList::SaveListThread(void *pUser)
 		{
 			f << r.front().m_aName << std::endl << r.front().m_aPass << std::endl << r.front().m_AuthLvl << std::endl;
 			t++;
-			if(t%50 == 0)
-				thread_sleep(1);
+			//if(t%50 == 0)
+				//thread_sleep(1);
 		}
 	}
 	f.close();
@@ -90,10 +86,14 @@ void CMemberList::SaveListThread(void *pUser)
 
 void CMemberList::Save()
 {
+/*
 	void *pSaveThread = thread_create(SaveListThread, this);
 #if defined(CONF_FAMILY_UNIX)
 	pthread_detach((pthread_t)pSaveThread);
 #endif
+	*/
+	SaveListThread(this);
+
 }
 
 CMemberList::CPlayerMember *CMemberList::SearchName(const char *pName, int *pPosition, bool NoCase)
