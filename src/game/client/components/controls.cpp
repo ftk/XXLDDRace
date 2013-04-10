@@ -177,9 +177,14 @@ static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 	int xl = int(pSelf->pControls->m_TargetPos.x);
 	int yl = int(pSelf->pControls->m_TargetPos.y);
 	
+	int localid = pSelf->pClient->m_Snap.m_LocalClientID;
+	
+	if(pSelf->pClient->m_Snap.m_SpecInfo.m_Active && pSelf->pClient->m_Snap.m_SpecInfo.m_UsePosition)
+		localid = pSelf->pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+	
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if(!pSelf->pClient->m_Snap.m_aCharacters[i].m_Active || i == pSelf->pClient->m_Snap.m_LocalClientID)
+		if(!pSelf->pClient->m_Snap.m_aCharacters[i].m_Active || i == localid)
 			continue;
 		int x = pSelf->pClient->m_Snap.m_aCharacters[i].m_Cur.m_X;
 		int y = pSelf->pClient->m_Snap.m_aCharacters[i].m_Cur.m_Y;
@@ -307,8 +312,8 @@ int CControls::SnapInput(int *pData)
 		//float IntraTick = Client()->IntraGameTick();
 		
 		//vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
-		//vec2 pos = vec2(Cur.m_X, Cur.m_Y);
-		vec2 pos = m_pClient->m_Snap.m_aCharacters[aimbot].m_Position;
+		vec2 pos = vec2(Cur.m_X, Cur.m_Y);
+		//vec2 pos = m_pClient->m_Snap.m_aCharacters[aimbot].m_Position;
 		vec2 pos_local = m_pClient->m_LocalCharacterPos;
 		// spectating
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
