@@ -1091,12 +1091,15 @@ NETSOCKET net_tcp_create(NETADDR bindaddr)
 	if(bindaddr.type&NETTYPE_IPV4)
 	{
 		struct sockaddr_in addr;
-		int socket = -1;
+		int socket = -1, optval = 1;
 
 		/* bind, we should check for error */
 		tmpbindaddr.type = NETTYPE_IPV4;
 		netaddr_to_sockaddr_in(&tmpbindaddr, &addr);
 		socket = priv_net_create_socket(AF_INET, SOCK_STREAM, (struct sockaddr *)&addr, sizeof(addr));
+		
+		setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&optval, sizeof(optval));
+		
 		if(socket >= 0)
 		{
 			sock.type |= NETTYPE_IPV4;
