@@ -287,7 +287,8 @@ int CControls::SnapInput(int *pData)
 	{
 		if(m_InputData.m_Hook)
 		{
-			if(last_hook_time + hook_interval < time)
+			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
+			if(last_hook_time + hook_interval < time && hook_state != HOOK_GRABBED)
 			{
 				m_InputData.m_Hook = 0;
 				Send = true;
@@ -302,7 +303,9 @@ int CControls::SnapInput(int *pData)
 	}
 	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
 	{
-		int localid = m_pClient->m_Snap.m_LocalClientID;
+		const int localid = m_pClient->m_Snap.m_LocalClientID;
+		
+		#ifdef AIMBOT_SNAPSHOT
 		
 		const CNetObj_Character& Prev = m_pClient->m_Snap.m_aCharacters[aimbot].m_Prev;
 		const CNetObj_Character& Cur = m_pClient->m_Snap.m_aCharacters[aimbot].m_Cur;
@@ -319,7 +322,7 @@ int CControls::SnapInput(int *pData)
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
 		{
 			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-			pos_local = m_pClient->m_Snap.m_aCharacters[specid].m_Position;
+			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
 		}
 		
 		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
@@ -336,6 +339,29 @@ int CControls::SnapInput(int *pData)
             pos += vel * (dist * aimbot_predict_dist);
             pos_local += vel_local * (dist * aimbot_predict_dist);
 		}
+		#else
+		vec2 pos_local = m_pClient->m_LocalCharacterPos;
+		vec2 pos = m_pClient->m_aClients[aimbot].m_Predicted.m_Pos;
+		
+		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
+		{
+			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
+		}
+		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
+		{
+			vec2 vel_local = m_pClient->m_aClients[localid].m_Predicted.m_Vel;
+			vec2 vel = m_pClient->m_aClients[aimbot].m_Predicted.m_Vel;
+			
+			pos += vel * aimbot_predict;
+			pos_local += vel_local * aimbot_predict;
+            float dist = distance(pos, pos_local);
+            
+            pos += vel * (dist * aimbot_predict_dist);
+            pos_local += vel_local * (dist * aimbot_predict_dist);
+		}
+		
+		#endif
 		
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
 			m_MousePos = pos;
