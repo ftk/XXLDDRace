@@ -1123,13 +1123,31 @@ void CGameContext::ConSolo(IConsole::IResult *pResult, void *pUserData)
     if (!pPlayer)
         return;
     CCharacter* pChr = pPlayer->GetCharacter();
-    if (!pChr)
-        return;
     if (pChr)
     {
-        bool insolo = pChr->Teams()->m_Core.GetSolo(pResult->m_ClientID);
+        const bool insolo = pChr->Teams()->m_Core.GetSolo(pResult->m_ClientID);
         pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, !insolo);
         pSelf->SendChatTarget(pResult->m_ClientID, insolo ? "You are now out of solo" : "You are now in solo");
     }
+}
+
+void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
+{
+    CGameContext *pSelf = (CGameContext *) pUserData;
+    
+    int to = pResult->GetInteger(0);
+    
+    if (!CheckClientID(to))
+        return;
+    
+    char message[256] = "<PM>: ";
+    str_append(message, pResult->GetString(1), sizeof(message) / sizeof(message[0]));
+    
+	CNetMsg_Sv_Chat Msg;
+	Msg.m_Team = 1;
+	Msg.m_ClientID = CheckClientID(pResult->m_ClientID) ? pResult->m_ClientID : -1;
+	Msg.m_pMessage = message;
+	pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, to);
+
 }
 
