@@ -1593,7 +1593,11 @@ void str_format(char *buffer, int buffer_size, const char *format, ...)
 #if defined(CONF_FAMILY_WINDOWS)
 	va_list ap;
 	va_start(ap, format);
-	_vsnprintf(buffer, buffer_size, format, ap);
+	int len = _vsnprintf(buffer, buffer_size - 1, format, ap);
+	if(len > 0 && len < buffer_size)
+		buffer[len] = '\0';
+	else
+		buffer[buffer_size - 1] = '\0';
 	va_end(ap);
 #else
 	va_list ap;

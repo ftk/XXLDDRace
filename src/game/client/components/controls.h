@@ -28,6 +28,8 @@ public:
 
 	int SnapInput(int *pData);
 	void ClampMousePos();
+	
+	void Aim();
 
 	bool auto_hit;
 	int64 hit_interval;
@@ -37,5 +39,6 @@ public:
 	int aimbot;
 	float aimbot_predict;
 	float aimbot_predict_dist;
+	bool aimbot_smooth; // aim on render
 };
 #endif

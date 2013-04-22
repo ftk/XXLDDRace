@@ -229,7 +229,12 @@ void CControls::OnConsoleInit()
 	{ static CAimbot s_Set = {m_pClient, this}; Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, (void *)&s_Set, "Aimbot lock to the nearest player"); }
     Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
     Console()->Register("aimbot_dist", "f", CFGFLAG_CLIENT, ConAimbotPredictDistance, this, "Set aimbot prediction distance multiplier");
-
+    
+    Console()->Register("aimbot_smooth", "i", CFGFLAG_CLIENT, ([](IConsole::IResult *pResult, void *pUserData)
+    {
+		((CControls *)pUserData)->aimbot_smooth = !!pResult->GetInteger(0);
+    }), this, "Toggle smoother visual aim");
+    
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 3}; Console()->Register("+weapon3", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to shotgun"); }
@@ -288,7 +293,8 @@ int CControls::SnapInput(int *pData)
 		if(m_InputData.m_Hook)
 		{
 			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
-			if(last_hook_time + hook_interval < time && hook_state != HOOK_GRABBED)
+			//if(last_hook_time + hook_interval < time && hook_state != HOOK_GRABBED)
+			if(hook_state != HOOK_GRABBED && hook_state != HOOK_FLYING)
 			{
 				m_InputData.m_Hook = 0;
 				Send = true;
@@ -301,75 +307,7 @@ int CControls::SnapInput(int *pData)
 			Send = true;
 		}
 	}
-	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
-	{
-		const int localid = m_pClient->m_Snap.m_LocalClientID;
-		
-		#ifdef AIMBOT_SNAPSHOT
-		
-		const CNetObj_Character& Prev = m_pClient->m_Snap.m_aCharacters[aimbot].m_Prev;
-		const CNetObj_Character& Cur = m_pClient->m_Snap.m_aCharacters[aimbot].m_Cur;
-		const CNetObj_Character& PrevLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Prev;
-		const CNetObj_Character& CurLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Cur;
-		
-		//float IntraTick = Client()->IntraGameTick();
-		
-		//vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
-		vec2 pos = vec2(Cur.m_X, Cur.m_Y);
-		//vec2 pos = m_pClient->m_Snap.m_aCharacters[aimbot].m_Position;
-		vec2 pos_local = m_pClient->m_LocalCharacterPos;
-		// spectating
-		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-		{
-			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
-		}
-		
-		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
-		{
-			//vec2 vel = mix(vec2(Prev.m_VelX/256.f, Prev.m_VelY/256.f), vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f), IntraTick);
-			//vec2 vel_local = mix(vec2(PrevLocal.m_VelX/256.f, PrevLocal.m_VelY/256.f), vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f), IntraTick);
-			vec2 vel = vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f);
-			vec2 vel_local = vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f);
-								
-			pos += vel * aimbot_predict;
-			pos_local += vel_local * aimbot_predict;
-            float dist = distance(pos, pos_local);
-            
-            pos += vel * (dist * aimbot_predict_dist);
-            pos_local += vel_local * (dist * aimbot_predict_dist);
-		}
-		#else
-		vec2 pos_local = m_pClient->m_LocalCharacterPos;
-		vec2 pos = m_pClient->m_aClients[aimbot].m_Predicted.m_Pos;
-		
-		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-		{
-			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
-		}
-		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
-		{
-			vec2 vel_local = m_pClient->m_aClients[localid].m_Predicted.m_Vel;
-			vec2 vel = m_pClient->m_aClients[aimbot].m_Predicted.m_Vel;
-			
-			pos += vel * aimbot_predict;
-			pos_local += vel_local * aimbot_predict;
-            float dist = distance(pos, pos_local);
-            
-            pos += vel * (dist * aimbot_predict_dist);
-            pos_local += vel_local * (dist * aimbot_predict_dist);
-		}
-		
-		#endif
-		
-		if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-			m_MousePos = pos;
-		else
-			m_MousePos = pos - pos_local;
-		m_TargetPos = pos;
-		ClampMousePos();
-	}
+	Aim();
 
 
 	// we freeze the input if menu is activated
@@ -450,6 +388,9 @@ int CControls::SnapInput(int *pData)
 
 void CControls::OnRender()
 {
+	if(aimbot_smooth)
+		Aim();
+
 	// update target pos
 	if(m_pClient->m_Snap.m_pGameInfoObj && !m_pClient->m_Snap.m_SpecInfo.m_Active)
 		m_TargetPos = m_pClient->m_LocalCharacterPos + m_MousePos;
@@ -462,7 +403,7 @@ void CControls::OnRender()
 bool CControls::OnMouseMove(float x, float y)
 {
 	if((m_pClient->m_Snap.m_pGameInfoObj && m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_PAUSED) ||
-		(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()))
+		(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()) || aimbot != -1)
 		return false;
 
 	m_MousePos += vec2(x, y); // TODO: ugly
@@ -487,5 +428,78 @@ void CControls::ClampMousePos()
 
 		if(length(m_MousePos) > MouseMax)
 			m_MousePos = normalize(m_MousePos)*MouseMax;
+	}
+}
+
+void CControls::Aim()
+{
+	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
+	{
+		const int localid = m_pClient->m_Snap.m_LocalClientID;
+		
+		#ifdef AIMBOT_SNAPSHOT
+		
+		const CNetObj_Character& Prev = m_pClient->m_Snap.m_aCharacters[aimbot].m_Prev;
+		const CNetObj_Character& Cur = m_pClient->m_Snap.m_aCharacters[aimbot].m_Cur;
+		const CNetObj_Character& PrevLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Prev;
+		const CNetObj_Character& CurLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Cur;
+		
+		//float IntraTick = Client()->IntraGameTick();
+		
+		//vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
+		vec2 pos = vec2(Cur.m_X, Cur.m_Y);
+		//vec2 pos = m_pClient->m_Snap.m_aCharacters[aimbot].m_Position;
+		vec2 pos_local = m_pClient->m_LocalCharacterPos;
+		// spectating
+		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
+		{
+			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
+		}
+		
+		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
+		{
+			//vec2 vel = mix(vec2(Prev.m_VelX/256.f, Prev.m_VelY/256.f), vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f), IntraTick);
+			//vec2 vel_local = mix(vec2(PrevLocal.m_VelX/256.f, PrevLocal.m_VelY/256.f), vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f), IntraTick);
+			vec2 vel = vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f);
+			vec2 vel_local = vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f);
+								
+			pos += vel * aimbot_predict;
+			pos_local += vel_local * aimbot_predict;
+            float dist = distance(pos, pos_local);
+            
+            pos += vel * (dist * aimbot_predict_dist);
+            pos_local += vel_local * (dist * aimbot_predict_dist);
+		}
+		#else
+		vec2 pos_local = m_pClient->m_LocalCharacterPos;
+		vec2 pos = m_pClient->m_aClients[aimbot].m_Predicted.m_Pos;
+		
+		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
+		{
+			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
+		}
+		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
+		{
+			vec2 vel_local = m_pClient->m_aClients[localid].m_Predicted.m_Vel;
+			vec2 vel = m_pClient->m_aClients[aimbot].m_Predicted.m_Vel;
+			
+			pos += vel * aimbot_predict;
+			pos_local += vel_local * aimbot_predict;
+            float dist = distance(pos, pos_local);
+            
+            pos += vel * (dist * aimbot_predict_dist);
+            pos_local += vel_local * (dist * aimbot_predict_dist);
+		}
+		
+		#endif
+		
+		if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
+			m_MousePos = pos;
+		else
+			m_MousePos = pos - pos_local;
+		m_TargetPos = pos;
+		ClampMousePos();
 	}
 }
