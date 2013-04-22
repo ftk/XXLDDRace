@@ -1536,7 +1536,7 @@ void CClient::Update()
 		else
 		{
 			// disconnect on error
-			Disconnect();
+			//Disconnect();
 		}
 	}
 	else if(State() == IClient::STATE_ONLINE && m_RecivedSnapshots >= 3)

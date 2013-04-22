@@ -826,39 +826,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	
 				Console()->ExecuteLine(pMsg->m_pMessage + 1, ClientID);
 	
-				//Same in server.cpp
-				//TODO: XXLTomate: put this in a seperate file...
-				int Censor = 0;
-				int cCounter = 0;
-				char reg[] = "register ";
-				char log[] = "login ";
-	
-				//Login
-				for (int i = 0; i < strlen(log)+1 ; i++)
-					if (log[i] == pMsg->m_pMessage[i+1])
-						cCounter++;
-					else if(cCounter == strlen(log))
-					{
-						Censor = 1;
-						break;
-					}
-					else
-						break;
-				//Register
-				for (int i = 0; i < strlen(reg)+1 ; i++)
-					if (reg[i] == pMsg->m_pMessage[i+1])
-						cCounter++;
-					else if(cCounter == strlen(reg))
-					{
-						Censor = 2;
-						break;
-					}
-					else
-						break;
-	
-				if (Censor == 1)
+				if(!strncmp(pMsg->m_pMessage, "login ", 6))
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "chat", "login ***");
-				else if(Censor == 2)
+				else if(!strncmp(pMsg->m_pMessage, "register ", 9))
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "chat", "register ***");
 				else
 				{

@@ -1019,37 +1019,9 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				char aBuf[256];
 
 
-				int Censor = 0;
-				int cCounter = 0;
-				char reg[] = "register ";
-				char log[] = "login ";
-
-				//Login
-				for (int i = 0; i < strlen(log)+1 ; i++)
-					if (log[i] == pCmd[i])
-						cCounter++;
-					else if(cCounter == strlen(log))
-					{
-						Censor = 1;
-						break;
-					}
-					else
-						break;
-				//Register
-					for (int i = 0; i < strlen(reg)+1 ; i++)
-						if (reg[i] == pCmd[i])
-							cCounter++;
-						else if(cCounter == strlen(reg))
-						{
-							Censor = 2;
-							break;
-						}
-						else
-							break;
-
-				if (Censor == 1)
+				if(!strncmp(pCmd, "login ", 6))
 					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='login ***'", ClientID);
-				else if(Censor == 2)
+				else if(!strncmp(pCmd, "register ", 9))
 					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='register ***'", ClientID);
 				else
 					str_format(aBuf, sizeof(aBuf), "ClientID=%d rcon='%s'", ClientID, pCmd);
