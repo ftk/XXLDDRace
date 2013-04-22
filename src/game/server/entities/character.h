@@ -251,6 +251,7 @@ public:
 	int m_LastIndexFrontTile;
 	bool m_Bloody;
 	vec2 m_RescuePos;
+	int m_RescueFlags;
 	int m_LastRescue;
 	int m_LastRescueSave;
 	bool m_IceHammer;
@@ -264,6 +265,18 @@ enum
 	DDRACE_STARTED,
 	DDRACE_CHEAT, // no time and won't start again unless ordered by a mod or death
 	DDRACE_FINISHED
+};
+
+enum
+{
+	RESCUEFLAG_NONE = 0,
+	RESCUEFLAG_DISARM = 1,
+	RESCUEFLAG_SOLOIN = 2,
+	RESCUEFLAG_SOLOOUT = 4,
+	RESCUEFLAG_HIT = 8,
+	RESCUEFLAG_NOHIT = 16,
+	RESCUEFLAG_EHOOK = 32,
+	RESCUEFLAG_NOEHOOK = 64,
 };
 
 #endif

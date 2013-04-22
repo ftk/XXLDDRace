@@ -84,7 +84,8 @@ void CPickup::Tick()
 						pChr->SetLastWeapon(WEAPON_GUN);
 						GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR, pChr->Teams()->TeamMask(pChr->Team()));
 					}
-					if(!pChr->m_FreezeTime) pChr->SetActiveWeapon(WEAPON_HAMMER);
+					if(!pChr->m_FreezeTime) pChr->SetActiveWeapon((pChr->GetActiveWeapon() == WEAPON_HAMMER) ? WEAPON_HAMMER : WEAPON_GUN);
+					pChr->m_RescueFlags |= RESCUEFLAG_DISARM;
 					break;
 
 				case POWERUP_WEAPON:

@@ -946,13 +946,64 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				//Teleport player
 				pChr->Core()->m_Pos = pChr->m_RescuePos;
                 pChr->Core()->m_Vel = vec2(0, 0); // reset momentum
+                
+                if(pChr->m_RescueFlags)
+                {
+	                // disarm player
+	                if(pChr->m_RescueFlags & RESCUEFLAG_DISARM)
+	                {
+	                	for(int i = WEAPON_SHOTGUN; i < NUM_WEAPONS; i++)
+						{
+							if(pChr->GetWeaponGot(i) && i != WEAPON_NINJA)
+							{
+								pChr->SetWeaponGot(i, false);
+								pChr->SetWeaponAmmo(i, 0);
+							}
+						}
+						pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You have been disarmed");
+	                }
+	                // solo fix
+	                if(pChr->m_RescueFlags & RESCUEFLAG_SOLOOUT)
+	                {
+	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now in a solo part");
+	                	pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, true);
+	                }
+	                else if(pChr->m_RescueFlags & RESCUEFLAG_SOLOIN)
+	                {
+	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now out of the solo part");
+	                	pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, false);
+	                }
+	                // hit fix
+	                if(pChr->m_RescueFlags & RESCUEFLAG_NOHIT)
+	                {
+	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You can hit others");
+	                	pChr->m_Hit = CCharacter::HIT_ALL;
+	                }
+	                else if(pChr->m_RescueFlags & RESCUEFLAG_HIT)
+	                {
+	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You can't hit others");
+	                	pChr->m_Hit = CCharacter::DISABLE_HIT_GRENADE|CCharacter::DISABLE_HIT_HAMMER|
+	                		CCharacter::DISABLE_HIT_RIFLE|CCharacter::DISABLE_HIT_SHOTGUN;
+	                }
+	                // endless hook fix
+	                if(pChr->m_RescueFlags & RESCUEFLAG_NOEHOOK)
+	                {
+	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been activated");
+	                	pChr->m_EndlessHook = true;
+	                }
+	                else if(pChr->m_RescueFlags & RESCUEFLAG_EHOOK)
+	                {
+	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been deactivated");
+	                	pChr->m_EndlessHook = false;
+	                }
+            	}
             }
 		}
 		else
 		{
 			//if (pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)
-            pChr->UnFreeze();
-            pChr->m_LastRescue = 0;
+			pChr->UnFreeze();
+			pChr->m_LastRescue = 0;
 		}
 	}
 	else
@@ -1148,6 +1199,14 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 	Msg.m_ClientID = CheckClientID(pResult->m_ClientID) ? pResult->m_ClientID : -1;
 	Msg.m_pMessage = message;
 	pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, to);
-
+	
+	if(CheckClientID(pResult->m_ClientID))
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Team = 1;
+		Msg.m_ClientID =  pResult->m_ClientID;
+		Msg.m_pMessage = message;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pResult->m_ClientID);
+	}
 }
 
