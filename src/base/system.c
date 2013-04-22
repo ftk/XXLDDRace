@@ -874,7 +874,7 @@ static int priv_net_close_all_sockets(NETSOCKET sock)
 
 static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, int sockaddrlen)
 {
-	int sock, e;
+	int sock, e, optval = 1;
 
 	/* create socket */
 	sock = socket(domain, type, 0);
@@ -902,6 +902,7 @@ static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, i
 #endif
 
 	/* bind the socket */
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&optval, sizeof(optval));
 	e = bind(sock, addr, sockaddrlen);
 	if(e != 0)
 	{
