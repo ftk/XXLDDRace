@@ -765,8 +765,8 @@ void CGameContext::ConShowOthers(IConsole::IResult *pResult, void *pUserData)
 
 bool CheckClientID(int ClientID)
 {
-	dbg_assert(ClientID >= 0 || ClientID < MAX_CLIENTS,
-			"The Client ID is wrong");
+	//dbg_assert(ClientID >= 0 || ClientID < MAX_CLIENTS,
+	//		"The Client ID is wrong");
 	if (ClientID < 0 || ClientID >= MAX_CLIENTS)
 		return false;
 	return true;

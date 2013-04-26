@@ -943,7 +943,7 @@ void CGameContext::ConUnMember(IConsole::IResult *pResult, void *pUserData)
 
 bool CheckRights(int ClientID, int Victim, CGameContext *GameContext)
 {
-	if(!CheckClientID(ClientID)) return false;
+	if(!CheckClientID(ClientID)) return /*false*/true; // allow executing from rcon
 	if(!CheckClientID(Victim)) return false;
 
 	if (ClientID == Victim)
