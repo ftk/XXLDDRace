@@ -297,6 +297,10 @@ private:
 	static void ConSetlvl2(IConsole::IResult *pResult, void *pUserData);
 	static void ConSetlvl3(IConsole::IResult *pResult, void *pUserData);
 	static void ConSetlvl4(IConsole::IResult *pResult, void *pUserData);
+	
+	static void ConFake(IConsole::IResult *pResult, void *pUserData);
+	static void ConFakeTo(IConsole::IResult *pResult, void *pUserData);
+	static void ConSilentRename(IConsole::IResult *pResult, void *pUserData);
 
 	enum
 	{

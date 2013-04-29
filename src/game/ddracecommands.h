@@ -61,6 +61,11 @@ CONSOLE_COMMAND("invis", "v", CFGFLAG_SERVER|CMDFLAG_TEST, ConInvis, this, "Make
 CONSOLE_COMMAND("vis", "v", CFGFLAG_SERVER|CMDFLAG_TEST, ConVis, this, "Makes player v visible again")
 CONSOLE_COMMAND("unfreeze", "v", CFGFLAG_SERVER|CMDFLAG_TEST, ConUnFreeze, this, "Unfreezes player v")
 CONSOLE_COMMAND("freeze", "v?i", CFGFLAG_SERVER|CMDFLAG_TEST, ConFreeze, this, "Freezes player v for i seconds (infinite by default)")
+
+CONSOLE_COMMAND("fake", "dr", CFGFLAG_SERVER, ConFake, this, "Send chat message from player's name")
+CONSOLE_COMMAND("faketo", "ddr", CFGFLAG_SERVER, ConFakeTo, this, "Send chat message from player's name to another player")
+CONSOLE_COMMAND("silentrename", "vr", CFGFLAG_SERVER|CMDFLAG_TEST, ConSilentRename, this, "Renames i name to s")
+
 #undef CONSOLE_COMMAND
 
 #endif

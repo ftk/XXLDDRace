@@ -945,7 +945,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				pChr->m_LastRescue = RescueDelay * pSelf->Server()->TickSpeed();
 				//Teleport player
 				pChr->Core()->m_Pos = pChr->m_RescuePos;
-                pChr->Core()->m_Vel = vec2(0, 0); // reset momentum
+                pChr->Core()->m_Vel = vec2(0.f, 0.f); // reset momentum
                 
                 if(pChr->m_RescueFlags)
                 {
@@ -996,6 +996,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been deactivated");
 	                	pChr->m_EndlessHook = false;
 	                }
+	                pChr->m_RescueFlags = RESCUEFLAG_NONE;
             	}
             }
 		}

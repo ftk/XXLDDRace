@@ -941,6 +941,46 @@ void CGameContext::ConUnMember(IConsole::IResult *pResult, void *pUserData)
 	pSelf->MemberList->UnMember(Victim, pSelf);
 }
 
+void CGameContext::ConFake(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->GetInteger(0);
+
+	pSelf->SendChat(Victim, CHAT_ALL, pResult->GetString(1), -1);
+}
+
+void CGameContext::ConFakeTo(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int sender = pResult->GetInteger(0), receiver = pResult->GetInteger(1);
+
+	CNetMsg_Sv_Chat Msg;
+	Msg.m_Team = 0;
+	Msg.m_ClientID = CheckClientID(sender) ? sender : -1;
+	Msg.m_pMessage = pResult->GetString(2);
+	pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, receiver);
+
+}
+
+void CGameContext::ConSilentRename(IConsole::IResult *pResult, void *pUserData)
+{
+	if(!CheckRights(pResult->m_ClientID, pResult->GetVictim(), (CGameContext *)pUserData)) return;
+	const char *newName = pResult->GetString(0);
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->GetVictim();
+
+	CPlayer *pPlayer = pSelf->m_apPlayers[Victim];
+	if(!pPlayer)
+		return;
+
+	CCharacter* pChr = pSelf->m_apPlayers[Victim]->GetCharacter();
+	if(!pChr)
+		return;
+
+	pSelf->Server()->SetClientName(Victim, newName);
+}
+
+
 bool CheckRights(int ClientID, int Victim, CGameContext *GameContext)
 {
 	if(!CheckClientID(ClientID)) return /*false*/true; // allow executing from rcon
