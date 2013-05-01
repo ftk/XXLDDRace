@@ -593,6 +593,8 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 
 	// copy new input
 	mem_copy(&m_Input, pNewInput, sizeof(m_Input));
+	if(m_FreezeTime > 0 || m_FreezeTime == -1)
+		mem_copy(&m_FreezedInput, pNewInput, sizeof(m_Input));
 	m_NumInputs++;
 
 	// it is not allowed to aim in the center
@@ -1784,9 +1786,7 @@ void CCharacter::HandleTiles(int Index)
 void CCharacter::DDRaceTick()
 {
 	m_Armor=(m_FreezeTime >= 0)?10-((m_FreezeTime+14)/15):0;
-	if(m_Input.m_Direction != 0 || m_Input.m_Jump != 0)
-		m_LastMove = Server()->Tick();
-
+	
 	if(m_FreezeTime > 0 || m_FreezeTime == -1)
 	{
 		if (m_FreezeTime % Server()->TickSpeed() == 0 || m_FreezeTime == -1)
@@ -1797,7 +1797,6 @@ void CCharacter::DDRaceTick()
 			m_FreezeTime--;
 		else
 			m_Ninja.m_ActivationTick = Server()->Tick();
-		m_FreezedInput = m_Input;
 		m_Input.m_Direction = 0;
 		m_Input.m_Jump = 0;
 		m_Input.m_Hook = 0;
