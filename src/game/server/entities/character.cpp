@@ -1797,6 +1797,7 @@ void CCharacter::DDRaceTick()
 			m_FreezeTime--;
 		else
 			m_Ninja.m_ActivationTick = Server()->Tick();
+		m_FreezedInput = m_Input;
 		m_Input.m_Direction = 0;
 		m_Input.m_Jump = 0;
 		m_Input.m_Hook = 0;
@@ -1891,6 +1892,7 @@ bool CCharacter::UnFreeze()
 			m_ActiveWeapon = WEAPON_GUN;
 		m_FreezeTime = 0;
 		m_FreezeTick = 0;
+		m_Input = m_FreezedInput;
 		if (m_ActiveWeapon==WEAPON_HAMMER) m_ReloadTimer = 0;
 		 return true;
 	}
