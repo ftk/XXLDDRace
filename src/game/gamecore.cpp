@@ -77,10 +77,13 @@ void CCharacterCore::Reset()
 	m_HookedPlayer = -1;
 	m_Jumped = 0;
 	m_TriggeredEvents = 0;
+	//m_FreezeTick = 0;
 }
 
-void CCharacterCore::Tick(bool UseInput, bool Freezed)
+void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 {
+	// Freeze - reset input (client)
+	// PredictFreeze - try to reset input if player is in freeze tile (client)
 	float PhysSize = 28.0f;
 	int MapIndex = Collision()->GetPureMapIndex(m_Pos);;
 	int MapIndexL = Collision()->GetPureMapIndex(vec2(m_Pos.x + (28/2)+4,m_Pos.y));
@@ -135,6 +138,25 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed)
 	float Accel = Grounded ? m_pWorld->m_Tuning.m_GroundControlAccel : m_pWorld->m_Tuning.m_AirControlAccel;
 	float Friction = Grounded ? m_pWorld->m_Tuning.m_GroundFriction : m_pWorld->m_Tuning.m_AirFriction;
 
+	if(PredictFreeze)
+	{
+		if(!Freezed && (m_TileIndex == TILE_FREEZE || m_TileFIndex == TILE_FREEZE))
+		{
+			// jumped in freeze tile, do not handle input for 3 seconds
+			//m_FreezeTick = time_get() + time_freq() * 3000;
+			Freezed = true;
+		}
+		/*else if(!Freezed && time_get() < m_FreezeTick)
+		{
+			Freezed = true;
+		}*/
+		else if(Freezed && (m_TileIndex == TILE_UNFREEZE || m_TileFIndex == TILE_UNFREEZE))
+		{
+			// unfreeze before server tells us
+			Freezed = false;
+		}
+	}
+	
 	// handle input
 	if(UseInput)
 	{
@@ -204,6 +226,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed)
 		m_HookedPlayer = -1;
 		m_HookState = HOOK_IDLE;
 		m_HookPos = m_Pos;
+		m_Jumped &= ~1;
 	}
 
 	// add the speed modification according to players wanted direction

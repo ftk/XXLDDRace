@@ -423,7 +423,7 @@ void CGameClient::UpdatePositions()
 }
 
 
-static void Evolve(CNetObj_Character *pCharacter, int Tick)
+static void Evolve(CNetObj_Character *pCharacter, int Tick, bool PredictFreeze)
 {
 	CWorldCore TempWorld;
 	CCharacterCore TempCore;
@@ -436,7 +436,7 @@ static void Evolve(CNetObj_Character *pCharacter, int Tick)
 	while(pCharacter->m_Tick < Tick)
 	{
 		pCharacter->m_Tick++;
-		TempCore.Tick(false);
+		TempCore.Tick(false, false, PredictFreeze);
 		TempCore.Move();
 		TempCore.Quantize();
 	}
@@ -829,9 +829,9 @@ void CGameClient::OnNewSnapshot()
 					m_Snap.m_aCharacters[Item.m_ID].m_Prev = *((const CNetObj_Character *)pOld);
 
 					if(m_Snap.m_aCharacters[Item.m_ID].m_Prev.m_Tick)
-						Evolve(&m_Snap.m_aCharacters[Item.m_ID].m_Prev, Client()->PrevGameTick());
+						Evolve(&m_Snap.m_aCharacters[Item.m_ID].m_Prev, Client()->PrevGameTick(), m_IsDDRace);
 					if(m_Snap.m_aCharacters[Item.m_ID].m_Cur.m_Tick)
-						Evolve(&m_Snap.m_aCharacters[Item.m_ID].m_Cur, Client()->GameTick());
+						Evolve(&m_Snap.m_aCharacters[Item.m_ID].m_Cur, Client()->GameTick(), m_IsDDRace);
 				}
 			}
 			else if(Item.m_Type == NETOBJTYPE_SPECTATORINFO)
@@ -1045,10 +1045,10 @@ void CGameClient::OnPredict()
 				if(pInput)
 					World.m_apCharacters[c]->m_Input = *((CNetObj_PlayerInput*)pInput);
 				bool freezed = m_IsDDRace && (m_Snap.m_aCharacters[c].m_Cur.m_Armor != 10 || m_Snap.m_SpecInfo.m_Active);
-				World.m_apCharacters[c]->Tick(true, freezed);
+				World.m_apCharacters[c]->Tick(true, freezed, m_IsDDRace);
 			}
 			else
-				World.m_apCharacters[c]->Tick(false);
+				World.m_apCharacters[c]->Tick(false, false, m_IsDDRace);
 
 		}
 

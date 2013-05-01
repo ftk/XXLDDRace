@@ -199,7 +199,7 @@ public:
 
 	void Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore* pTeams);
 	void Reset();
-	void Tick(bool UseInput, bool Freezed = false);
+	void Tick(bool UseInput, bool Freezed = false, bool PredictFreeze = false);
 	void Move();
 
 	void Read(const CNetObj_CharacterCore *pObjCore);
@@ -216,6 +216,8 @@ public:
 	int m_MaxJumps;
 	int m_JumpCount;
 	void HandleFly();
+	
+	//int m_FreezeTick;
 
 private:
 
