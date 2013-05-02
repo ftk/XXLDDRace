@@ -972,10 +972,12 @@ void CConsole::DeregisterTempAll()
 		}
 	}
 	
-	for(hash_map_t::const_iterator it = commands.begin(); it != commands.end(); ++it)
+	for(hash_map_t::const_iterator it = commands.begin(); it != commands.end();)
 	{
 		if(it->second->m_Temp)
-			commands.erase(it);
+			it = commands.erase(it);
+		else
+			++it;
 	}
 
 	m_TempCommands.Reset();
