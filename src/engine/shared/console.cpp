@@ -971,6 +971,12 @@ void CConsole::DeregisterTempAll()
 			pCommand->m_pNext = pNext;
 		}
 	}
+	
+	for(hash_map_t::const_iterator it = commands.begin(); it != commands.end(); ++it)
+	{
+		if(it->second->m_Temp)
+			commands.erase(it);
+	}
 
 	m_TempCommands.Reset();
 	m_pRecycleList = 0;
