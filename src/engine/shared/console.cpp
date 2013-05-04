@@ -947,11 +947,9 @@ void CConsole::DeregisterTemp(const char *pName)
 	while(it != end)
 	{
 		if(it->second->m_Temp && str_comp(it->second->m_pName, pName) == 0)
-		{
-			commands.erase(it);
-			break;
-		}
-		++it;
+			it = commands.erase(it);
+		else
+			++it;
 	}
 	
 }

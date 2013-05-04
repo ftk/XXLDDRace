@@ -340,7 +340,7 @@ void CChat::EnableMode(int Team)
 		else
 			m_Mode = MODE_ALL;
 
-		m_Input.Clear();
+		//m_Input.Clear();
 		Input()->ClearEvents();
 		m_CompletionChosen = -1;
 	}
