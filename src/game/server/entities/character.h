@@ -257,6 +257,7 @@ public:
 	bool m_IceHammer;
 	bool m_Fly;
 	int m_HammerType;
+	CTuningParams m_ChrTuning;
 };
 
 enum

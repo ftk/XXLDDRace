@@ -57,10 +57,14 @@ float VelocityRamp(float Value, float Start, float Range, float Curvature)
 	return 1.0f/powf(Curvature, (Value-Start)/Range);
 }
 
-void CCharacterCore::Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore* pTeams)
+void CCharacterCore::Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore* pTeams, CTuningParams* pTuning)
 {
 	m_pWorld = pWorld;
 	m_pCollision = pCollision;
+	if(!pTuning)
+		m_pTuning = &(pWorld->m_Tuning);
+	else
+		m_pTuning = pTuning;
 
 	m_pTeams = pTeams;
 	m_Id = -1;
@@ -132,11 +136,11 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 
 	vec2 TargetDirection = normalize(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
 
-	m_Vel.y += m_pWorld->m_Tuning.m_Gravity;
+	m_Vel.y += m_pTuning->m_Gravity;
 
-	float MaxSpeed = Grounded ? m_pWorld->m_Tuning.m_GroundControlSpeed : m_pWorld->m_Tuning.m_AirControlSpeed;
-	float Accel = Grounded ? m_pWorld->m_Tuning.m_GroundControlAccel : m_pWorld->m_Tuning.m_AirControlAccel;
-	float Friction = Grounded ? m_pWorld->m_Tuning.m_GroundFriction : m_pWorld->m_Tuning.m_AirFriction;
+	float MaxSpeed = Grounded ? m_pTuning->m_GroundControlSpeed : m_pTuning->m_AirControlSpeed;
+	float Accel = Grounded ? m_pTuning->m_GroundControlAccel : m_pTuning->m_AirControlAccel;
+	float Friction = Grounded ? m_pTuning->m_GroundFriction : m_pTuning->m_AirFriction;
 
 	if(PredictFreeze)
 	{
@@ -184,14 +188,14 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 				if(Grounded)
 				{
 					m_TriggeredEvents |= COREEVENT_GROUND_JUMP;
-					m_Vel.y = -m_pWorld->m_Tuning.m_GroundJumpImpulse;
+					m_Vel.y = -m_pTuning->m_GroundJumpImpulse;
 					m_Jumped |= 1;
 					m_JumpCount = 0; //XXLmod
 				}
 				else if(!(m_Jumped&2))
 				{
 					m_TriggeredEvents |= COREEVENT_AIR_JUMP;
-					m_Vel.y = -m_pWorld->m_Tuning.m_AirJumpImpulse;
+					m_Vel.y = -m_pTuning->m_AirJumpImpulse;
 					m_Jumped |= 3;
 				}
 			}
@@ -262,11 +266,11 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 	}
 	else if(m_HookState == HOOK_FLYING)
 	{
-		vec2 NewPos = m_HookPos+m_HookDir*m_pWorld->m_Tuning.m_HookFireSpeed;
-		if(distance(m_Pos, NewPos) > m_pWorld->m_Tuning.m_HookLength)
+		vec2 NewPos = m_HookPos+m_HookDir*m_pTuning->m_HookFireSpeed;
+		if(distance(m_Pos, NewPos) > m_pTuning->m_HookLength)
 		{
 			m_HookState = HOOK_RETRACT_START;
-			NewPos = m_Pos + normalize(NewPos-m_Pos) * m_pWorld->m_Tuning.m_HookLength;
+			NewPos = m_Pos + normalize(NewPos-m_Pos) * m_pTuning->m_HookLength;
 			m_pReset = true;
 		}
 
@@ -284,7 +288,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 		}
 
 		// Check against other players first
-		if(m_pWorld && m_pWorld->m_Tuning.m_PlayerHooking)
+		if(m_pWorld && m_pTuning->m_PlayerHooking)
 		{
 			float Distance = 0.0f;
 			for(int i = 0; i < MAX_CLIENTS; i++)
@@ -348,7 +352,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 		// don't do this hook rutine when we are hook to a player
 		if(m_HookedPlayer == -1 && distance(m_HookPos, m_Pos) > 46.0f)
 		{
-			vec2 HookVel = normalize(m_HookPos-m_Pos)*m_pWorld->m_Tuning.m_HookDragAccel;
+			vec2 HookVel = normalize(m_HookPos-m_Pos)*m_pTuning->m_HookDragAccel;
 			// the hook as more power to drag you up then down.
 			// this makes it easier to get on top of an platform
 			if(HookVel.y > 0)
@@ -364,7 +368,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 			vec2 NewVel = m_Vel+HookVel;
 
 			// check if we are under the legal limit for the hook
-			if(length(NewVel) < m_pWorld->m_Tuning.m_HookDragSpeed || length(NewVel) < length(m_Vel))
+			if(length(NewVel) < m_pTuning->m_HookDragSpeed || length(NewVel) < length(m_Vel))
 				m_Vel = NewVel; // no problem. apply
 
 		}
@@ -396,7 +400,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 			// handle player <-> player collision
 			float Distance = distance(m_Pos, pCharCore->m_Pos);
 			vec2 Dir = normalize(m_Pos - pCharCore->m_Pos);
-			if(m_pWorld->m_Tuning.m_PlayerCollision && Distance < PhysSize*1.25f && Distance > 0.0f)
+			if(m_pTuning->m_PlayerCollision && Distance < PhysSize*1.25f && Distance > 0.0f)
 			{
 				float a = (PhysSize*1.45f - Distance);
 				float Velocity = 0.5f;
@@ -411,12 +415,12 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 			}
 
 			// handle hook influence
-			if(m_HookedPlayer == i && m_pWorld->m_Tuning.m_PlayerHooking)
+			if(m_HookedPlayer == i && m_pTuning->m_PlayerHooking)
 			{
 				if(Distance > PhysSize*1.50f) // TODO: fix tweakable variable
 				{
-					float Accel = m_pWorld->m_Tuning.m_HookDragAccel * (Distance/m_pWorld->m_Tuning.m_HookLength);
-					float DragSpeed = m_pWorld->m_Tuning.m_HookDragSpeed;
+					float Accel = m_pTuning->m_HookDragAccel * (Distance/m_pTuning->m_HookLength);
+					float DragSpeed = m_pTuning->m_HookDragSpeed;
 
 					// add force to the hooked player
 					vec2 Temp = pCharCore->m_Vel;
@@ -456,7 +460,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 
 void CCharacterCore::Move()
 {
-	float RampValue = VelocityRamp(length(m_Vel)*50, m_pWorld->m_Tuning.m_VelrampStart, m_pWorld->m_Tuning.m_VelrampRange, m_pWorld->m_Tuning.m_VelrampCurvature);
+	float RampValue = VelocityRamp(length(m_Vel)*50, m_pTuning->m_VelrampStart, m_pTuning->m_VelrampRange, m_pTuning->m_VelrampCurvature);
 
 	m_Vel.x = m_Vel.x*RampValue;
 
@@ -465,7 +469,7 @@ void CCharacterCore::Move()
 
 	m_Vel.x = m_Vel.x*(1.0f/RampValue);
 
-	if(m_pWorld && m_pWorld->m_Tuning.m_PlayerCollision)
+	if(m_pWorld && m_pTuning->m_PlayerCollision)
 	{
 		// check player collision
 		float Distance = distance(m_Pos, NewPos);
@@ -562,7 +566,7 @@ bool CCharacterCore::IsRightTeam(int MapIndex)
 //XXLmod
 void CCharacterCore::HandleFly()
 {
-	vec2 Temp = vec2(0,-m_pWorld->m_Tuning.m_AirJumpImpulse);
+	vec2 Temp = vec2(0,-m_pTuning->m_AirJumpImpulse);
 	if(Temp.y < 0 && ((m_TileIndex == TILE_STOP && m_TileFlags == ROTATION_180) || (m_TileIndexB == TILE_STOP && m_TileFlagsB == ROTATION_180) || (m_TileIndexB == TILE_STOPS && (m_TileFlagsB == ROTATION_0 || m_TileFlagsB == ROTATION_180)) || (m_TileIndexB == TILE_STOPA) || (m_TileFIndex == TILE_STOP && m_TileFFlags == ROTATION_180) || (m_TileFIndexB == TILE_STOP && m_TileFFlagsB == ROTATION_180) || (m_TileFIndexB == TILE_STOPS && (m_TileFFlagsB == ROTATION_0 || m_TileFFlagsB == ROTATION_180)) || (m_TileFIndexB == TILE_STOPA) || (m_TileSIndex == TILE_STOP && m_TileSFlags == ROTATION_180) || (m_TileSIndexB == TILE_STOP && m_TileSFlagsB == ROTATION_180) || (m_TileSIndexB == TILE_STOPS && (m_TileSFlagsB == ROTATION_0 || m_TileSFlagsB == ROTATION_180)) || (m_TileSIndexB == TILE_STOPA)))
 		Temp.y = 0;
 	if(Temp.y > 0 && ((m_TileIndex == TILE_STOP && m_TileFlags == ROTATION_0) || (m_TileIndexT == TILE_STOP && m_TileFlagsT == ROTATION_0) || (m_TileIndexT == TILE_STOPS && (m_TileFlagsT == ROTATION_0 || m_TileFlagsT == ROTATION_180)) || (m_TileIndexT == TILE_STOPA) || (m_TileFIndex == TILE_STOP && m_TileFFlags == ROTATION_0) || (m_TileFIndexT == TILE_STOP && m_TileFFlagsT == ROTATION_0) || (m_TileFIndexT == TILE_STOPS && (m_TileFFlagsT == ROTATION_0 || m_TileFFlagsT == ROTATION_180)) || (m_TileFIndexT == TILE_STOPA) || (m_TileSIndex == TILE_STOP && m_TileSFlags == ROTATION_0) || (m_TileSIndexT == TILE_STOP && m_TileSFlagsT == ROTATION_0) || (m_TileSIndexT == TILE_STOPS && (m_TileSFlagsT == ROTATION_0 || m_TileSFlagsT == ROTATION_180)) || (m_TileSIndexT == TILE_STOPA)))

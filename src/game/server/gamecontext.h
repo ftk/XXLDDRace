@@ -48,6 +48,7 @@ class CGameContext : public IGameServer
 	CTuningParams m_Tuning;
 
 	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
+	static void ConTuneCharParam(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneDump(IConsole::IResult *pResult, void *pUserData);
 	static void ConPause(IConsole::IResult *pResult, void *pUserData);

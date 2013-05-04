@@ -179,6 +179,7 @@ class CCharacterCore
 {
 	CWorldCore *m_pWorld;
 	CCollision *m_pCollision;
+	CTuningParams *m_pTuning;
 public:
 	vec2 m_Pos;
 	vec2 m_Vel;
@@ -197,7 +198,7 @@ public:
 
 	int m_TriggeredEvents;
 
-	void Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore* pTeams);
+	void Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore* pTeams, CTuningParams* pTuning = 0);
 	void Reset();
 	void Tick(bool UseInput, bool Freezed = false, bool PredictFreeze = false);
 	void Move();

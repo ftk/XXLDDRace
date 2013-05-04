@@ -71,7 +71,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Pos = Pos;
 
 	m_Core.Reset();
-	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision(), &((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.m_Core);
+	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision(), &((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.m_Core, &m_ChrTuning);
 	m_Core.m_Pos = m_Pos;
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = &m_Core;
 
@@ -89,6 +89,8 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	DDRaceInit();
 	
 	XXLDDRaceInit();
+	
+	m_ChrTuning = GameServer()->m_World.m_Core.m_Tuning;
 
 	//jDDRace
 	m_Core.m_MaxJumps = 2; //2 is default

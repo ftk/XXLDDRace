@@ -435,10 +435,20 @@ void CGameContext::CheckPureTuning()
 
 void CGameContext::SendTuningParams(int ClientID)
 {
-	CheckPureTuning();
+	//CheckPureTuning();
+	if(ClientID == -1)
+	{
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			SendTuningParams(i);
+		}
+		return;
+	}
+	CCharacter * pChr = GetPlayerChar(ClientID);
+	if(!pChr) return;
 
 	CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
-	int *pParams = (int *)&m_Tuning;
+	int *pParams = (int *)&(pChr->m_ChrTuning);
 	for(unsigned i = 0; i < sizeof(m_Tuning)/sizeof(int); i++)
 		Msg.AddInt(pParams[i]);
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
@@ -463,7 +473,7 @@ void CGameContext::SwapTeams()
 void CGameContext::OnTick()
 {
 	// check tuning
-	CheckPureTuning();
+	//CheckPureTuning();
 
 	// copy tuning
 	m_World.m_Core.m_Tuning = m_Tuning;
@@ -683,33 +693,6 @@ void CGameContext::OnClientEnter(int ClientID)
 		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), m_apPlayers[ClientID]->GetTeam());
 
 		Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-
-		time_t rawtime;
-		struct tm* timeinfo;
-		char d[16], m [16], y[16];
-		int dd, mm, yy;
-
-		time ( &rawtime );
-		timeinfo = localtime ( &rawtime );
-
-		strftime (d,sizeof(y),"%d",timeinfo);
-		strftime (m,sizeof(m),"%m",timeinfo);
-		strftime (y,sizeof(y),"%Y",timeinfo);
-		dd = atoi(d);
-		mm = atoi(m);
-		yy = atoi(y);
-		if((mm == 12 && dd >= 20))
-		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Happy %d from GreYFoX", yy+1);
-			SendBroadcast(aBuf, ClientID);
-		}
-		else if(mm == 1 && dd <= 20)
-		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Happy %d from GreYFoX", yy);
-			SendBroadcast(aBuf, ClientID);
-		}
 	}
 	m_VoteUpdate = true;
 
@@ -1422,6 +1405,26 @@ void CGameContext::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "No such tuning parameter");
 }
 
+void CGameContext::ConTuneCharParam(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+	const char *pParamName = pResult->GetString(1);
+	float NewValue = pResult->GetFloat(2);
+	
+	CCharacter *pChr = pSelf->GetPlayerChar(ClientID);
+
+	if(pChr && pChr->m_ChrTuning.Set(pParamName, NewValue))
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "%d: %s changed to %.2f", ClientID, pParamName, NewValue);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
+		pSelf->SendTuningParams(-1);
+	}
+	else
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "No such tuning parameter");
+}
+
 void CGameContext::ConTuneReset(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -1839,6 +1842,7 @@ void CGameContext::OnConsoleInit()
 	m_ChatPrintCBIndex = Console()->RegisterPrintCallback(0, SendChatResponse, this);
 
 	Console()->Register("tune", "si", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
+	Console()->Register("tune_player", "si", CFGFLAG_SERVER, ConTuneCharParam, this, "Tune variable to value for player");
 	Console()->Register("tune_reset", "", CFGFLAG_SERVER, ConTuneReset, this, "Reset tuning");
 	Console()->Register("tune_dump", "", CFGFLAG_SERVER, ConTuneDump, this, "Dump tuning");
 
