@@ -67,6 +67,14 @@ inline T distance(const vector2_base<T> a, const vector2_base<T> &b)
 }
 
 template<typename T>
+inline T distance2(const vector2_base<T> a, const vector2_base<T> &b)
+{
+	float x1 = a.x - b.x, 
+		y1 = a.y - b.y;
+	return x1 * x1 + y1 * y1;
+}
+
+template<typename T>
 inline T dot(const vector2_base<T> a, const vector2_base<T> &b)
 {
 	return a.x*b.x + a.y*b.y;

@@ -44,9 +44,13 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 		return 0;
 
 	int Num = 0;
-	for(CEntity *pEnt = m_apFirstEntityTypes[Type];	pEnt; pEnt = pEnt->m_pNextTypeEntity)
+	CEntity *pEnt = m_apFirstEntityTypes[Type];
+	const float R2 = (Radius+pEnt->m_ProximityRadius) * (Radius+pEnt->m_ProximityRadius);
+	
+	for(; pEnt; pEnt = pEnt->m_pNextTypeEntity)
 	{
-		if(distance(pEnt->m_Pos, Pos) < Radius+pEnt->m_ProximityRadius)
+		//const float R2 = (Radius+pEnt->m_ProximityRadius) * (Radius+pEnt->m_ProximityRadius);
+		if(distance2(pEnt->m_Pos, Pos) < R2)
 		{
 			if(ppEnts)
 				ppEnts[Num] = pEnt;
@@ -194,10 +198,14 @@ void CGameWorld::Tick()
 CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, CCharacter *pNotThis, int CollideWith, class CCharacter *pThisOnly)
 {
 	// Find other players
-	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
+	float ClosestLen2 = distance2(Pos0, Pos1) * 10000.0f;
 	CCharacter *pClosest = 0;
+	
 
 	CCharacter *p = (CCharacter *)FindFirst(ENTTYPE_CHARACTER);
+	
+	const float R2 = (p->m_ProximityRadius+Radius) * (p->m_ProximityRadius+Radius);
+	
 	for(; p; p = (CCharacter *)p->TypeNext())
  	{
 		if(p == pNotThis)
@@ -207,14 +215,15 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 			continue;
 
 		vec2 IntersectPos = closest_point_on_line(Pos0, Pos1, p->m_Pos);
-		float Len = distance(p->m_Pos, IntersectPos);
-		if(Len < p->m_ProximityRadius+Radius)
+		//const float R2 = (p->m_ProximityRadius+Radius) * (p->m_ProximityRadius+Radius);
+		float Len2 = distance2(p->m_Pos, IntersectPos);
+		if(Len2 < R2)
 		{
-			Len = distance(Pos0, IntersectPos);
-			if(Len < ClosestLen)
+			Len2 = distance2(Pos0, IntersectPos);
+			if(Len2 < ClosestLen2)
 			{
 				NewPos = IntersectPos;
-				ClosestLen = Len;
+				ClosestLen2 = Len2;
 				pClosest = p;
 			}
 		}
@@ -227,21 +236,24 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 CCharacter *CGameWorld::ClosestCharacter(vec2 Pos, float Radius, CEntity *pNotThis)
 {
 	// Find other players
-	float ClosestRange = Radius*2;
+	float ClosestRange2 = Radius*Radius*4;
 	CCharacter *pClosest = 0;
 
 	CCharacter *p = (CCharacter *)GameServer()->m_World.FindFirst(ENTTYPE_CHARACTER);
+	const float R2 = (p->m_ProximityRadius+Radius) * (p->m_ProximityRadius+Radius);
+	
 	for(; p; p = (CCharacter *)p->TypeNext())
  	{
 		if(p == pNotThis)
 			continue;
 
-		float Len = distance(Pos, p->m_Pos);
-		if(Len < p->m_ProximityRadius+Radius)
+		const float Len2 = distance2(Pos, p->m_Pos);
+		//const float R2 = (p->m_ProximityRadius+Radius) * (p->m_ProximityRadius+Radius);
+		if(Len2 < R2)
 		{
-			if(Len < ClosestRange)
+			if(Len2 < ClosestRange2)
 			{
-				ClosestRange = Len;
+				ClosestRange2 = Len2;
 				pClosest = p;
 			}
 		}
