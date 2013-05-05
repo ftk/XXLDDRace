@@ -54,22 +54,24 @@ vec2 CProjectile::GetPos(float Time)
 {
 	float Curvature = 0;
 	float Speed = 0;
+	
+	CTuningParams * Tuning = GameServer()->Tuning(m_Owner);
 
 	switch(m_Type)
 	{
 		case WEAPON_GRENADE:
-			Curvature = GameServer()->Tuning()->m_GrenadeCurvature;
-			Speed = GameServer()->Tuning()->m_GrenadeSpeed;
+			Curvature = Tuning->m_GrenadeCurvature;
+			Speed = Tuning->m_GrenadeSpeed;
 			break;
 
 		case WEAPON_SHOTGUN:
-			Curvature = GameServer()->Tuning()->m_ShotgunCurvature;
-			Speed = GameServer()->Tuning()->m_ShotgunSpeed;
+			Curvature = Tuning->m_ShotgunCurvature;
+			Speed = Tuning->m_ShotgunSpeed;
 			break;
 
 		case WEAPON_GUN:
-			Curvature = GameServer()->Tuning()->m_GunCurvature;
-			Speed = GameServer()->Tuning()->m_GunSpeed;
+			Curvature = Tuning->m_GunCurvature;
+			Speed = Tuning->m_GunSpeed;
 			break;
 	}
 

@@ -388,7 +388,7 @@ void CCharacter::FireWeapon()
 					m_pPlayer->GetCID(),//Owner
 					ProjStartPos,//Pos
 					Direction,//Dir
-					(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_GunLifetime),//Span
+					(int)(Server()->TickSpeed()*GameServer()->Tuning(m_pPlayer->GetCID())->m_GunLifetime),//Span
 					0,//Freeze
 					0,//Explosive
 					0,//Force
@@ -443,7 +443,7 @@ void CCharacter::FireWeapon()
 			Server()->SendMsg(&Msg, 0,m_pPlayer->GetCID());
 
 			GameServer()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE);*/
-			new CLaser(&GameServer()->m_World, m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID(), WEAPON_SHOTGUN);
+			new CLaser(&GameServer()->m_World, m_Pos, Direction, GameServer()->Tuning(m_pPlayer->GetCID())->m_LaserReach, m_pPlayer->GetCID(), WEAPON_SHOTGUN);
 			if (!(g_Config.m_SvSilentXXL && m_FastReload))
 				GameServer()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE, Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()));
 		} break;
@@ -457,7 +457,7 @@ void CCharacter::FireWeapon()
 					m_pPlayer->GetCID(),//Owner
 					ProjStartPos,//Pos
 					Direction,//Dir
-					(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_GrenadeLifetime),//Span
+					(int)(Server()->TickSpeed()*GameServer()->Tuning(m_pPlayer->GetCID())->m_GrenadeLifetime),//Span
 					0,//Freeze
 					true,//Explosive
 					0,//Force
@@ -481,7 +481,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_RIFLE:
 		{
-			new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID(), WEAPON_RIFLE);
+			new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning(m_pPlayer->GetCID())->m_LaserReach, m_pPlayer->GetCID(), WEAPON_RIFLE);
 			if (!(g_Config.m_SvSilentXXL && m_FastReload))
 				GameServer()->CreateSound(m_Pos, SOUND_RIFLE_FIRE, Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()));
 		} break;

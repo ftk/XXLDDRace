@@ -77,6 +77,11 @@ public:
 	class IConsole *Console() { return m_pConsole; }
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
+	CTuningParams *Tuning(int ClientID)
+	{
+		CCharacter * pChr = GetPlayerChar(ClientID);
+		return pChr ? &(pChr->m_ChrTuning) : &m_Tuning;
+	}
 
 	CGameContext();
 	~CGameContext();
