@@ -5,6 +5,7 @@
 
 #include <base/math.h>
 
+#include <engine/config.h>
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 
@@ -18,7 +19,7 @@
 #include "controls.h"
 
 CControls::CControls() : auto_hit(false), hit_interval(0), 
-	auto_hook(false), hook_interval(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.f)
+	auto_hook(false), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.01f), aimbot_smooth(false)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -137,7 +138,7 @@ static void ConAutoHook(IConsole::IResult *pResult, void *pUserData)
 	pSelf->auto_hook = !!pResult->GetInteger(0);
 	if(!pSelf->auto_hook)
 		pSelf->m_InputData.m_Hook = 0;
-	pSelf->hook_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
+	//pSelf->hook_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
 }
 
 static void ConAimbotLock(IConsole::IResult *pResult, void *pUserData)
@@ -208,8 +209,27 @@ static void ConAimbotPredictDistance(IConsole::IResult *pResult, void *pUserData
     CControls *pSelf = (CControls *)pUserData;
     pSelf->aimbot_predict_dist = pResult->GetFloat(0);
 }
+
+static void ConfigSaveCallback(class IConfig *pConfig, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	
+	char buf[128];
+	str_format(buf, sizeof(buf), "aimbot_predict %f", pSelf->aimbot_predict);
+	pConfig->WriteLine(buf);
+	str_format(buf, sizeof(buf), "aimbot_dist %f", pSelf->aimbot_predict_dist);
+	pConfig->WriteLine(buf);
+	str_format(buf, sizeof(buf), "aimbot_smooth %d", pSelf->aimbot_smooth);
+	pConfig->WriteLine(buf);
+}
+
+
 void CControls::OnConsoleInit()
 {
+	IConfig *pConfig = Kernel()->RequestInterface<IConfig>();
+	if(pConfig)
+		pConfig->RegisterCallback(ConfigSaveCallback, this);
+	
 	// game commands
 	Console()->Register("+left", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputDirectionLeft, "Move left");
 	Console()->Register("+right", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputDirectionRight, "Move right");
@@ -223,8 +243,8 @@ void CControls::OnConsoleInit()
 	
 	Console()->Register("autohit", "ii", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 	Console()->Register("+autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
-	Console()->Register("autohook", "ii", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
-	Console()->Register("+autohook", "i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
+	Console()->Register("autohook", "i?i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
+	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
 	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
 	{ static CAimbot s_Set = {m_pClient, this}; Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, (void *)&s_Set, "Aimbot lock to the nearest player"); }
     Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
@@ -261,7 +281,7 @@ int CControls::SnapInput(int *pData)
 	bool Send = false;
 
 	static int64 last_hit_time = 0;
-	static int64 last_hook_time = 0;
+	//static int64 last_hook_time = 0;
 
 	int64 time = time_get();
 	
@@ -303,7 +323,7 @@ int CControls::SnapInput(int *pData)
 		else
 		{
 			m_InputData.m_Hook = 1;
-			last_hook_time = time;
+			//last_hook_time = time;
 			Send = true;
 		}
 	}
@@ -453,7 +473,7 @@ void CControls::Aim()
 		// spectating
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
 		{
-			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			//int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
 			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
 		}
 		
@@ -477,7 +497,7 @@ void CControls::Aim()
 		
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
 		{
-			int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			//int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
 			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
 		}
 		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
