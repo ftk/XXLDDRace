@@ -48,6 +48,16 @@ public:
 	bool Set(const char *pName, float Value);
 	bool Get(int Index, float *pValue);
 	bool Get(const char *pName, float *pValue);
+	
+	inline CTuningParams& operator = (const CTuningParams& rhs)
+	{
+		mem_copy(this, &rhs, sizeof(CTuningParams));
+		return *this;
+	}
+	inline bool operator != (const CTuningParams& rhs) const
+	{
+		return mem_comp(this, &rhs, sizeof(CTuningParams));
+	}
 };
 
 

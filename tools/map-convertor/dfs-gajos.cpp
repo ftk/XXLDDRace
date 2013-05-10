@@ -3,11 +3,11 @@
 #include <cstdlib>
 #include <ctime>
 
-#define SIZE_X 20
-#define SIZE_Y 20
+#define SIZE_X 30
+#define SIZE_Y 30
 
-#define CELL_X 15
-#define CELL_Y 15
+#define CELL_X 19
+#define CELL_Y 19
 
 enum direction
 {
@@ -19,7 +19,7 @@ enum direction
 
 //#define RANDOM_BLOCK ((!(rand()%(CELL_Y * CELL_X * 2)))?'X':' ')
 //#define RANDOM_BLOCK ((!(rand()%((CELL_Y - 5) * (CELL_X - 4) + int(lenght * 0.5))))?'X':' ')
-#define RANDOM_BLOCK ((!(rand()%(8 + int(lenght / 5))))?'X':' ')
+#define RANDOM_BLOCK ((!(rand()%(8 + int(lenght / 5))))?'O':' ')
 
 struct cell
 {
@@ -179,7 +179,7 @@ void fill_maze(int x, int y, int lenght = 0)
   }
 }
 
-void fill_special_row(char * buf, int row, char filler_spawn, char filler_start) // start, end
+void fill_special_row(char * buf, int row, char filler_spawn, char filler_start, char filler_exit) // start, end
 {
   for(int i = 0; i < CELL_X; i++)
     buf[i] = filler_spawn;
@@ -197,7 +197,10 @@ void fill_special_row(char * buf, int row, char filler_spawn, char filler_start)
   else
   {
     for(int i = 0; i < CELL_X; i++)
-      buf[i] = filler_start;
+      if(i == 0 || i == CELL_X - 1)
+        buf[i] = filler_exit;
+      else
+        buf[i] = filler_start;
   }
   if(row == 0 || row == CELL_Y - 1)
   {
@@ -206,7 +209,7 @@ void fill_special_row(char * buf, int row, char filler_spawn, char filler_start)
       if(i != centerx)
         buf[i] = 'O';
       else
-        buf[i] = filler_start;
+        buf[i] = filler_exit;
     }
   }
 
@@ -241,9 +244,9 @@ int main()
       {
         cell& cur = maze[x][y];
         if(x == startx && y == starty)
-          fill_special_row(row_buf, row, 'S', 's');
+          fill_special_row(row_buf, row, 'S', 's', 'G');
         else if(x == endx && y == endy)
-          fill_special_row(row_buf, row, ' ', 'e');
+          fill_special_row(row_buf, row, ' ', 'e', 'g');
         else
         {
           cur.fill_row(row_buf, row);

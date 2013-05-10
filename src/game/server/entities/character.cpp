@@ -74,6 +74,13 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision(), &((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.m_Core, &m_ChrTuning);
 	m_Core.m_Pos = m_Pos;
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = &m_Core;
+	
+	if(m_ChrTuning != *(GameServer()->Tuning()))
+	{
+		m_ChrTuning = *(GameServer()->Tuning());
+		GameServer()->SendTuningParams(m_pPlayer->GetCID());
+	}
+
 
 	m_ReckoningTick = 0;
 	mem_zero(&m_SendCore, sizeof(m_SendCore));
@@ -90,8 +97,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	
 	XXLDDRaceInit();
 	
-	m_ChrTuning = GameServer()->m_World.m_Core.m_Tuning;
-
 	//jDDRace
 	m_Core.m_MaxJumps = 2; //2 is default
 	m_Core.m_JumpCount = 0;
@@ -1237,47 +1242,12 @@ void CCharacter::HandleTiles(int Index)
 	if(Index < 0)
 		return;
 	int cp = GameServer()->Collision()->IsCheckpoint(MapIndex);
-	if(cp != -1 && m_DDRaceState == DDRACE_STARTED && cp > m_CpActive)
-	{
-		m_CpActive = cp;
-		m_CpCurrent[cp] = m_Time;
-		m_CpTick = Server()->Tick() + Server()->TickSpeed() * 2;
-
-		CPlayerData *pData = GameServer()->Score()->PlayerData(m_pPlayer->GetCID());
-		CNetMsg_Sv_DDRaceTime Msg;
-		Msg.m_Time = (int)m_Time;
-		Msg.m_Check = 0;
-		Msg.m_Finish = 0;
-
-		if(m_CpActive != -1 && m_CpTick > Server()->Tick())
-		{
-			if(pData->m_BestTime && pData->m_aBestCpTime[m_CpActive] != 0)
-			{
-				float Diff = (m_CpCurrent[m_CpActive] - pData->m_aBestCpTime[m_CpActive])*100;
-				Msg.m_Check = (int)Diff;
-
-				if (g_Config.m_SvLaserScore)
-				{
-					char aBuf[64];
-					if (Diff >= 0)
-						str_format(aBuf, sizeof(aBuf), "+%5.2f", Diff/100);
-					else
-						str_format(aBuf, sizeof(aBuf), "%5.2f", Diff/100);
-
-					GameServer()->CreateLolText(this, false, vec2(0,-75), vec2 (0,-1), 50, aBuf);
-				}
-			}
-		}
-
-		if(m_pPlayer->m_IsUsingDDRaceClient)
-			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, m_pPlayer->GetCID());
-	}
 	int cpf = GameServer()->Collision()->IsFCheckpoint(MapIndex);
-	if(cpf != -1 && m_DDRaceState == DDRACE_STARTED && cpf > m_CpActive)
+	if(m_DDRaceState == DDRACE_STARTED && ((cp != -1 && cp > m_CpActive) || (cpf != -1 && cpf > m_CpActive)))
 	{
-		m_CpActive = cpf;
-		m_CpCurrent[cpf] = m_Time;
-		m_CpTick = Server()->Tick() + Server()->TickSpeed()*2;
+		m_CpActive = ((cp != -1 && cp > m_CpActive) ? cp : cpf);
+		m_CpCurrent[m_CpActive] = m_Time;
+		m_CpTick = Server()->Tick() + Server()->TickSpeed() * 2;
 
 		CPlayerData *pData = GameServer()->Score()->PlayerData(m_pPlayer->GetCID());
 		CNetMsg_Sv_DDRaceTime Msg;
@@ -1641,6 +1611,46 @@ void CCharacter::HandleTiles(int Index)
 			return;
 		if (m_Core.m_MaxJumps >0)
 			m_Core.m_MaxJumps--; //remove a jump
+	}
+	
+	{
+		// tune mod
+		//CTuningParams * Tuning = &m_ChrTuning;//GameServer()->Tuning(m_pPlayer->GetCID());
+		bool TuningSend = false;
+		#define TUNE_TILE(tile,param,value) \
+			if(((m_TileIndex == tile) || (m_TileFIndex == tile)) && m_ChrTuning.m_##param.Get() != value) \
+			{ \
+			m_ChrTuning.m_ ## param.Set(value); \
+			TuningSend = true; \
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), #param " has been set to " #value); \
+			} \
+		/* */
+		const int G = 50;
+		TUNE_TILE(0xa0, Gravity, G)
+		TUNE_TILE(0xa1, Gravity, 0)
+		TUNE_TILE(0xa2, Gravity, 2*G)
+		TUNE_TILE(0xa3, Gravity, 3*G)
+		TUNE_TILE(0xa4, Gravity, -1*G)
+		TUNE_TILE(0xa5, Gravity, -2*G)
+		TUNE_TILE(0xa6, Gravity, G/2)
+		TUNE_TILE(0xa7, Gravity, G/(-2))
+		
+		const int GF = 50;
+		TUNE_TILE(0xa8, GroundFriction, GF)
+		TUNE_TILE(0xa9, GroundFriction, 0)
+		TUNE_TILE(0xaa, GroundFriction, 100)
+		
+		const int AF = 95;
+		TUNE_TILE(0xab, AirFriction, AF)
+		TUNE_TILE(0xac, AirFriction, 0)
+		TUNE_TILE(0xad, AirFriction, 100)
+		
+		#undef TUNE_TILE
+		
+		if(TuningSend)
+		{
+			GameServer()->SendTuningParams(m_pPlayer->GetCID());
+		}
 	}
 
 	//First time here?

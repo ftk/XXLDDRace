@@ -1445,6 +1445,13 @@ void CGameContext::ConTuneDump(IConsole::IResult *pResult, void *pUserData)
 		float v;
 		pSelf->Tuning()->Get(i, &v);
 		str_format(aBuf, sizeof(aBuf), "%s %.2f", pSelf->Tuning()->m_apNames[i], v);
+		for(int p = 0; p < MAX_CLIENTS; p++)
+		{
+			float pv;
+			pSelf->Tuning(p)->Get(i, &pv);
+			if(pv != v)
+				str_format(aBuf, sizeof(aBuf), "%s [%d:%.2f]", aBuf, p, pv);
+		}
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
 	}
 }

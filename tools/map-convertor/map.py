@@ -29,6 +29,7 @@ class RGBTile:
   shotgun = (1, 255, 255)
   grenade = (2, 255, 255)
   rifle = (3, 255, 255)
+  no_gravity = (128, 255, 255)
 
 # 0x59 = tile at 6th row and 10th column in tileset
 color_to_tile = dict(
@@ -52,7 +53,9 @@ color_to_tile = dict(
 
   RGBTile.shotgun : [0xc7, 0x00],
   RGBTile.grenade : [0xc8, 0x00],
-  RGBTile.rifle : [0xca, 0x00]
+  RGBTile.rifle : [0xca, 0x00],
+  
+  RGBTile.no_gravity : [0xa1, 0x1f]
 
   # TODO: add more
 })
@@ -108,7 +111,9 @@ txt_to_color = dict(
   '.' : RGBTile.unfreeze,
   'h' : RGBTile.shotgun,
   'g' : RGBTile.grenade,
-  'r' : RGBTile.rifle
+  'r' : RGBTile.rifle,
+  
+  'G' : RGBTile.no_gravity
 })
 
 def txt2rgb(ch):
