@@ -444,11 +444,11 @@ void CGameContext::SendTuningParams(int ClientID)
 		}
 		return;
 	}
-	CCharacter * pChr = GetPlayerChar(ClientID);
-	if(!pChr) return;
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
+		return;
 
 	CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
-	int *pParams = (int *)&(pChr->m_ChrTuning);
+	int *pParams = (int *)(Tuning(ClientID));
 	for(unsigned i = 0; i < sizeof(m_Tuning)/sizeof(int); i++)
 		Msg.AddInt(pParams[i]);
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
