@@ -55,7 +55,7 @@ color_to_tile = dict(
   RGBTile.grenade : [0xc8, 0x00],
   RGBTile.rifle : [0xca, 0x00],
   
-  RGBTile.no_gravity : [0xa1, 0x1f]
+  RGBTile.no_gravity : [0xa1, 0x00]
 
   # TODO: add more
 })
