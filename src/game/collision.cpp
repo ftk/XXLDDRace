@@ -109,7 +109,7 @@ void CCollision::Init(class CLayers *pLayers)
 
 				// DDRace tiles
 				if(Index == TILE_THROUGH || (Index >= TILE_FREEZE && Index <= TILE_UNFREEZE) || (Index >= TILE_SWITCHOPEN && Index <= TILE_TELECHECKIN) || (Index >= TILE_BEGIN && Index <= TILE_STOPA) || Index == TILE_CP || Index == TILE_CP_F || (Index >= TILE_OLDLASER && Index <= TILE_NPH) || (Index >= TILE_EHOOK_START && Index <= TILE_SOLO_END) || (Index >= TILE_DFREEZE && Index <= TILE_DUNFREEZE)
-						|| (Index >=TILE_RAINBOW && Index<= TILE_RMNINJA)
+						|| (Index >=TILE_EXTRA_START && Index<= TILE_EXTRA_END)
 						|| (Index >=TILE_JUMPS_DEFAULT && Index<= TILE_JUMPS_REMOVE))
 					m_pFront[i].m_Index = Index;
 			}
@@ -140,7 +140,7 @@ void CCollision::Init(class CLayers *pLayers)
 
 			// DDRace tiles
 			if(Index == TILE_THROUGH || (Index >= TILE_FREEZE && Index <= TILE_UNFREEZE) || (Index >= TILE_SWITCHOPEN && Index <= TILE_TELECHECKIN) || (Index >= TILE_BEGIN && Index <= TILE_STOPA) || Index == TILE_CP || Index == TILE_CP_F || (Index >= TILE_OLDLASER && Index <= TILE_NPH) || (Index >= TILE_EHOOK_START && Index <= TILE_SOLO_END) || (Index >= TILE_DFREEZE && Index <= TILE_DUNFREEZE)
-					|| (Index >=TILE_RAINBOW && Index<= TILE_RMNINJA)
+					|| (Index >=TILE_EXTRA_START && Index<= TILE_EXTRA_END)
 					|| (Index >=TILE_JUMPS_DEFAULT && Index<= TILE_JUMPS_REMOVE))
 				m_pTiles[i].m_Index = Index;
 		}
@@ -549,9 +549,9 @@ bool CCollision::TileExists(int Index)
 		return true;
 	if(m_pFront && m_pFront[Index].m_Index >= TILE_FREEZE && m_pFront[Index].m_Index  <= TILE_NPH)
 		return true;
-	if(m_pTiles[Index].m_Index >= TILE_RAINBOW && m_pTiles[Index].m_Index <= TILE_RMNINJA)
+	if(m_pTiles[Index].m_Index >= TILE_EXTRA_START && m_pTiles[Index].m_Index <= TILE_EXTRA_END)
 		return true;
-	if(m_pFront && m_pFront[Index].m_Index >= TILE_RAINBOW && m_pFront[Index].m_Index  <= TILE_RMNINJA)
+	if(m_pFront && m_pFront[Index].m_Index >= TILE_EXTRA_START && m_pFront[Index].m_Index  <= TILE_EXTRA_END)
 		return true;
 	if(m_pTiles[Index].m_Index >= TILE_JUMPS_DEFAULT && m_pTiles[Index].m_Index <= TILE_JUMPS_REMOVE)
 		return true;
