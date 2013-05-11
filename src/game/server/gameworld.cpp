@@ -45,7 +45,7 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 
 	int Num = 0;
 	CEntity *pEnt = m_apFirstEntityTypes[Type];
-	const float R2 = (Radius+pEnt->m_ProximityRadius) * (Radius+pEnt->m_ProximityRadius);
+	const float R2 = pEnt ? ((Radius+pEnt->m_ProximityRadius) * (Radius+pEnt->m_ProximityRadius)) : 0.f;
 	
 	for(; pEnt; pEnt = pEnt->m_pNextTypeEntity)
 	{
@@ -204,7 +204,7 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 
 	CCharacter *p = (CCharacter *)FindFirst(ENTTYPE_CHARACTER);
 	
-	const float R2 = (p->m_ProximityRadius+Radius) * (p->m_ProximityRadius+Radius);
+	const float R2 = p ? ((p->m_ProximityRadius+Radius) * (p->m_ProximityRadius+Radius)) : 0.f;
 	
 	for(; p; p = (CCharacter *)p->TypeNext())
  	{
