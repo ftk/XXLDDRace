@@ -120,7 +120,10 @@ void CScoreboard::RenderSpectators(float x, float y, float w)
 			if (g_Config.m_ClShowIDs)
 			{
 				char aId[4];
-				str_format(aId,sizeof(aId),"%d:",pInfo->m_ClientID);
+				if(m_pClient->m_Snap.m_aCharacters[pInfo->m_ClientID].m_Cur.m_PlayerFlags & PLAYERFLAG_IN_MENU)
+					str_format(aId,sizeof(aId),"%d-",pInfo->m_ClientID);
+				else
+					str_format(aId,sizeof(aId),"%d:",pInfo->m_ClientID);
 				str_append(aBuffer, aId, sizeof(aBuffer));
 			}
 		str_append(aBuffer, m_pClient->m_aClients[pInfo->m_ClientID].m_aName, sizeof(aBuffer));

@@ -29,15 +29,20 @@ extern "C" {
 	See Also:
 		<dbg_break>
 */
-void dbg_assert(int test, const char *msg);
-#define dbg_assert(test,msg) dbg_assert_imp(__FILE__, __LINE__, test, msg)
+//void dbg_assert(int test, const char *msg);
+
 void dbg_assert_imp(const char *filename, int line, int test, const char *msg);
 
 
-#ifdef __clang_analyzer__
+#if defined(__clang_analyzer__)
 #include <assert.h>
-#undef dbg_assert
 #define dbg_assert(test,msg) assert(test)
+#elif !defined(CONF_RELEASE)
+// debug
+#define dbg_assert(test,msg) ((test)?((void)0):(dbg_assert_imp(__FILE__, __LINE__, test, msg)))
+#else
+// release
+#define dbg_assert(test,msg) ((void)0)
 #endif
 
 #ifndef __GNUC__
