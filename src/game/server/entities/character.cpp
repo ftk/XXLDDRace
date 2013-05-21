@@ -1328,13 +1328,20 @@ void CCharacter::HandleTiles(int Index)
 	{
 		GameServer()->SendChatTarget(GetPlayer()->GetCID(), "Endless hook has been activated");
 		m_EndlessHook = true;
-		m_RescueFlags |= RESCUEFLAG_EHOOK;
+		if(m_RescueFlags & RESCUEFLAG_NOEHOOK)
+			m_RescueFlags &= ~RESCUEFLAG_NOEHOOK;
+		else
+			m_RescueFlags |= RESCUEFLAG_EHOOK;
 	}
 	else if(((m_TileIndex == TILE_EHOOK_END) || (m_TileFIndex == TILE_EHOOK_END)) && m_EndlessHook)
 	{
 		GameServer()->SendChatTarget(GetPlayer()->GetCID(), "Endless hook has been deactivated");
 		m_EndlessHook = false;
-		m_RescueFlags |= RESCUEFLAG_NOEHOOK;
+		if(m_RescueFlags & RESCUEFLAG_EHOOK)
+			m_RescueFlags &= ~RESCUEFLAG_EHOOK;
+		else
+			m_RescueFlags |= RESCUEFLAG_NOEHOOK;
+
 	}
 	if(((m_TileIndex == TILE_HIT_START) || (m_TileFIndex == TILE_HIT_START)) && m_Hit != HIT_ALL)
 	{
@@ -1613,10 +1620,13 @@ void CCharacter::HandleTiles(int Index)
 			m_Core.m_MaxJumps--; //remove a jump
 	}
 	
+	if((m_TileIndex >= TILE_EXTRA_START && m_TileIndex <= TILE_EXTRA_END) || (m_TileFIndex >= TILE_EXTRA_START && m_TileFIndex <= TILE_EXTRA_END))
 	{
 		// tune mod
 		//CTuningParams * Tuning = &m_ChrTuning;//GameServer()->Tuning(m_pPlayer->GetCID());
 		bool TuningSend = false;
+		const int TicksPerSecond = 50;
+		
 		#define TUNE_TILE(tile,param,value) \
 			if(((m_TileIndex == tile) || (m_TileFIndex == tile)) && m_ChrTuning.m_##param.Get() != value) \
 			{ \
@@ -1644,7 +1654,37 @@ void CCharacter::HandleTiles(int Index)
 		TUNE_TILE(0xab, AirFriction, AF)
 		TUNE_TILE(0xac, AirFriction, 0)
 		TUNE_TILE(0xad, AirFriction, 100)
+				
 		
+		const int HL = 38000;
+		TUNE_TILE(0x90, HookLength, HL)
+		TUNE_TILE(0x91, HookLength, 2*HL)
+		TUNE_TILE(0x92, HookLength, 3*HL)
+		TUNE_TILE(0x93, HookLength, HL/2)
+		
+		const int GCS = 1000;
+		TUNE_TILE(0x94, GroundControlSpeed, GCS)
+		TUNE_TILE(0x95, GroundControlSpeed, 2*GCS)
+		TUNE_TILE(0x96, GroundControlSpeed, GCS/2)
+		
+		const int ACS = 25000 / TicksPerSecond;
+		TUNE_TILE(0x97, AirControlSpeed, ACS)
+		TUNE_TILE(0x98, AirControlSpeed, 2*ACS)						
+		TUNE_TILE(0x99, AirControlSpeed, 3*ACS)
+		TUNE_TILE(0x9a, AirControlSpeed, ACS/2)
+		
+		const int GJI = 1320;
+		TUNE_TILE(0x9b, GroundJumpImpulse, GJI)
+		TUNE_TILE(0x9c, GroundJumpImpulse, 0)
+		TUNE_TILE(0x9d, GroundJumpImpulse, 2*GJI)
+		
+		const int Yes = 100, No = 0;
+		
+		TUNE_TILE(0xae, PlayerHooking, Yes)
+		TUNE_TILE(0xaf, PlayerHooking, No)
+
+		TUNE_TILE(0x9e, PlayerCollision, Yes)
+		TUNE_TILE(0x9f, PlayerCollision, No)
 		#undef TUNE_TILE
 		
 		if(TuningSend)

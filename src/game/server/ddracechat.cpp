@@ -952,15 +952,18 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 	                // disarm player
 	                if(pChr->m_RescueFlags & RESCUEFLAG_DISARM)
 	                {
+	                	bool disarmed = false;
 	                	for(int i = WEAPON_SHOTGUN; i < NUM_WEAPONS; i++)
 						{
 							if(pChr->GetWeaponGot(i) && i != WEAPON_NINJA)
 							{
 								pChr->SetWeaponGot(i, false);
 								pChr->SetWeaponAmmo(i, 0);
+								disarmed = true;
 							}
 						}
-						pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You have been disarmed");
+						if(disarmed)
+							pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You have been disarmed");
 	                }
 	                // solo fix
 	                if(pChr->m_RescueFlags & RESCUEFLAG_SOLOOUT)
@@ -986,12 +989,12 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 	                		CCharacter::DISABLE_HIT_RIFLE|CCharacter::DISABLE_HIT_SHOTGUN;
 	                }
 	                // endless hook fix
-	                if(pChr->m_RescueFlags & RESCUEFLAG_NOEHOOK)
+	                if(pChr->m_RescueFlags & RESCUEFLAG_NOEHOOK && !pChr->m_EndlessHook)
 	                {
 	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been activated");
 	                	pChr->m_EndlessHook = true;
 	                }
-	                else if(pChr->m_RescueFlags & RESCUEFLAG_EHOOK)
+	                else if(pChr->m_RescueFlags & RESCUEFLAG_EHOOK && pChr->m_EndlessHook)
 	                {
 	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been deactivated");
 	                	pChr->m_EndlessHook = false;

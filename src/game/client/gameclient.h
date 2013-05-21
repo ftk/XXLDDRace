@@ -255,6 +255,11 @@ public:
 
 	class CRaceDemo *m_pRaceDemo;
 	class CGhost *m_pGhost;
+	
+	inline bool IsDDRaceServer() const
+	{
+		return m_IsDDRace;
+	}
 
 private:
 

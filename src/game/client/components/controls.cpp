@@ -164,6 +164,8 @@ static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 	}
 	else if(pSelf->pControls->aimbot != -1)
 		return;
+	if(!pSelf->pClient->IsDDRaceServer())
+		return;
 	
 	int64 mindist = 1000000000LL;
 	int id = -1;
