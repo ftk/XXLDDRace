@@ -50,7 +50,6 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 		SPACER=2,
 
 		COL_FLAG_LOCK=0,
-		COL_FLAG_PURE,
 		COL_FLAG_FAV,
 		COL_NAME,
 		COL_GAMETYPE,
@@ -63,12 +62,11 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 	static CColumn s_aCols[] = {
 		{-1,			-1,						" ",		-1, 2.0f, 0, {0}, {0}},
 		{COL_FLAG_LOCK,	-1,						" ",		-1, 14.0f, 0, {0}, {0}},
-		{COL_FLAG_PURE,	-1,						" ",		-1, 14.0f, 0, {0}, {0}},
 		{COL_FLAG_FAV,	-1,						" ",		-1, 14.0f, 0, {0}, {0}},
 		{COL_NAME,		IServerBrowser::SORT_NAME,		"Name",		0, 300.0f, 0, {0}, {0}},	// Localize - these strings are localized within CLocConstString
-		{COL_GAMETYPE,	IServerBrowser::SORT_GAMETYPE,	"Type",		1, 50.0f, 0, {0}, {0}},
+		{COL_GAMETYPE,	IServerBrowser::SORT_GAMETYPE,	"Type",		1, 70.0f, 0, {0}, {0}},
 		{COL_MAP,		IServerBrowser::SORT_MAP,			"Map", 		1, 100.0f, 0, {0}, {0}},
-		{COL_PLAYERS,	IServerBrowser::SORT_NUMPLAYERS,	"Players",	1, 60.0f, 0, {0}, {0}},
+		{COL_PLAYERS,	IServerBrowser::SORT_NUMPLAYERS,	"Players",	1, 50.0f, 0, {0}, {0}},
 		{-1,			-1,						" ",		1, 10.0f, 0, {0}, {0}},
 		{COL_PING,		IServerBrowser::SORT_PING,		"Ping",		1, 40.0f, FIXED, {0}, {0}},
 	};
@@ -310,20 +308,6 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 				if(pItem->m_Flags & SERVER_FLAG_PASSWORD)
 					DoButton_Icon(IMAGE_BROWSEICONS, SPRITE_BROWSE_LOCK, &Button);
 			}
-			else if(ID == COL_FLAG_PURE)
-			{
-				if(	str_comp(pItem->m_aGameType, "DM") == 0 ||
-					str_comp(pItem->m_aGameType, "TDM") == 0 ||
-					str_comp(pItem->m_aGameType, "CTF") == 0)
-				{
-					// pure server
-				}
-				else
-				{
-					// unpure
-					DoButton_Icon(IMAGE_BROWSEICONS, SPRITE_BROWSE_UNPURE, &Button);
-				}
-			}
 			else if(ID == COL_FLAG_FAV)
 			{
 				if(pItem->m_Favorite)
@@ -412,7 +396,13 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 				CTextCursor Cursor;
 				TextRender()->SetCursor(&Cursor, Button.x, Button.y, 12.0f*UI()->Scale(), TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
 				Cursor.m_LineWidth = Button.w;
+				unsigned GameTypeHash = str_quickhash(pItem->m_aGameType);
+				TextRender()->TextColor(float(GameTypeHash & 0x3ff | 64)/0x3ff,
+					float((GameTypeHash >> 10) & 0x3ff | 64)/0x3ff,
+					float((GameTypeHash >> 20) & 0x3ff | 64)/0x3ff, 
+					1);
 				TextRender()->TextEx(&Cursor, pItem->m_aGameType, -1);
+				TextRender()->TextColor(1,1,1,1);
 			}
 
 		}
