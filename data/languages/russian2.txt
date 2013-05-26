@@ -1,0 +1,688 @@
+
+##### translated strings #####
+
+%d Bytes
+== %d байтов
+
+%d of %d servers, %d players
+== %d из %d серверов, %d проигрывателей
+
+%d%% loaded
+== %d%% загружен
+
+%ds left
+== %d сек остался
+
+%i minute left
+== %i минута остался!
+
+%i minutes left
+== %i минут остался!
+
+%i second left
+== %i секунда остался!
+
+%i seconds left
+== %i секунд остался!
+
+%s wins!
+== %s подебил!
+
+-Page %d-
+== -Служитель %d-
+
+Abort
+== Аборт
+
+Add
+== Добавьте
+
+Add Friend
+== Друг добавьте
+
+Address
+== Аддресс
+
+All
+== Всё
+
+Alpha
+== Альфа
+
+Always show name plates
+== Всегда показать плитку имени
+
+Are you sure that you want to delete the demo?
+== Вы хотите удалить демонстрацию?
+
+Are you sure that you want to quit?
+== Вы действительно хотите уйти?
+
+Are you sure that you want to remove the player from your friends list?
+== Вы хотите удалить проигрыватель из твоего друзей списка?
+
+As this is the first time you launch the game, please enter your nick name below. It's recommended that you check the settings to adjust them to your liking before joining a server.
+== Это первое время ты запустил игру, Вам необходимо ввести свой логин низко. Лучше всего, чтобы узнать их возможности настроить по своему вкусу, прежде чем подключиться к серверу.
+
+Automatically record demos
+== Автоматически рекорд демонстраций
+
+Automatically take game over screenshot
+== Автоматически брать игра окончена выстрел в экран
+
+Blue team
+== Синяя команда
+
+Blue team wins!
+== Синяя команда победили!
+
+Body
+== Труп
+
+Call vote
+== Звонок голосу
+
+Change settings
+== Изменить возможности
+
+Chat
+== Болтун
+
+Clan
+== Род
+
+Client
+== Заказчик
+
+Close
+== Закрытие
+
+Compatible version
+== Совместимый вариант
+
+Connect
+== Присоединиться
+
+Connecting to
+== Присоединиться к
+
+Connection Problems...
+== Присоединиться проблемы...
+
+Console
+== Утешить
+
+Controls
+== Управление
+
+Count players only
+== Считать проигрывателей только
+
+Country
+== Кантри
+
+Crc:
+== СРС:
+
+Created:
+== Созданный:
+
+Current
+== Текущий
+
+Current version: %s
+== Версия текущая: %s
+
+Custom colors
+== Обычай цвета
+
+Delete
+== Удалять
+
+Delete demo
+== Удалить демонстрацию
+
+Demo details
+== Демонстрация детали
+
+Demofile: %s
+== Демонстрация: %s
+
+Demos
+== Демонстраций
+
+Disconnect
+== Разъединять
+
+Disconnected
+== Разъединено
+
+Display Modes
+== Режим отображателя
+
+Downloading map
+== Загружаем карту
+
+Draw!
+== Рисовать!
+
+Dynamic Camera
+== Динамика камеры
+
+Emoticon
+== Эмоция-смайлик
+
+Enter
+== Ввод
+
+Error
+== Ошибка
+
+Error loading demo
+== Ошибка загрузки демонстрации
+
+FSAA samples
+== FSAA образцы
+
+Favorite
+== Любимый
+
+Favorites
+== Любимые
+
+Feet
+== Нога
+
+Filter
+== Фильтровать
+
+Fire
+== Огонь
+
+Folder
+== Фольдер
+
+Force vote
+== Сила голоса
+
+Free-View
+== Вид свободы
+
+Friends
+== Други
+
+Fullscreen
+== Полный экран
+
+Game
+== Игра
+
+Game info
+== Игра информация
+
+Game over
+== Конец игры
+
+Game type
+== Игры тип
+
+Game types:
+== Игры типы:
+
+General
+== Генерал
+
+Graphics
+== Графики
+
+Grenade
+== Граната
+
+Hammer
+== Молоток
+
+Has people playing
+== Люди проигрываются
+
+High Detail
+== Высокие детали
+
+Hook
+== Крючок
+
+Host address
+== Адрес хозяина
+
+Hue
+== Хуе
+
+Info
+== Информировать
+
+Internet
+== Интернет
+
+Invalid Demo
+== Инвалид демонстрации
+
+Join blue
+== Вступить синий
+
+Join game
+== Вступить в игру
+
+Join red
+== Вступить красный
+
+Jump
+== Прыгай
+
+Kick player
+== Пнуть проигрыватель
+
+LAN
+== ЛВС
+
+Language
+== Язык
+
+Length:
+== Расстояние
+
+Lht.
+== Лхт
+
+Loading
+== Загружаем
+
+MOTD
+== МОТД
+
+Map
+== Карта
+
+Map:
+== Карта:
+
+Max Screenshots
+== Максим выстрела в экран
+
+Max demos
+== Максим демонстрация
+
+Maximum ping:
+== Максимум пинг:
+
+Miscellaneous
+== Смешанный
+
+Mouse sens.
+== Мышь чувствует
+
+Move left
+== Двигай влево
+
+Move player to spectators
+== Сделать проигрыватель зрителем
+
+Move right
+== Двигай вправо
+
+Movement
+== Двигаться
+
+Mute when not active
+== Немой когда неактивный
+
+Name
+== Имя
+
+Name plates size
+== Размер плитки имени
+
+Netversion:
+== Нетверсии:
+
+New name:
+== Новое имя
+
+News
+== Новые
+
+Next weapon
+== След оружие
+
+Nickname
+== Имя Ника
+
+No
+== Не
+
+No password
+== Не пароль
+
+No servers found
+== Сервера нет найденых
+
+No servers match your filter criteria
+== Нет серверов под Ваш критерий
+
+Ok
+== Окей
+
+Open
+== Открывать
+
+Parent Folder
+== Папка родителя
+
+Password
+== Пароль
+
+Password incorrect
+== Пароль не корректен
+
+Ping
+== Пинг
+
+Pistol
+== Пистолет
+
+Play
+== Проигрывать
+
+Play background music
+== Проигрывать заднюю музыку
+
+Player
+== Проигрыватель
+
+Player country:
+== Страна проигрывателя:
+
+Player options
+== Опции проигрывателя
+
+Players
+== Проигрыватели
+
+Please balance teams!
+== Пожалуйста баланс!
+
+Prev. weapon
+== Прев. оружие
+
+Quality Textures
+== Качество текстур
+
+Quick search:
+== Искать быстро:
+
+Quit
+== Выйти
+
+Quit anyway?
+== Выйти всё равно?
+
+REC %3d:%02d
+== РЕК %3d:%02d
+
+Reason:
+== Резон:
+
+Record demo
+== Рекорд демонстрации
+
+Red team
+== Команда красный
+
+Red team wins!
+== Команда красный подебили!
+
+Refresh
+== Регенерация
+
+Refreshing master servers
+== Регенерация серверов мастера 
+
+Remote console
+== Консоль удалена
+
+Remove
+== Удалять
+
+Remove friend
+== Удалять друзей
+
+Rename
+== Переназвать
+
+Rename demo
+== Переназвать демонстрацию
+
+Reset filter
+== Сброс фильтра
+
+Reset to defaults
+== Сброс к началам
+
+Rifle
+== Винтовка
+
+Round
+== Патрон
+
+Sample rate
+== Скорость образцов
+
+Sat.
+== Спутник
+
+Score
+== Счет
+
+Score board
+== Доска счета
+
+Score limit
+== Ограничить счет
+
+Scoreboard
+== Доска счета
+
+Screenshot
+== Выстрел в экран
+
+Server address:
+== Сервер адрес
+
+Server details
+== Сервер деталей
+
+Server filter
+== Сервер фильтр
+
+Server info
+== Сервер информация
+
+Server not full
+== Сервер не полный
+
+Settings
+== Возможности
+
+Shotgun
+== Дробовик
+
+Show chat
+== Показать болтовню
+
+Show friends only
+== Показать только друзей
+
+Show ingame HUD
+== Показать ХУД игры
+
+Show name plates
+== Показать плитки имён
+
+Show only supported
+== Показать только поддерживать
+
+Size:
+== Размер:
+
+Skins
+== Кожа
+
+Sound
+== Звук
+
+Sound error
+== Звуковая ошибка
+
+Sound volume
+== Звуковая громкость
+
+Spectate
+== Зритель
+
+Spectate next
+== Зритель след.
+
+Spectate previous
+== Зритель пред.
+
+Spectator mode
+== Зритель режима
+
+Spectators
+== Зрители
+
+Standard gametype
+== Стандартный gametype
+
+Standard map
+== Стандартная карта
+
+Stop record
+== Остановить рекорд
+
+Strict gametype filter
+== Строгий gametype фильтр
+
+Sudden Death
+== Внезапно смерть
+
+Switch weapon on pickup
+== Переключить оружие на пикапе
+
+Team
+== Команда
+
+Team chat
+== Командная болтовня
+
+Teeworlds %s is out! Download it at www.teeworlds.com!
+== Тройник миров %s ушел! Качай www.teeworlds.com
+
+Texture Compression
+== Текстура компрессия
+
+The audio device couldn't be initialised.
+== Аудио устройство не может быть инициализировано
+
+The server is running a non-standard tuning on a pure game type.
+== Сервер запущен с нестандартными тюнингом на чистом gametype.
+
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== Есть не спасти карту в редакторе, Вы возможно хотите спасти это перед тем, как уйти.
+
+Time limit
+== Ограничение времени
+
+Time limit: %d min
+== Ограничение времени: %d м
+
+Try again
+== Попробуй опять
+
+Type
+== Типо
+
+Type:
+== Типо:
+
+UI Color
+== Цвет УЙ
+
+Unable to delete the demo
+== Не удалять демонстрацию
+
+Unable to rename the demo
+== Не переназвать демонстрацию
+
+Use sounds
+== Используй звуки
+
+Use team colors for name plates
+== Используй цвета команд для плитки имен
+
+V-Sync
+== В-Сунц
+
+Version
+== Версия
+
+Version:
+== Версия:
+
+Vote command:
+== Команда голоса:
+
+Vote description:
+== Описание голоса:
+
+Vote no
+== Голос нет
+
+Vote yes
+== Голос да
+
+Voting
+== Голосование
+
+Warmup
+== Тепло
+
+Weapon
+== Оружие
+
+Welcome to Teeworlds
+== Добро пожаловать в Тройник миров!
+
+Yes
+== Да
+
+You must restart the game for all settings to take effect.
+== Ты должен старт игры для всех возможностей принять эффект
+
+Your skin
+== Ваша кожа
+
+no limit
+== Нет ограничению
+
+##### needs translation #####
+
+Game paused
+== Игра остановить
+
+Respawn
+== Перепорождать
+
+Show only chat messages from friends
+== Покажи болтовню сообщений только от друга
+
+##### old translations #####
+

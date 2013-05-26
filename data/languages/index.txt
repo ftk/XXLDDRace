@@ -72,6 +72,10 @@ russian
 == Русский
 == 643
 
+russian2
+== PYCCKNN
+== 643
+
 serbian
 == Srpski
 == 688
