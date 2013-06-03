@@ -1214,3 +1214,28 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 	}
 }
 
+void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData)
+{
+    CGameContext *pSelf = (CGameContext *) pUserData;
+    const int ClientID = pResult->m_ClientID;
+    CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
+    if(!pChar)
+    	return;
+    auto iterator = pSelf->m_SavedPlayers.find(pSelf->Server()->ClientName(ClientID));
+    if(iterator == pSelf->m_SavedPlayers.end())
+    	return;
+    
+	CPlayerRescueState& state = iterator->second;
+	if(state.Pos == vec2(0.f, 0.f))
+		return;
+	
+	pChar->Core()->m_Pos = state.Pos;
+	pChar->Core()->m_Vel = vec2(0.f, 0.f);
+	pChar->m_StartTime = state.StartTime;
+	pChar->m_DDRaceState = state.DDState;
+	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+		if(state.WFlags & (1U << i))
+			pChar->GiveWeapon(i, -1);
+	pSelf->m_SavedPlayers.erase(iterator);
+}
+

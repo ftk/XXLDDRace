@@ -733,6 +733,24 @@ void CGameContext::OnClientConnected(int ClientID)
 void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 {
 	AbortVoteKickOnDisconnect(ClientID);
+	// save position
+	{
+		CCharacter * pChar = GetPlayerChar(ClientID);
+		if(pChar && !pChar->Team())
+		{
+			CPlayerRescueState state;
+			
+			state.Pos = pChar->m_RescuePos;
+			state.StartTime = pChar->m_StartTime;
+			state.DDState = pChar->m_DDRaceState | DDRACE_CHEAT;
+			state.WFlags = 0;
+			for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+				if(pChar->GetWeaponGot(i))
+					state.WFlags |= (1U << i);
+			m_SavedPlayers[Server()->ClientName(ClientID)] = state;
+		}
+	}
+	
 	m_apPlayers[ClientID]->OnDisconnect(pReason);
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = 0;

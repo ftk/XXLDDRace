@@ -36,6 +36,8 @@ CHAT_COMMAND("logout", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLogOut, this, "Logo
 CHAT_COMMAND("solo", "", CFGFLAG_CHAT|CFGFLAG_SERVER, ConSolo, this, "Activate/deactivate solo mode")
 CHAT_COMMAND("pm", "ir", CFGFLAG_CHAT|CFGFLAG_SERVER, ConPrivMsg, this, "Send private message")
 
+CHAT_COMMAND("dr", "", CFGFLAG_CHAT|CFGFLAG_SERVER, ConDisconnectRescue, this, "Rescue to location before disconnect")
+
 #if defined(CONF_SQL)
 CHAT_COMMAND("times", "?s?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConTimes, this, "/times ?s?i shows last 5 times of the server or of a player beginning with name s starting with time i (i = 1 by default)")
 #endif

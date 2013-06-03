@@ -17,6 +17,10 @@
 #include "memberlist.h"
 
 #include "score.h"
+
+#include <map>
+#include <string>
+
 /*
 	Tick
 		Game Context (CGameContext::tick)
@@ -70,8 +74,9 @@ class CGameContext : public IGameServer
 
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
-
+	
 	bool m_Resetting;
+	
 public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }
@@ -307,6 +312,8 @@ private:
 	static void ConFake(IConsole::IResult *pResult, void *pUserData);
 	static void ConFakeTo(IConsole::IResult *pResult, void *pUserData);
 	static void ConSilentRename(IConsole::IResult *pResult, void *pUserData);
+	
+	static void ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData);
 
 	enum
 	{
@@ -343,6 +350,16 @@ public:
 
 	int m_ChatResponseTargetID;
 	int m_ChatPrintCBIndex;
+	
+	struct CPlayerRescueState
+	{
+		vec2 Pos;
+		int StartTime;
+		int DDState;
+		unsigned WFlags;
+	};
+	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
+
 };
 
 inline int CmaskAll() { return -1; }
