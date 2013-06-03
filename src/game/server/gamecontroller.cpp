@@ -158,11 +158,11 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 	sides[7]=GameServer()->Collision()->Entity(x-1,y+1, Layer);
 
 
-	if(Index == ENTITY_SPAWN)
+	if(Index == ENTITY_SPAWN && m_aNumSpawnPoints[0] != MAX_SPAWNS)
 		m_aaSpawnPoints[0][m_aNumSpawnPoints[0]++] = Pos;
-	else if(Index == ENTITY_SPAWN_RED)
+	else if(Index == ENTITY_SPAWN_RED && m_aNumSpawnPoints[1] != MAX_SPAWNS)
 		m_aaSpawnPoints[1][m_aNumSpawnPoints[1]++] = Pos;
-	else if(Index == ENTITY_SPAWN_BLUE)
+	else if(Index == ENTITY_SPAWN_BLUE && m_aNumSpawnPoints[2] != MAX_SPAWNS)
 		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
 
 	else if(Index == ENTITY_DOOR)
@@ -420,7 +420,7 @@ void IGameController::ChangeMap(const char *pToMap)
 {
 	/*str_copy(m_aMapWish, pToMap, sizeof(m_aMapWish));
 	EndRound();*/
-	str_copy(g_Config.m_SvMap, pToMap, sizeof(m_aMapWish));
+	str_copy(g_Config.m_SvMap, pToMap, sizeof(g_Config.m_SvMap));
 }
 
 /*void IGameController::CycleMap()

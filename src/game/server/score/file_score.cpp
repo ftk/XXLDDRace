@@ -4,7 +4,6 @@
 #include <base/tl/sorted_array.h>
 
 #include <engine/shared/config.h>
-#include <sstream>
 #include <fstream>
 #include <string.h>
 #include "../gamemodes/DDRace.h"
@@ -43,13 +42,20 @@ CFileScore::~CFileScore()
 
 std::string SaveFile()
 {
-	std::ostringstream oss;
+	std::string str;
 	if (g_Config.m_SvScoreFolder[0])
-		oss << g_Config.m_SvScoreFolder << "/" << g_Config.m_SvMap
-		<< "_record.dtb";
+	{
+		str = g_Config.m_SvScoreFolder;
+		str += "/" ;
+		str += g_Config.m_SvMap;
+		str += "_record.dtb";
+	}
 	else
-		oss << g_Config.m_SvMap << "_record.dtb";
-	return oss.str();
+	{
+		str = g_Config.m_SvMap;
+		str += "_record.dtb";
+	}
+	return str;
 }
 
 void CFileScore::SaveScoreThread(void *pUser)
@@ -73,8 +79,6 @@ void CFileScore::SaveScoreThread(void *pUser)
 				f << std::endl;
 			}
 			t++;
-			if (t % 50 == 0)
-				thread_sleep(1);
 		}
 	}
 	f.close();

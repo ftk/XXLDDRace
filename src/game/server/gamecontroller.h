@@ -14,7 +14,8 @@ class CDoor;
 */
 class IGameController
 {
-	vec2 m_aaSpawnPoints[3][64];
+	enum { MAX_SPAWNS = 128 };
+	vec2 m_aaSpawnPoints[3][MAX_SPAWNS];
 	int m_aNumSpawnPoints[3];
 
 	class CGameContext *m_pGameServer;
