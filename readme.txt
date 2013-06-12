@@ -1,3 +1,27 @@
+
+mkRace is a mod of XXLDDRace with various features.
+
+Features (server):
+ - Per player tuning using tune tiles
+ - New commands: /solo /pm /dr
+ - Bug fixes
+ - The most recent version of teeworlds
+
+Features (client):
+ - Custom quit message (command "quitmessage")
+ - Improved freeze prediction
+ - Bug fixes
+ - New commands: +autohook +autohit
+ - All features of teeworlds 0.6.2 client
+ - Ctrl+V in chat (Windows)
+ - Ctrl+W and Ctrl+U shortcuts in chat
+
+
+teeworlds ---> DDRace ---> XXLDDRace ---> mkRace
+
+-----
+
+
 This is a mod (DDRace) and it's for the game Teeworlds and it's being maintained by GreYFoX@GTi & btd with the help of others like heinrich5991, noother & Floff, in the previous versions 3da and Fluxid.
 
 DDRace has been rebuilt from scratch by btd based on DDRace-Beta to Teeworlds Trunk 0.5, GreYFoX@GTi helped re-adding features once it was Trunk, you can track this in the commit log.
