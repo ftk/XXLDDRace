@@ -684,8 +684,8 @@ void CGameContext::OnClientEnter(int ClientID)
 		str_format(aBuf, sizeof(aBuf), "'%s' entered and joined the %s", Server()->ClientName(ClientID), m_pController->GetTeamName(m_apPlayers[ClientID]->GetTeam()));
 		SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 
-		SendChatTarget(ClientID, "   XXLDDrace "  XXL_VERSION " by XXLTomate");
-		SendChatTarget(ClientID, "   DDRace-mod with some extras.");
+		SendChatTarget(ClientID, "   Welcome to mkRace " GIT_SHORTREV_HASH);
+		SendChatTarget(ClientID, "   XXLDDRace mod with some extras.");
 		SendChatTarget(ClientID, "   For more info write /info");
 
 		if(g_Config.m_SvWelcome[0]!=0)
@@ -742,7 +742,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 			
 			state.Pos = pChar->m_RescuePos;
 			state.StartTime = pChar->m_StartTime;
-			state.DDState = pChar->m_DDRaceState | DDRACE_CHEAT;
+			state.DDState = pChar->m_DDRaceState;
 			state.WFlags = 0;
 			for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
 				if(pChar->GetWeaponGot(i))

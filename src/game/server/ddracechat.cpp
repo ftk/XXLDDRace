@@ -34,24 +34,24 @@ void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credit",
 			"Code (in the past): \'3DA\' and \'Fluxid\'");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credit",
-			"Modded mod by XXLTomate.");
+			"XXLDDRace by XXLTomate. mkRace by z and disarmer");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credit",
-			"Info at XXL-Clan.com .");
+			"Visit www.disarmer.ru for more information.");
 }
 
 void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
-			"-->XXLDDRace<--");
+			"mkRace rev. " GIT_SHORTREV_HASH);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
-			"Mod by XXLTomate based on");
+			"mkRace based on XXLDDRace mod by XXLTomate");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
 			"DDRace Mod. Version: " DDRACE_VERSION);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
 			"XXLDDRace Mod. Version: " XXL_VERSION);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
-			"Download and info at XXL-Clan.com");
+			"Visit disarmer.ru");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
 			"For commands /cmdlist");
 }
@@ -1234,8 +1234,12 @@ void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserDa
 	pChar->m_StartTime = state.StartTime;
 	pChar->m_DDRaceState = state.DDState;
 	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+	{
+		pChar->SetWeaponGot(i, false);
+		pChar->SetWeaponAmmo(i, 0);
 		if(state.WFlags & (1U << i))
 			pChar->GiveWeapon(i, -1);
+	}
 	pSelf->m_SavedPlayers.erase(iterator);
 }
 
