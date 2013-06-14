@@ -839,7 +839,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 	
 				Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_ADMIN);
-				Console()->SetFlagMask(CFGFLAG_SERVER);
+				Console()->SetFlagMask(CFGFLAG_SERVER|CFGFLAG_ECON);
 				m_ChatResponseTargetID = -1;
 			}
 			else
