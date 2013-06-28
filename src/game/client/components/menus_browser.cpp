@@ -397,9 +397,9 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 				TextRender()->SetCursor(&Cursor, Button.x, Button.y, 12.0f*UI()->Scale(), TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
 				Cursor.m_LineWidth = Button.w;
 				unsigned GameTypeHash = str_quickhash(pItem->m_aGameType);
-				TextRender()->TextColor(float(GameTypeHash & 0x3ff | 64)/0x3ff,
-					float((GameTypeHash >> 10) & 0x3ff | 64)/0x3ff,
-					float((GameTypeHash >> 20) & 0x3ff | 64)/0x3ff, 
+				TextRender()->TextColor(float((GameTypeHash & 0x3ff) | 128)/0x3ff,
+					float(((GameTypeHash >> 10) & 0x3ff) | 128)/0x3ff,
+					float(((GameTypeHash >> 20) & 0x3ff) | 128)/0x3ff, 
 					1);
 				TextRender()->TextEx(&Cursor, pItem->m_aGameType, -1);
 				TextRender()->TextColor(1,1,1,1);

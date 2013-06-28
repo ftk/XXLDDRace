@@ -1417,7 +1417,16 @@ void CGameContext::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "%s changed to %.2f", pParamName, NewValue);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
-		pSelf->SendTuningParams(-1);
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			CCharacter *pChr = pSelf->GetPlayerChar(i);
+			if(pChr)
+			{
+				pChr->m_ChrTuning.Set(pParamName, NewValue);
+				pSelf->SendTuningParams(i);
+			}
+		}
+
 	}
 	else
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "No such tuning parameter");
@@ -2178,9 +2187,12 @@ void CGameContext::SendChatResponse(const char *pLine, void *pUser)
 	ReentryGuard++;
 
 	if(*pLine == '[')
-	do
+	{
 		pLine++;
-	while(*(pLine - 2) != ':' && *pLine != 0); // remove the category (e.g. [Console]: No Such Command)
+		do
+			pLine++;
+		while(*(pLine - 2) != ':' && *pLine != 0); // remove the category (e.g. [Console]: No Such Command)
+	}
 
 	pSelf->SendChatTarget(ClientID, pLine);
 
