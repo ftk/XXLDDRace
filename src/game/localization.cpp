@@ -8,10 +8,25 @@
 #include <engine/console.h>
 #include <engine/storage.h>
 
+#include <unordered_map>
+
+static std::unordered_map<const char*, const char*> loc;
+
 const char *Localize(const char *pStr)
 {
+	//dbg_msg("localize", "searching for %s", pStr);
+	
+	auto it = loc.find(pStr);
+	if(it != loc.end())
+		return it->second;
+	
 	const char *pNewStr = g_Localization.FindString(str_quickhash(pStr));
-	return pNewStr ? pNewStr : pStr;
+	
+	pNewStr = pNewStr ? pNewStr : pStr;
+	
+	//dbg_msg("localize", "%s -> %s", pStr, pNewStr);
+	loc[pStr] = pNewStr;
+	return pNewStr;
 }
 
 CLocConstString::CLocConstString(const char *pStr)
@@ -62,6 +77,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 	str_format(aBuf, sizeof(aBuf), "loaded '%s'", pFilename);
 	pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 	m_Strings.clear();
+	loc.clear();
 
 	char aOrigin[512];
 	CLineReader LineReader;

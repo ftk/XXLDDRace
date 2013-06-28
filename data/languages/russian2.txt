@@ -218,7 +218,7 @@ Game
 == Игра
 
 Game info
-== Игра информация
+== Игры информация
 
 Game over
 == Конец игры
@@ -560,7 +560,7 @@ Spectators
 == Зрители
 
 Standard gametype
-== Стандартный gametype
+== Стандартный тип
 
 Standard map
 == Стандартная карта
@@ -569,7 +569,7 @@ Stop record
 == Остановить рекорд
 
 Strict gametype filter
-== Строгий gametype фильтр
+== Строгий типа фильтр
 
 Sudden Death
 == Внезапно смерть
@@ -587,13 +587,13 @@ Teeworlds %s is out! Download it at www.teeworlds.com!
 == Тройник миров %s ушел! Качай www.teeworlds.com
 
 Texture Compression
-== Текстура компрессия
+== Текстуры компрессия
 
 The audio device couldn't be initialised.
 == Аудио устройство не может быть инициализировано
 
 The server is running a non-standard tuning on a pure game type.
-== Сервер запущен с нестандартными тюнингом на чистом gametype.
+== Сервер запущен с нестандартными тюнами на чистом типе.
 
 There's an unsaved map in the editor, you might want to save it before you quit the game.
 == Есть не спасти карту в редакторе, Вы возможно хотите спасти это перед тем, как уйти.
@@ -632,10 +632,10 @@ V-Sync
 == В-Сунц
 
 Version
-== Версия
+== Версий
 
 Version:
-== Версия:
+== Версий:
 
 Vote command:
 == Команда голоса:
@@ -684,5 +684,42 @@ Respawn
 Show only chat messages from friends
 == Покажи болтовню сообщений только от друга
 
-##### old translations #####
+DDRace
+== Диди Раса
+
+Cute!!! Minitees
+== Милый маленький тройник
+
+Use DDRace Scoreboard
+== Используй доску Диди расы
+
+Show client IDs in Scoreboard
+== Покажи какие клиенты на доске
+
+Tee
+== Тройник
+
+Bind free keys with DDRace pre-configured binds
+== Связать и освободить ключи с помощью Диди расизм конфигурации
+
+Show players in other teams
+== Покажи проигрыватель в другой бригаде
+
+Enable save ghost
+== Сберечь привидение 
+
+Enable show ghost
+== Покажи привидение
+
+Enable ghost
+== Включить привидение
+
+Enable save the player name within the demo
+== Сберечь проигрыватель, а имя внутри демонстрации
+
+Enable save the best demo of each race
+== Сберечь лучшую демонстрацию расы
+
+Enable DDRace cheats like zoom
+== Диди обманывает зум
 
