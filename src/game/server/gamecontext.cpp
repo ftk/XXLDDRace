@@ -827,11 +827,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	
 				Console()->ExecuteLine(pMsg->m_pMessage + 1, ClientID);
 	
-				if(!strncmp(pMsg->m_pMessage, "login ", 6))
+				if(!strncmp(pMsg->m_pMessage+1, "login ", 6))
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "chat", "login ***");
-				else if(!strncmp(pMsg->m_pMessage, "register ", 9))
+				else if(!strncmp(pMsg->m_pMessage+1, "register ", 9))
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "chat", "register ***");
-				else
+				else if(pMsg->m_pMessage[1] != 'r' || pMsg->m_pMessage[2]) // skip "/r"
 				{
 					char aBuf[256];
 					str_format(aBuf, sizeof(aBuf), "%d used %s", ClientID, pMsg->m_pMessage);

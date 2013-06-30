@@ -457,43 +457,8 @@ void CControls::Aim()
 {
 	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
 	{
-		const int localid = m_pClient->m_Snap.m_LocalClientID;
+		//const int localid = m_pClient->m_Snap.m_LocalClientID;
 		
-		#ifdef AIMBOT_SNAPSHOT
-		
-		const CNetObj_Character& Prev = m_pClient->m_Snap.m_aCharacters[aimbot].m_Prev;
-		const CNetObj_Character& Cur = m_pClient->m_Snap.m_aCharacters[aimbot].m_Cur;
-		const CNetObj_Character& PrevLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Prev;
-		const CNetObj_Character& CurLocal = m_pClient->m_Snap.m_aCharacters[localid].m_Cur;
-		
-		//float IntraTick = Client()->IntraGameTick();
-		
-		//vec2 pos = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Cur.m_X, Cur.m_Y), IntraTick);
-		vec2 pos = vec2(Cur.m_X, Cur.m_Y);
-		//vec2 pos = m_pClient->m_Snap.m_aCharacters[aimbot].m_Position;
-		vec2 pos_local = m_pClient->m_LocalCharacterPos;
-		// spectating
-		if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-		{
-			//int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
-		}
-		
-		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
-		{
-			//vec2 vel = mix(vec2(Prev.m_VelX/256.f, Prev.m_VelY/256.f), vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f), IntraTick);
-			//vec2 vel_local = mix(vec2(PrevLocal.m_VelX/256.f, PrevLocal.m_VelY/256.f), vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f), IntraTick);
-			vec2 vel = vec2(Cur.m_VelX/256.f, Cur.m_VelY/256.f);
-			vec2 vel_local = vec2(CurLocal.m_VelX/256.f, CurLocal.m_VelY/256.f);
-								
-			pos += vel * aimbot_predict;
-			pos_local += vel_local * aimbot_predict;
-            float dist = distance(pos, pos_local);
-            
-            pos += vel * (dist * aimbot_predict_dist);
-            pos_local += vel_local * (dist * aimbot_predict_dist);
-		}
-		#else
 		vec2 pos_local = m_pClient->m_LocalCharacterPos;
 		vec2 pos = m_pClient->m_aClients[aimbot].m_Predicted.m_Pos;
 		
@@ -504,18 +469,16 @@ void CControls::Aim()
 		}
 		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
 		{
-			vec2 vel_local = m_pClient->m_aClients[localid].m_Predicted.m_Vel;
+			//vec2 vel_local = m_pClient->m_aClients[localid].m_Predicted.m_Vel;
 			vec2 vel = m_pClient->m_aClients[aimbot].m_Predicted.m_Vel;
 			
 			pos += vel * aimbot_predict;
-			pos_local += vel_local * aimbot_predict;
+			//pos_local += vel_local * aimbot_predict;
             float dist = distance(pos, pos_local);
             
             pos += vel * (dist * aimbot_predict_dist);
-            pos_local += vel_local * (dist * aimbot_predict_dist);
+            //pos_local += vel_local * (dist * aimbot_predict_dist);
 		}
-		
-		#endif
 		
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
 			m_MousePos = pos;
