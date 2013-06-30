@@ -903,7 +903,18 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 		return;
 	}
 
-	if(pChr)
+	if(!pChr)
+	{
+		pSelf->SendChatTarget(pResult->m_ClientID, "You are not alive!");
+		return;
+	}
+	
+	if(pChr->m_RescueOverride)
+	{
+		pSelf->SendChatTarget(pResult->m_ClientID, "Rescue is disabled by the map.");
+		return;
+	}
+	
 	{
 		if (!pChr->m_LastRescue || !(pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)){
 
@@ -1010,8 +1021,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 			pChr->m_LastRescue = 0;
 		}
 	}
-	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not alive!");
+
 }
 
 void CGameContext::ConHelper(IConsole::IResult *pResult, void *pUserData)

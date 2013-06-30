@@ -100,6 +100,8 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	//jDDRace
 	m_Core.m_MaxJumps = 2; //2 is default
 	m_Core.m_JumpCount = 0;
+	
+	m_RescueOverride = false;
 
 
 	return true;
@@ -1628,7 +1630,7 @@ void CCharacter::HandleTiles(int Index)
 		const int TicksPerSecond = 50;
 		
 		#define TUNE_TILE(tile,param,value) \
-			if(((m_TileIndex == tile) || (m_TileFIndex == tile)) && m_ChrTuning.m_##param.Get() != value) \
+			if(((m_TileIndex == tile) || (m_TileFIndex == tile)) && m_ChrTuning.m_##param.Get() != (value)) \
 			{ \
 			m_ChrTuning.m_ ## param.Set(value); \
 			TuningSend = true; \
@@ -1685,11 +1687,43 @@ void CCharacter::HandleTiles(int Index)
 
 		TUNE_TILE(0x9e, PlayerCollision, Yes)
 		TUNE_TILE(0x9f, PlayerCollision, No)
+		
+		const int AJI = 1200;
+		TUNE_TILE(0x80, AirJumpImpulse, AJI)
+		TUNE_TILE(0x81, AirJumpImpulse, 0)
+		TUNE_TILE(0x82, AirJumpImpulse, 2*AJI)
+		TUNE_TILE(0x83, AirJumpImpulse, 3*AJI)
+		TUNE_TILE(0x84, AirJumpImpulse, -1*AJI)
+		TUNE_TILE(0x85, AirJumpImpulse, -2*AJI)
+		TUNE_TILE(0x86, AirJumpImpulse, AJI/2)
+		TUNE_TILE(0x87, AirJumpImpulse, AJI/(-2))
+		
+		const int LR = 80000;
+		TUNE_TILE(0x88, LaserReach, LR)
+		TUNE_TILE(0x89, LaserReach, 2*LR)
+		TUNE_TILE(0x8a, LaserReach, LR/2)
+		
+		TUNE_TILE(0x8b, LaserBounceNum, 1)
+		TUNE_TILE(0x8c, LaserBounceNum, 4)
+		TUNE_TILE(0x8d, LaserBounceNum, 0)
+		
 		#undef TUNE_TILE
+		
 		
 		if(TuningSend)
 		{
 			GameServer()->SendTuningParams(m_pPlayer->GetCID());
+		}
+		
+		// enable /R
+		if((m_TileIndex == 0xba) || (m_TileFIndex == 0xba))
+		{
+			m_RescueOverride = false;
+		}
+		else if((m_TileIndex == 0xbb) || (m_TileFIndex == 0xbb))
+		{
+			// disable /R
+			m_RescueOverride = true;
 		}
 	}
 

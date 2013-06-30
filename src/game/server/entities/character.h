@@ -257,7 +257,9 @@ public:
 	bool m_IceHammer;
 	bool m_Fly;
 	int m_HammerType;
+	//
 	CTuningParams m_ChrTuning;
+	bool m_RescueOverride; // no rescue (enabled by map)
 };
 
 enum
