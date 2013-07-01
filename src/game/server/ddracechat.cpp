@@ -955,7 +955,7 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 				//"save" last rescue time
 				pChr->m_LastRescue = RescueDelay * pSelf->Server()->TickSpeed();
 				//Teleport player
-				pChr->Core()->m_Pos = pChr->m_Pos = pChr->m_RescuePos;
+				pChr->Core()->m_Pos = pChr->m_PrevPos = pChr->m_Pos = pChr->m_RescuePos;
                 pChr->Core()->m_Vel = vec2(0.f, 0.f); // reset momentum
                 
                 if(pChr->m_RescueFlags)
@@ -1239,7 +1239,7 @@ void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserDa
 	if(state.Pos == vec2(0.f, 0.f))
 		return;
 	
-	pChar->Core()->m_Pos = pChar->m_Pos = state.Pos;
+	pChar->Core()->m_Pos = pChar->m_PrevPos = pChar->m_Pos = state.Pos;
 	pChar->Core()->m_Vel = vec2(0.f, 0.f);
 	pChar->m_StartTime = state.StartTime;
 	pChar->m_DDRaceState = state.DDState;
