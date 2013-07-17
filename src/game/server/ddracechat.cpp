@@ -1243,6 +1243,7 @@ void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserDa
 	pChar->Core()->m_Vel = vec2(0.f, 0.f);
 	pChar->m_StartTime = state.StartTime;
 	pChar->m_DDRaceState = state.DDState;
+	pChar->m_ChrTuning = state.Tuning;
 	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
 	{
 		pChar->SetWeaponGot(i, false);

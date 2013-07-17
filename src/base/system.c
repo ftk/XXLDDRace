@@ -1583,8 +1583,11 @@ void str_append(char *dst, const char *src, int dst_size)
 
 void str_copy(char *dst, const char *src, int dst_size)
 {
-	strncpy(dst, src, dst_size);
-	dst[dst_size-1] = 0; /* assure null termination */
+    while(--dst_size && *src)
+    {
+        *(dst++) = *(src++);
+    }
+    *dst = '\0';
 }
 
 int str_length(const char *str)

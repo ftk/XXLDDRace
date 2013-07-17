@@ -68,7 +68,7 @@ static int *m_pMixBuffer = 0;	// buffer only used by the thread callback functio
 static unsigned m_MaxFrames = 0;
 
 // TODO: there should be a faster way todo this
-static short Int2Short(int i)
+static inline short Int2Short(int i)
 {
 	if(i > 0x7fff)
 		return 0x7fff;

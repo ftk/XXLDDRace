@@ -357,6 +357,7 @@ public:
 		int StartTime;
 		int DDState;
 		unsigned WFlags;
+		CTuningParams Tuning;
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
 

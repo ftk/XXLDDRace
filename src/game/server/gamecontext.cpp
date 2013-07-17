@@ -744,6 +744,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 			state.StartTime = pChar->m_StartTime;
 			state.DDState = pChar->m_DDRaceState;
 			state.WFlags = 0;
+			state.Tuning = pChar->m_ChrTuning;
 			for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
 				if(pChar->GetWeaponGot(i))
 					state.WFlags |= (1U << i);
