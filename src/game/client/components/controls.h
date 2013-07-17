@@ -34,11 +34,11 @@ public:
 	bool auto_hit;
 	int64 hit_interval;
 	bool auto_hook;
-	//int64 hook_interval;
+	int auto_hook_type;
 	
 	int aimbot;
 	float aimbot_predict;
 	float aimbot_predict_dist;
-	bool aimbot_smooth; // aim on render
+	int aimbot_smooth; // aim on render
 };
 #endif

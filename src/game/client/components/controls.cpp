@@ -19,7 +19,7 @@
 #include "controls.h"
 
 CControls::CControls() : auto_hit(false), hit_interval(0), 
-	auto_hook(false), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.01f), aimbot_smooth(false)
+	auto_hook(false), auto_hook_type(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.01f), aimbot_smooth(0)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -138,7 +138,7 @@ static void ConAutoHook(IConsole::IResult *pResult, void *pUserData)
 	pSelf->auto_hook = !!pResult->GetInteger(0);
 	if(!pSelf->auto_hook)
 		pSelf->m_InputData.m_Hook = 0;
-	//pSelf->hook_interval = (long long)(pResult->GetInteger(1)) * time_freq() / 1000LL;
+	pSelf->auto_hook_type = pResult->GetInteger(1);
 }
 
 static void ConAimbotLock(IConsole::IResult *pResult, void *pUserData)
@@ -200,6 +200,7 @@ static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 	}
 	
 	pSelf->pControls->aimbot = id;
+	pSelf->pControls->Aim();
 }
 static void ConAimbotPredict(IConsole::IResult *pResult, void *pUserData)
 {
@@ -245,8 +246,8 @@ void CControls::OnConsoleInit()
 	
 	Console()->Register("autohit", "ii", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 	Console()->Register("+autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
-	Console()->Register("autohook", "i?i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
-	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Spam-click hook");
+	Console()->Register("autohook", "i?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
+	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
 	{ static CAimbot s_Set = {m_pClient, this}; Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, (void *)&s_Set, "Aimbot lock to the nearest player"); }
     Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
@@ -254,8 +255,8 @@ void CControls::OnConsoleInit()
     
     Console()->Register("aimbot_smooth", "i", CFGFLAG_CLIENT, ([](IConsole::IResult *pResult, void *pUserData)
     {
-		((CControls *)pUserData)->aimbot_smooth = !!pResult->GetInteger(0);
-    }), this, "Toggle smoother visual aim");
+		((CControls *)pUserData)->aimbot_smooth = pResult->GetInteger(0);
+    }), this, "Toggle smoother visual aim (0=on input send, 1=on render, 2=stealth");
     
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
@@ -306,7 +307,7 @@ int CControls::SnapInput(int *pData)
 
 	if(auto_hit && last_hit_time + hit_interval < time)
 	{
-		m_InputData.m_Fire = (m_InputData.m_Fire + 31) & INPUT_STATE_MASK;
+		m_InputData.m_Fire = (m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
 		last_hit_time = time;
 		Send = true;
 	}
@@ -315,11 +316,21 @@ int CControls::SnapInput(int *pData)
 		if(m_InputData.m_Hook)
 		{
 			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
-			//if(last_hook_time + hook_interval < time && hook_state != HOOK_GRABBED)
-			if(hook_state != HOOK_GRABBED && hook_state != HOOK_FLYING)
+			const int hooked_player = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookedPlayer;
+			
+			if(hook_state != HOOK_FLYING)
 			{
-				m_InputData.m_Hook = 0;
-				Send = true;
+				bool unhook = false;
+				switch(auto_hook_type)
+				{
+				case 0: if(hook_state != HOOK_GRABBED) unhook = true; break;
+				case 1: if(hook_state != HOOK_GRABBED || hooked_player == -1) unhook = true; break;
+				case 2: unhook = true; break;
+				}
+				if(unhook)
+				{
+					m_InputData.m_Hook = 0; Send = true;
+				}
 			}
 		}
 		else
@@ -329,7 +340,14 @@ int CControls::SnapInput(int *pData)
 			Send = true;
 		}
 	}
-	Aim();
+	if(aimbot_smooth == 0 || aimbot_smooth == 1)
+		Aim();
+	else 
+	{
+		if((aimbot_smooth&2 && m_InputData.m_Fire != m_LastData.m_Fire && m_InputData.m_Fire&1) ||
+			(aimbot_smooth&4 && m_InputData.m_Hook != m_LastData.m_Hook && m_InputData.m_Hook))
+				Aim();
+	}
 
 
 	// we freeze the input if menu is activated
@@ -351,10 +369,6 @@ int CControls::SnapInput(int *pData)
 		m_InputData.m_TargetX = round(m_MousePos.x * c);
 		m_InputData.m_TargetY = round(m_MousePos.y * c);
 
-		if(!m_InputData.m_TargetX && !m_InputData.m_TargetY)
-		{
-			m_InputData.m_TargetX = 1;
-		}
 
 		// set direction
 		m_InputData.m_Direction = 0;
@@ -410,7 +424,7 @@ int CControls::SnapInput(int *pData)
 
 void CControls::OnRender()
 {
-	if(aimbot_smooth)
+	if(aimbot_smooth == 1)
 		Aim();
 
 	// update target pos
@@ -425,7 +439,7 @@ void CControls::OnRender()
 bool CControls::OnMouseMove(float x, float y)
 {
 	if((m_pClient->m_Snap.m_pGameInfoObj && m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_PAUSED) ||
-		(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()) || aimbot != -1)
+		(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()) || (aimbot != -1 && aimbot_smooth < 2))
 		return false;
 
 	m_MousePos += vec2(x, y); // TODO: ugly
