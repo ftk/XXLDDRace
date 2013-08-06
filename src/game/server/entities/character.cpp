@@ -174,6 +174,10 @@ void CCharacter::HandleNinja()
 
 		// reset velocity so the client doesn't predict stuff
 		m_Core.m_Vel = vec2(0.f, 0.f);
+		
+		// check that we're not in solo part
+		if (Teams()->m_Core.GetSolo(m_pPlayer->GetCID()))
+			return;
 
 		// check if we Hit anything along the way
 		{
@@ -187,6 +191,14 @@ void CCharacter::HandleNinja()
 			{
 				if (aEnts[i] == this)
 					continue;
+
+				// Don't hit players in other teams
+				if (Team() != aEnts[i]->Team())
+					continue;
+
+				// Don't hit players in solo parts
+				if (Teams()->m_Core.GetSolo(aEnts[i]->m_pPlayer->GetCID()))
+					return;
 
 				// make sure we haven't Hit this object before
 				bool bAlreadyHit = false;
