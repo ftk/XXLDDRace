@@ -230,7 +230,7 @@ void CFileScore::ShowTop5(IConsole::IResult *pResult, int ClientID,
 			break;
 		CPlayerScore *r = &m_Top[i + Debut - 1];
 		str_format(aBuf, sizeof(aBuf),
-				"%d. %s Time: %d minute(s) %5.2f second(s)", i + Debut,
+				"%d. %s Time: %d:%02.2f", i + Debut,
 				r->m_aName, (int) r->m_Score / 60,
 				r->m_Score - ((int) r->m_Score / 60 * 60));
 		pSelf->SendChatTarget(ClientID, aBuf);

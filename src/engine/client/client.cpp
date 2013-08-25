@@ -1966,9 +1966,9 @@ void CClient::Run()
 		if(g_Config.m_ClCpuThrottle)
 			thread_sleep(g_Config.m_ClCpuThrottle);
 		else if(g_Config.m_DbgStress)
-			thread_sleep(5);
+			thread_sleep(3);
 		else if(!m_pGraphics->WindowActive())
-			thread_sleep(20);
+			thread_sleep(5);
 
 		if(g_Config.m_DbgHitch)
 		{
