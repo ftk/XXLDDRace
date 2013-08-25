@@ -239,6 +239,7 @@ void CControls::OnConsoleInit()
 	Console()->Register("+jump", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputData.m_Jump, "Jump");
 	Console()->Register("+hook", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputData.m_Hook, "Hook");
 	Console()->Register("+fire", "", CFGFLAG_CLIENT, ConKeyInputCounter, &m_InputData.m_Fire, "Fire");
+	Console()->Register("+showhookcoll", "", CFGFLAG_CLIENT, ConKeyInputState, &m_ShowHookColl, "Show Hook Collision");
 
 	Console()->Register("mouse", "ff", CFGFLAG_CLIENT, ConMousePos, this, "Set mouse position");
 	Console()->Register("mouse_angle", "f", CFGFLAG_CLIENT, ConMouseAngle, this, "Set mouse angle in degree");
@@ -299,6 +300,9 @@ int CControls::SnapInput(int *pData)
 
 	if(m_pClient->m_pScoreboard->Active())
 		m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
+
+	if (m_pClient->m_pControls->m_ShowHookColl)
+		m_InputData.m_PlayerFlags |= PLAYERFLAG_AIM;
 
 	if(m_LastData.m_PlayerFlags != m_InputData.m_PlayerFlags)
 		Send = true;
