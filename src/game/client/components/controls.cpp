@@ -19,7 +19,7 @@
 #include "controls.h"
 
 CControls::CControls() : auto_hit(false), hit_interval(0), 
-	auto_hook(false), auto_hook_type(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.01f), aimbot_smooth(0)
+	auto_hook(false), auto_hook_type(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.012f /* 1 / HookFireSpeed */), aimbot_smooth(0)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -301,7 +301,7 @@ int CControls::SnapInput(int *pData)
 	if(m_pClient->m_pScoreboard->Active())
 		m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 
-	if (m_pClient->m_pControls->m_ShowHookColl)
+	if (m_ShowHookColl || (auto_hook && auto_hook_type&4))
 		m_InputData.m_PlayerFlags |= PLAYERFLAG_AIM;
 
 	if(m_LastData.m_PlayerFlags != m_InputData.m_PlayerFlags)
@@ -317,32 +317,7 @@ int CControls::SnapInput(int *pData)
 	}
 	if(auto_hook) // rehook
 	{
-		if(m_InputData.m_Hook)
-		{
-			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
-			const int hooked_player = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookedPlayer;
-			
-			if(hook_state != HOOK_FLYING)
-			{
-				bool unhook = false;
-				switch(auto_hook_type)
-				{
-				case 0: if(hook_state != HOOK_GRABBED) unhook = true; break;
-				case 1: if(hook_state != HOOK_GRABBED || hooked_player == -1) unhook = true; break;
-				case 2: unhook = true; break;
-				}
-				if(unhook)
-				{
-					m_InputData.m_Hook = 0; Send = true;
-				}
-			}
-		}
-		else
-		{
-			m_InputData.m_Hook = 1;
-			//last_hook_time = time;
-			Send = true;
-		}
+		AutoHook();
 	}
 	if(aimbot_smooth == 0 || aimbot_smooth == 1)
 		Aim();
@@ -456,17 +431,18 @@ void CControls::ClampMousePos()
 {
 	if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
 	{
-		m_MousePos.x = clamp(m_MousePos.x, 200.0f, Collision()->GetWidth()*32-200.0f);
-		m_MousePos.y = clamp(m_MousePos.y, 200.0f, Collision()->GetHeight()*32-200.0f);
+		m_MousePos.x = clamp(m_MousePos.x, 0.0f, Collision()->GetWidth()*32.f);
+		m_MousePos.y = clamp(m_MousePos.y, 0.0f, Collision()->GetHeight()*32.f);
 
 	}
 	else
 	{
-		float CameraMaxDistance = 200.0f;
-		float FollowFactor = g_Config.m_ClMouseFollowfactor/100.0f;
-		float MouseMax = min(CameraMaxDistance/FollowFactor + g_Config.m_ClMouseDeadzone, (float)g_Config.m_ClMouseMaxDistance);
+		const float CameraMaxDistance = 200.0f;
+		const float FollowFactor = g_Config.m_ClMouseFollowfactor/100.0f;
+		const float MouseMax = min(CameraMaxDistance/FollowFactor + g_Config.m_ClMouseDeadzone, (float)g_Config.m_ClMouseMaxDistance);
+		const float MouseMax2 = MouseMax * MouseMax; // squared
 
-		if(length(m_MousePos) > MouseMax)
+		if((m_MousePos.x*m_MousePos.x + m_MousePos.y*m_MousePos.y) > MouseMax2) // lenght(m_MousePos) > sqrt(MouseMax)
 			m_MousePos = normalize(m_MousePos)*MouseMax;
 	}
 }
@@ -504,5 +480,73 @@ void CControls::Aim()
 			m_MousePos = pos - pos_local;
 		m_TargetPos = pos;
 		ClampMousePos();
+	}
+}
+
+void CControls::AutoHook()
+{
+	// settings
+	#define GETBIT(w,idx) (((w) >> (idx)) & 1)
+	const bool hook_walls = GETBIT(auto_hook_type, 0),
+		hook_players = GETBIT(auto_hook_type, 1),
+		intellihook = GETBIT(auto_hook_type, 2),
+		hook_once = GETBIT(auto_hook_type, 3); // only for intellihook
+	#undef GETBIT
+	if(!intellihook)
+	{
+		// dump autohook
+		if(m_InputData.m_Hook)
+		{
+			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
+			const int hooked_player = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookedPlayer;
+			
+			if(hook_state != HOOK_FLYING)
+			{
+				if(!(
+					(hook_walls && hook_state == HOOK_GRABBED && hooked_player == -1) ||
+					(hook_players && hook_state == HOOK_GRABBED && hooked_player != -1)
+				))
+				{
+					m_InputData.m_Hook = 0;
+				}
+			}
+		}
+		else
+		{
+			// hook everything
+			m_InputData.m_Hook = 1;
+		}
+	}
+	else
+	{
+		// intelligent hook
+		if(!m_InputData.m_Hook)
+		{
+			const vec2 Position = m_pClient->m_LocalCharacterPos;
+			const vec2 Direction = normalize(m_MousePos);
+			vec2 initPos = Position + Direction * 28.0f * 1.5f;
+			vec2 finishPos = initPos + Direction * (m_pClient->m_Tuning.m_HookLength - 60.f);
+			if(hook_walls && Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true))
+			{
+				vec2 finishPosPost = finishPos+Direction * 1.0f;
+				if (!(Collision()->GetCollisionAt(finishPosPost.x, finishPosPost.y)&CCollision::COLFLAG_NOHOOK))
+				{
+					// can hook
+					m_InputData.m_Hook = 1;
+				}
+			}
+			
+			
+			// hook characters
+			if(!m_InputData.m_Hook && hook_players)
+				if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
+					m_InputData.m_Hook = 1;
+		}
+		else if(!hook_once)
+		{
+			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
+			if(hook_state != HOOK_FLYING && hook_state != HOOK_GRABBED)
+				m_InputData.m_Hook = 0;
+		}
 	}
 }

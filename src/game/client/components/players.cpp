@@ -323,13 +323,11 @@ void CPlayers::RenderPlayer(
 		if (Player.m_PlayerFlags&PLAYERFLAG_AIM)
 		{
 			Graphics()->TextureSet(-1);
-			vec2 initPos = Position + Direction * 42.0f;
-			vec2 finishPos = initPos + Direction * (m_pClient->m_Tuning.m_HookLength-60.0f);
+			vec2 initPos = Position + Direction * 28.0f * 1.5f;
+			vec2 finishPos = initPos + Direction * (m_pClient->m_Tuning.m_HookLength-60.f);
 			Graphics()->LinesBegin();
 			Graphics()->SetColor(1.00f, 0.0f, 0.0f, 1.00f);
 
-
-			Graphics()->SetColor(1.00f, 0.0f, 0.0f, 1.00f);
 			if (Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true))
 			{
 				vec2 finishPosPost = finishPos+Direction * 1.0f;
@@ -337,7 +335,7 @@ void CPlayers::RenderPlayer(
 					Graphics()->SetColor(130.0f/255.0f, 232.0f/255.0f, 160.0f/255.0f, 1.0f);
 			}
 
-			if (m_pClient->IntersectCharacter(initPos, finishPos, 12.0f, finishPos) != -1)
+			if (m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
 				Graphics()->SetColor(1.0f, 1.0f, 0.0f, 1.0f);
 
 			IGraphics::CLineItem LineItem(Position.x, Position.y, finishPos.x, finishPos.y);

@@ -1222,33 +1222,42 @@ IGameClient *CreateGameClient()
 
 //H-Client
 // TODO: should be more general
-int CGameClient::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos)
+int CGameClient::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, float Speed/*hook speed*/)
 {
 	// Find other players
-	static const int ProximityRadius = 28;
-	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
+	const float ProximityRadius2 = (28.f + Radius) * (28.f + Radius);
+	float ClosestLen2 = distance2(Pos0, Pos1) * 10000.0f;
 	int ClosestID = -1;
 
 	for (int i=0; i<MAX_CLIENTS; i++)
 	{
-        CClientData cData = m_aClients[i];
-        CNetObj_Character Prev = m_Snap.m_aCharacters[i].m_Prev;
-        CNetObj_Character Player = m_Snap.m_aCharacters[i].m_Cur;
-
-        vec2 Position = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Player.m_X, Player.m_Y), Client()->IntraGameTick());
+        const CClientData& cData = m_aClients[i];
 
         if (!cData.m_Active || cData.m_Team == TEAM_SPECTATORS || m_Snap.m_LocalClientID == m_Snap.m_paPlayerInfos[i]->m_ClientID)
             continue;
 
+        vec2 Position = cData.m_Predicted.m_Pos;
+        vec2 Velocity = cData.m_Predicted.m_Vel;
+
 		vec2 IntersectPos = closest_point_on_line(Pos0, Pos1, Position);
-		float Len = distance(Position, IntersectPos);
-		if(Len < ProximityRadius+Radius)
+		
+		if(Speed != 0.f)
 		{
-			Len = distance(Pos0, IntersectPos);
-			if(Len < ClosestLen)
+			const float DistFromTarget = distance(Pos0, IntersectPos);
+			// predict
+			Position += Velocity * (DistFromTarget / Speed);
+			// can be deleted ?
+			IntersectPos = closest_point_on_line(Pos0, Pos1, Position);
+		}
+		
+		float Len2 = distance2(Position, IntersectPos);
+		if(Len2 < ProximityRadius2)
+		{
+			Len2 = distance2(Pos0, IntersectPos);
+			if(Len2 < ClosestLen2)
 			{
 				NewPos = IntersectPos;
-				ClosestLen = Len;
+				ClosestLen2 = Len2;
 				ClosestID = i;
 			}
 		}

@@ -261,7 +261,7 @@ public:
 		return m_IsDDRace;
 	}
 
-	int IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos);
+	int IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, float Speed = 0.f);
 
 private:
 

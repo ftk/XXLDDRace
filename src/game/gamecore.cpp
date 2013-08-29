@@ -267,7 +267,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 	else if(m_HookState == HOOK_FLYING)
 	{
 		vec2 NewPos = m_HookPos+m_HookDir*m_pTuning->m_HookFireSpeed;
-		if(distance(m_Pos, NewPos) > m_pTuning->m_HookLength)
+		if(distance2(m_Pos, NewPos) > (m_pTuning->m_HookLength*m_pTuning->m_HookLength))
 		{
 			m_HookState = HOOK_RETRACT_START;
 			NewPos = m_Pos + normalize(NewPos-m_Pos) * m_pTuning->m_HookLength;
@@ -298,14 +298,15 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 					continue;
 
 				vec2 ClosestPoint = closest_point_on_line(m_HookPos, NewPos, pCharCore->m_Pos);
-				if(distance(pCharCore->m_Pos, ClosestPoint) < PhysSize+2.0f)
+				if(distance2(pCharCore->m_Pos, ClosestPoint) < (PhysSize+2.0f)*(PhysSize+2.0f))
 				{
-					if (m_HookedPlayer == -1 || distance(m_HookPos, pCharCore->m_Pos) < Distance)
+					const float CurDist = distance2(m_HookPos, pCharCore->m_Pos);
+					if (m_HookedPlayer == -1 || CurDist < Distance)
 					{
 						m_TriggeredEvents |= COREEVENT_HOOK_ATTACH_PLAYER;
 						m_HookState = HOOK_GRABBED;
 						m_HookedPlayer = i;
-						Distance = distance(m_HookPos, pCharCore->m_Pos);
+						Distance = CurDist;
 					}
 				}
 			}
@@ -350,7 +351,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 		}
 
 		// don't do this hook rutine when we are hook to a player
-		if(m_HookedPlayer == -1 && distance(m_HookPos, m_Pos) > 46.0f)
+		if(m_HookedPlayer == -1 && distance2(m_HookPos, m_Pos) > 46.0f*46.0f)
 		{
 			vec2 HookVel = normalize(m_HookPos-m_Pos)*m_pTuning->m_HookDragAccel;
 			// the hook as more power to drag you up then down.
@@ -373,7 +374,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 
 		}
 
-		// release hook (max hook time is 1.25
+		// release hook (max hook time is 1.20
 		m_HookTick++;
 		if(m_HookedPlayer != -1 && (m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5 || !m_pWorld->m_apCharacters[m_HookedPlayer]))
 		{
@@ -454,8 +455,8 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 	}
 
 	// clamp the velocity to something sane
-	if(length(m_Vel) > 6000)
-		m_Vel = normalize(m_Vel) * 6000;
+	if(length(m_Vel) > 12000)
+		m_Vel = normalize(m_Vel) * 12000;
 }
 
 void CCharacterCore::Move()

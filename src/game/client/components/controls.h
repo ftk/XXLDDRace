@@ -31,6 +31,7 @@ public:
 	void ClampMousePos();
 	
 	void Aim();
+	void AutoHook();
 
 	bool auto_hit;
 	int64 hit_interval;
