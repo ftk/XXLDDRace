@@ -33,7 +33,7 @@ CONSOLE_COMMAND("force_unpause", "v", CFGFLAG_SERVER, ConForcePause, this, "Set 
 CONSOLE_COMMAND("mute", "", CFGFLAG_SERVER, ConMute, this, "");
 CONSOLE_COMMAND("muteid", "vi", CFGFLAG_SERVER, ConMuteID, this, "");
 CONSOLE_COMMAND("muteip", "si", CFGFLAG_SERVER, ConMuteIP, this, "");
-CONSOLE_COMMAND("unmute", "v", CFGFLAG_SERVER, ConUnmute, this, "");
+CONSOLE_COMMAND("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "");
 CONSOLE_COMMAND("mutes", "", CFGFLAG_SERVER, ConMutes, this, "");
 
 // XXLDDRace

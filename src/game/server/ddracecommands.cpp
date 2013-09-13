@@ -419,8 +419,7 @@ void CGameContext::ConUnmute(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	char aIpBuf[64];
 	char aBuf[64];
-	int Victim = pResult->GetVictim();
-	if (!CheckRights(pResult->m_ClientID, Victim, (CGameContext *)pUserData)) return;
+	int Victim = pResult->GetInteger(0);
 
 	if (Victim < 0 || Victim >= pSelf->m_NumMutes)
 		return;
