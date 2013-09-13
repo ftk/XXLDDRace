@@ -261,8 +261,6 @@ void CGameContext::SendChat(int ChatterClientID, int Team, const char *pText, in
 	{
 		if(ProcessSpamProtection(SpamProtectionClientID))
 		{
-			SendChatTarget(SpamProtectionClientID, "Muted text:");
-			SendChatTarget(SpamProtectionClientID, pText);
 			return;
 		}
 	}
