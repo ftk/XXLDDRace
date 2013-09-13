@@ -34,7 +34,7 @@ CHAT_COMMAND("helper", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConHelper, this, "Call
 CHAT_COMMAND("logout", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLogOut, this, "Logout of rcon and membertile")
 
 CHAT_COMMAND("solo", "", CFGFLAG_CHAT|CFGFLAG_SERVER, ConSolo, this, "Activate/deactivate solo mode")
-CHAT_COMMAND("pm", "ir", CFGFLAG_CHAT|CFGFLAG_SERVER, ConPrivMsg, this, "Send private message")
+CHAT_COMMAND("pm", "vr", CFGFLAG_CHAT|CFGFLAG_SERVER, ConPrivMsg, this, "Send private message")
 
 CHAT_COMMAND("dr", "", CFGFLAG_CHAT|CFGFLAG_SERVER, ConDisconnectRescue, this, "Rescue to location before disconnect")
 

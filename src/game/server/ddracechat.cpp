@@ -1200,10 +1200,12 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 {
     CGameContext *pSelf = (CGameContext *) pUserData;
     
-    int to = pResult->GetInteger(0);
+    int to = pResult->GetVictim();
     
     if (!CheckClientID(to))
         return;
+    if(CheckClientID(pResult->m_ClientID) && ProcessSpamProtection(pResult->m_ClientID))
+    	return;
     
     char message[256] = "<PM>: ";
     str_append(message, pResult->GetString(1), sizeof(message) / sizeof(message[0]));
@@ -1216,12 +1218,21 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 	
 	if(CheckClientID(pResult->m_ClientID))
 	{
-		CNetMsg_Sv_Chat Msg;
-		Msg.m_Team = 1;
-		Msg.m_ClientID =  pResult->m_ClientID;
-		Msg.m_pMessage = message;
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pResult->m_ClientID);
+		str_format(message, sizeof(message) / sizeof(message[0]), "%s -> %s : %s", 
+			pSelf->Server()->ClientName(pResult->m_ClientID),
+			pSelf->Server()->ClientName(to),
+			pResult->GetString(1));
+
 	}
+	else
+	{
+		str_format(message, sizeof(message) / sizeof(message[0]), "%d -> %s : %s", 
+			pResult->m_ClientID,
+			pSelf->Server()->ClientName(to),
+			pResult->GetString(1));
+	}
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "pmchat", message);
 }
 
 void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData)
