@@ -1219,7 +1219,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 	if(CheckClientID(pResult->m_ClientID))
 	{
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pResult->m_ClientID);
-		str_format(message, sizeof(message) / sizeof(message[0]), "%s -> %s : %s", 
+		str_format(message, sizeof(message) / sizeof(message[0]), "\"%s\" -> \"%s\" : %s", 
 			pSelf->Server()->ClientName(pResult->m_ClientID),
 			pSelf->Server()->ClientName(to),
 			pResult->GetString(1));
@@ -1227,7 +1227,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 	}
 	else
 	{
-		str_format(message, sizeof(message) / sizeof(message[0]), "%d -> %s : %s", 
+		str_format(message, sizeof(message) / sizeof(message[0]), "%d -> \"%s\" : %s", 
 			pResult->m_ClientID,
 			pSelf->Server()->ClientName(to),
 			pResult->GetString(1));
