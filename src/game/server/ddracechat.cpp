@@ -1204,7 +1204,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
     
     if (!CheckClientID(to))
         return;
-    if(CheckClientID(pResult->m_ClientID) && ProcessSpamProtection(pResult->m_ClientID))
+    if(CheckClientID(pResult->m_ClientID) && pSelf->ProcessSpamProtection(pResult->m_ClientID))
     	return;
     
     char message[256] = "<PM>: ";
@@ -1232,7 +1232,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 			pSelf->Server()->ClientName(to),
 			pResult->GetString(1));
 	}
-	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "pmchat", message);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "pmchat", message);
 }
 
 void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData)
