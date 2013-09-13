@@ -1200,7 +1200,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 {
     CGameContext *pSelf = (CGameContext *) pUserData;
     
-    int to = pResult->GetVictim();
+    int to = pResult->GetInteger(0);
     
     if (!CheckClientID(to))
         return;
