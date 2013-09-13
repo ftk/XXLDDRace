@@ -342,11 +342,8 @@ int CControls::SnapInput(int *pData)
 	}
 	else
 	{
-		float c = 1.f;
-		if(!m_pClient->m_Snap.m_SpecInfo.m_Active)
-			c = 256.f;
-		m_InputData.m_TargetX = round(m_MousePos.x * c);
-		m_InputData.m_TargetY = round(m_MousePos.y * c);
+		m_InputData.m_TargetX = round(m_MousePos.x);
+		m_InputData.m_TargetY = round(m_MousePos.y);
 
 
 		// set direction
@@ -526,20 +523,17 @@ void CControls::AutoHook()
 			const vec2 Direction = normalize(m_MousePos);
 			vec2 initPos = Position + Direction * 28.0f * 1.5f;
 			vec2 finishPos = initPos + Direction * (m_pClient->m_Tuning.m_HookLength - 60.f);
-			if(hook_walls && Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true))
+			int Hit = Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true);
+			if(hook_walls && Hit && !(Hit&CCollision::COLFLAG_NOHOOK))
 			{
-				vec2 finishPosPost = finishPos+Direction * 1.0f;
-				if (!(Collision()->GetCollisionAt(finishPosPost.x, finishPosPost.y)&CCollision::COLFLAG_NOHOOK))
-				{
-					// can hook
-					m_InputData.m_Hook = 1;
-				}
+				// can hook
+				m_InputData.m_Hook = 1;
 			}
 			
 			
 			// hook characters
 			if(!m_InputData.m_Hook && hook_players)
-				if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
+				if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed/100.f) != -1)
 					m_InputData.m_Hook = 1;
 		}
 		else if(!hook_once)
