@@ -533,7 +533,7 @@ void CControls::AutoHook()
 			
 			// hook characters
 			if(!m_InputData.m_Hook && hook_players)
-				if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed/100.f) != -1)
+				if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
 					m_InputData.m_Hook = 1;
 		}
 		else if(!hook_once)

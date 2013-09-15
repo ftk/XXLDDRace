@@ -332,7 +332,7 @@ void CPlayers::RenderPlayer(
 			if(Hit && !(Hit&CCollision::COLFLAG_NOHOOK))
 				Graphics()->SetColor(130.0f/255.0f, 232.0f/255.0f, 160.0f/255.0f, 1.0f);
 
-			if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed/100.f) != -1)
+			if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
 				Graphics()->SetColor(1.0f, 1.0f, 0.0f, 1.0f);
 
 			IGraphics::CLineItem LineItem(Position.x, Position.y, finishPos.x, finishPos.y);
