@@ -1233,7 +1233,7 @@ int CGameClient::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& Ne
 	{
         const CClientData& cData = m_aClients[i];
 
-        if (!cData.m_Active || cData.m_Team == TEAM_SPECTATORS || m_Snap.m_LocalClientID == m_Snap.m_paPlayerInfos[i]->m_ClientID)
+        if (!cData.m_Active || !m_Snap.m_aCharacters[i].m_Active || cData.m_Team == TEAM_SPECTATORS || m_Snap.m_LocalClientID == m_Snap.m_paPlayerInfos[i]->m_ClientID)
             continue;
 
         vec2 Position = cData.m_Predicted.m_Pos;
