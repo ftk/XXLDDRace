@@ -3,6 +3,8 @@
 #include <base/system.h>
 #include "huffman.h"
 
+#include <algorithm>
+
 struct CHuffmanConstructNode
 {
 	unsigned short m_NodeId;
@@ -24,26 +26,13 @@ void CHuffman::Setbits_r(CNode *pNode, int Bits, unsigned Depth)
 }
 
 // TODO: this should be something faster, but it's enough for now
-static void BubbleSort(CHuffmanConstructNode **ppList, int Size)
+static void StableSort(CHuffmanConstructNode **ppList, int Size)
 {
-	int Changed = 1;
-	CHuffmanConstructNode *pTemp;
-
-	while(Changed)
-	{
-		Changed = 0;
-		for(int i = 0; i < Size-1; i++)
+	std::stable_sort(ppList, ppList + Size,
+		[](const CHuffmanConstructNode * left, const CHuffmanConstructNode * right)
 		{
-			if(ppList[i]->m_Frequency < ppList[i+1]->m_Frequency)
-			{
-				pTemp = ppList[i];
-				ppList[i] = ppList[i+1];
-				ppList[i+1] = pTemp;
-				Changed = 1;
-			}
-		}
-		Size--;
-	}
+			return left->m_Frequency > right->m_Frequency;
+		});
 }
 
 void CHuffman::ConstructTree(const unsigned *pFrequencies)
@@ -74,8 +63,8 @@ void CHuffman::ConstructTree(const unsigned *pFrequencies)
 	// construct the table
 	while(NumNodesLeft > 1)
 	{
-		// we can't rely on stdlib's qsort for this, it can generate different results on different implementations
-		BubbleSort(apNodesLeft, NumNodesLeft);
+		// replaced with STL's stable sort
+		StableSort(apNodesLeft, NumNodesLeft);
 
 		m_aNodes[m_NumNodes].m_NumBits = 0;
 		m_aNodes[m_NumNodes].m_aLeafs[0] = apNodesLeft[NumNodesLeft-1]->m_NodeId;

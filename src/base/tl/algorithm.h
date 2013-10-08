@@ -5,6 +5,8 @@
 
 #include "range.h"
 
+#include <algorithm>
+
 
 /*
 	insert 4
@@ -110,7 +112,7 @@ void sort_quick(R range)
 template<class R>
 void sort(R range)
 {
-	sort_bubble(range);
+	std::sort(&range.front(), &range.back());
 }
 
 

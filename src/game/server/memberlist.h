@@ -23,7 +23,7 @@ private:
 		CPlayerMember() {};
 		CPlayerMember(const char *pName, const char *pPass, int AuthLvl);
 
-		bool operator<(const CPlayerMember& other) { return (this->m_AuthLvl < other.m_AuthLvl); }
+		bool operator<(const CPlayerMember& other) const { return (this->m_AuthLvl < other.m_AuthLvl); }
 	};
 
 	sorted_array<CPlayerMember> m_List;
