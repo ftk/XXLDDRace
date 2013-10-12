@@ -428,7 +428,7 @@ void CChat::AddLine(int ClientID, int Team, const char *pLine)
 	int64 Now = time_get();
 	if(ClientID == -1)
 	{
-		if(Now-m_aLastSoundPlayed[CHAT_SERVER] >= time_freq()*3/10)
+		if(Now-m_aLastSoundPlayed[CHAT_SERVER] >= time_freq()*3/10 && g_Config.m_SndChat)
 		{
 			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CHAT_SERVER, 0);
 			m_aLastSoundPlayed[CHAT_SERVER] = Now;
@@ -444,7 +444,7 @@ void CChat::AddLine(int ClientID, int Team, const char *pLine)
 	}
 	else
 	{
-		if(Now-m_aLastSoundPlayed[CHAT_CLIENT] >= time_freq()*3/10)
+		if(Now-m_aLastSoundPlayed[CHAT_CLIENT] >= time_freq()*3/10 && g_Config.m_SndChat)
 		{
 			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CHAT_CLIENT, 0);
 			m_aLastSoundPlayed[CHAT_CLIENT] = Now;
