@@ -40,7 +40,7 @@ CFileScore::~CFileScore()
 	lock_release(gs_ScoreLock);
 }
 
-std::string SaveFile()
+static std::string SaveFile()
 {
 	std::string str;
 	if (g_Config.m_SvScoreFolder[0])

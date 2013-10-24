@@ -446,7 +446,7 @@ void CGameTeams::OnFinish(CPlayer* Player)
 		}
 	}
 
-	if (NeedToSendNewRecord && Player->m_IsUsingDDRaceClient)
+	if (NeedToSendNewRecord)
 	{
 		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
