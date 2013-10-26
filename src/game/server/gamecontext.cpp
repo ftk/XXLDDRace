@@ -747,6 +747,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 				if(pChar->GetWeaponGot(i))
 					state.WFlags |= (1U << i);
 			state.EndlessHook = pChar->m_EndlessHook;
+			state.DeepFreeze = pChar->m_DeepFreeze;
 			state.Hit = pChar->m_Hit;
 			state.RescueOverride = pChar->m_RescueOverride;
 			m_SavedPlayers[Server()->ClientName(ClientID)] = state;

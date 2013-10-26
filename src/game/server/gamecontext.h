@@ -359,6 +359,7 @@ public:
 		unsigned WFlags;
 		CTuningParams Tuning;
 		bool EndlessHook;
+		bool DeepFreeze;
 		int Hit;
 		int RescueOverride;
 	};

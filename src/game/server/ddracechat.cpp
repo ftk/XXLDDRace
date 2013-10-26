@@ -1256,9 +1256,16 @@ void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserDa
 	pChar->m_DDRaceState = state.DDState;
 	pChar->m_ChrTuning = state.Tuning;
 	pChar->m_EndlessHook = state.EndlessHook;
+	pChar->m_DeepFreeze = state.DeepFreeze;
 	pChar->m_Hit = state.Hit;
 	pChar->m_RescueOverride = state.RescueOverride;
 	pChar->m_Super = false;
+	pChar->m_FastReload = false;
+	pChar->m_RescuePos = vec2(0.f, 0.f);
+	pChar->m_LastRescueSave = 0;
+	pChar->ResetInput();
+
+	
 	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
 	{
 		pChar->SetWeaponGot(i, false);
