@@ -7,7 +7,7 @@
 #include <game/server/gamemodes/DDRace.h>
 #include "plasma.h"
 
-const float ACCEL = 1.1f;
+static const float Acceleration = 1.1f;
 
 CPlasma::CPlasma(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, bool Freeze,
 		bool Explosive, int ResponsibleTeam) :
@@ -44,7 +44,7 @@ bool CPlasma::HitCharacter()
 void CPlasma::Move()
 {
 	m_Pos += m_Core;
-	m_Core *= ACCEL;
+	m_Core *= Acceleration;
 }
 
 void CPlasma::Reset()
