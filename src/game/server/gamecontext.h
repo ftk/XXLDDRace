@@ -358,6 +358,9 @@ public:
 		int DDState;
 		unsigned WFlags;
 		CTuningParams Tuning;
+		bool EndlessHook;
+		int Hit;
+		int RescueOverride;
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
 
