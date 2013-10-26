@@ -1281,6 +1281,7 @@ void CCharacter::HandleTiles(int Index)
 
 		if(m_CpActive != -1 && m_CpTick > Server()->Tick())
 		{
+			Teams()->OnCheckpointReached(m_pPlayer->GetCID(), m_StartTime, m_CpActive);
 			if(pData->m_BestTime && pData->m_aBestCpTime[m_CpActive] != 0)
 			{
 				float Diff = (m_CpCurrent[m_CpActive] - pData->m_aBestCpTime[m_CpActive])*100;

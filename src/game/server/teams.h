@@ -4,12 +4,15 @@
 
 #include <game/teamscore.h>
 #include <game/server/gamecontext.h>
+#include <game/server/score/logger.h>
 
 class CGameTeams
 {
 	int m_TeamState[MAX_CLIENTS];
 	int m_MembersCount[MAX_CLIENTS];
 	bool m_TeeFinished[MAX_CLIENTS];
+
+    CScoreLogger m_Logger;
 
 	class CGameContext * m_pGameContext;
 
@@ -79,12 +82,17 @@ public:
 	{
 		return m_TeeFinished[ClientID];
 	}
-	;
+
 	int GetTeamState(int Team)
 	{
 		return m_TeamState[Team];
 	}
-	;
+
+    void OnCheckpointReached(int ClientID, int StartTick, int Checkpoint)
+    {
+        m_Logger.LogCheckpoint(ClientID, m_Core.Team(ClientID), StartTick, Checkpoint);
+    }
+
 };
 
 #endif

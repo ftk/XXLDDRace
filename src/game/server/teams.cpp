@@ -6,6 +6,7 @@ CGameTeams::CGameTeams(CGameContext *pGameContext) :
 		m_pGameContext(pGameContext)
 {
 	Reset();
+    m_Logger.Init(Server());
 }
 
 void CGameTeams::Reset()
@@ -335,6 +336,9 @@ void CGameTeams::OnFinish(CPlayer* Player)
 {
 	if (!Player || !Player->IsPlaying())
 		return;
+
+    m_Logger.LogFinish(Player->GetCID(), m_Core.Team(Player->GetCID()), GetStartTime(Player));
+
 	//TODO:DDRace:btd: this ugly
 	float time = (float) (Server()->Tick() - GetStartTime(Player))
 			/ ((float) Server()->TickSpeed());
