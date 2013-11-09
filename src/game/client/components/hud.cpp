@@ -99,7 +99,6 @@ void CHud::RenderSuddenDeath()
 void CHud::RenderScoreHud()
 {
 	// render small score hud
-	/*
 	if(!(m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_GAMEOVER))
 	{
 		int GameFlags = m_pClient->m_Snap.m_pGameInfoObj->m_GameFlags;
@@ -249,7 +248,6 @@ void CHud::RenderScoreHud()
 			}
 		}
 	}
-	*/
 }
 
 void CHud::RenderWarmupTimer()
@@ -469,12 +467,13 @@ void CHud::OnRender()
 	{
 		if(m_pClient->m_Snap.m_pLocalCharacter && !(m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_GAMEOVER))
 		{
-			RenderHealthAndAmmo(m_pClient->m_Snap.m_pLocalCharacter);
+			if (g_Config.m_ClShowhudHealthAmmo)
+				RenderHealthAndAmmo(m_pClient->m_Snap.m_pLocalCharacter);
 			RenderDDRaceEffects();
 		}
 		else if(m_pClient->m_Snap.m_SpecInfo.m_Active)
 		{
-			if(m_pClient->m_Snap.m_SpecInfo.m_SpectatorID != SPEC_FREEVIEW)
+			if(m_pClient->m_Snap.m_SpecInfo.m_SpectatorID != SPEC_FREEVIEW && g_Config.m_ClShowhudHealthAmmo)
 				RenderHealthAndAmmo(&m_pClient->m_Snap.m_aCharacters[m_pClient->m_Snap.m_SpecInfo.m_SpectatorID].m_Cur);
 			RenderSpectatorHud();
 		}
@@ -482,7 +481,8 @@ void CHud::OnRender()
 		RenderGameTimer();
 		RenderPauseNotification();
 		RenderSuddenDeath();
-		RenderScoreHud();
+		if (g_Config.m_ClShowhudScore)
+			RenderScoreHud();
 		RenderWarmupTimer();
 		RenderFps();
 		if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
