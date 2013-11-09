@@ -174,7 +174,8 @@ void CGhost::RenderGhost(CGhostCharacter Player, CGhostCharacter Prev, CNetObj_C
 	bool InAir = !Collision()->CheckPoint(Player.m_X, Player.m_Y+16);
 	bool WantOtherDir = (Player.m_Direction == -1 && Vel.x > 0) || (Player.m_Direction == 1 && Vel.x < 0);
 
-	float WalkTime = fmod(absolute(Position.x), 100.0f)/100.0f;
+	float WalkTime = (Position.x >= 0) ? fmod(Position.x, g_Config.m_ClWalkSpeed) : g_Config.m_ClWalkSpeed - fmod(-Position.x, g_Config.m_ClWalkSpeed);
+	WalkTime /= g_Config.m_ClWalkSpeed;
 	CAnimState State;
 	State.Set(&g_pData->m_aAnimations[ANIM_BASE], 0);
 
