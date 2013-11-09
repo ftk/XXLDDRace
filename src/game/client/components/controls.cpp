@@ -324,7 +324,7 @@ int CControls::SnapInput(int *pData)
 	else 
 	{
 		if((aimbot_smooth&2 && m_InputData.m_Fire != m_LastData.m_Fire && m_InputData.m_Fire&1) ||
-			(aimbot_smooth&4 && m_InputData.m_Hook != m_LastData.m_Hook && m_InputData.m_Hook))
+			(aimbot_smooth&4 && !m_LastData.m_Hook && m_InputData.m_Hook))
 				Aim();
 	}
 
@@ -350,8 +350,10 @@ int CControls::SnapInput(int *pData)
 		m_InputData.m_Direction = 0;
 		if(m_InputDirectionLeft && !m_InputDirectionRight)
 			m_InputData.m_Direction = -1;
-		if(!m_InputDirectionLeft && m_InputDirectionRight)
+		else if(!m_InputDirectionLeft && m_InputDirectionRight)
 			m_InputData.m_Direction = 1;
+		else if(m_InputDirectionLeft && m_InputDirectionRight)
+			m_InputData.m_Direction = m_LastData.m_Direction ? -m_LastData.m_Direction : 1;
 
 		// stress testing
 		if(g_Config.m_DbgStress)
