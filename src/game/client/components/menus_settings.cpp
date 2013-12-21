@@ -1139,5 +1139,18 @@ void CMenus::RenderSettingsDDRace(CUIRect MainView)
 	{
 		g_Config.m_ClShowhudHealthAmmo ^= 1;
 	}
+	
+	// Set Ping
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%d", g_Config.m_ClSetPing);
+		MainView.HSplitTop(20.0f, &Button, &MainView);
+		UI()->DoLabelScaled(&Button, Localize("Set Prediction Ping"), 14.0f, -1);
+		Button.VSplitLeft(190.0f, 0, &Button);
+		static float Offset = 0.0f;
+		DoEditBox(&g_Config.m_ClSetPing, &Button, aBuf, sizeof(aBuf), 14.0f, &Offset);
+		g_Config.m_ClSetPing = min(900, max(0, str_toint(aBuf)));
+	}
+
 
 }
