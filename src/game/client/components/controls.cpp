@@ -526,7 +526,7 @@ void CControls::AutoHook()
 			const int Angle = round(atan2(m_MousePos.x, m_MousePos.y) * 256); // compress
 			const vec2 Direction = vec2(sin(Angle/256.f), cos(Angle/256.f)); // decompress
 			vec2 initPos = Position + Direction * 28.0f * 1.5f;
-			vec2 finishPos = initPos + Direction * (m_pClient->m_Tuning.m_HookLength - 60.f);
+            vec2 finishPos = Position + Direction * (m_pClient->m_Tuning.m_HookLength);
 			int Hit = Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true);
 			if(hook_walls && Hit && !(Hit&CCollision::COLFLAG_NOHOOK))
 			{

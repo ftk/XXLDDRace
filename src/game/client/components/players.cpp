@@ -325,7 +325,7 @@ void CPlayers::RenderPlayer(
 		{
 			Graphics()->TextureSet(-1);
 			vec2 initPos = Position + Direction * 28.0f * 1.5f;
-			vec2 finishPos = initPos + Direction * (m_pClient->m_Tuning.m_HookLength-60.f);
+			vec2 finishPos = Position + Direction * (m_pClient->m_Tuning.m_HookLength);
 			Graphics()->LinesBegin();
 			Graphics()->SetColor(1.00f, 0.0f, 0.0f, 1.00f);
 
