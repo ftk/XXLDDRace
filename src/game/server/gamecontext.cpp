@@ -734,7 +734,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	// save position
 	{
 		CCharacter * pChar = GetPlayerChar(ClientID);
-		if(pChar && !pChar->Team())
+		if(pChar && (!pChar->Team() || (pChar->Team() >= 10 && pChar->Team() <= 15))
 		{
 			CPlayerRescueState state;
 			
