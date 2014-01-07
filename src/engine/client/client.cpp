@@ -775,16 +775,10 @@ const char *CClient::ErrorString()
 
 void CClient::Render()
 {
-	// if(g_Config.m_GfxClear)
-	if(g_Config.m_ClShowEntities && g_Config.m_ClDDRaceCheats)
-	{
-		if (g_Config.m_ClShowEntities == 2)
-			Graphics()->Clear(0,0,0);
-		else
-			Graphics()->Clear(0.3f,0.3f,0.6f);
-	}
+	if(g_Config.m_ClShowEntities || g_Config.m_ClHideQuads)
+		Graphics()->Clear(g_Config.m_ClBckRed*0.01f,g_Config.m_ClBckGreen*0.01f,g_Config.m_ClBckBlue*0.01f);
 	else if(g_Config.m_GfxClear)
-		Graphics()->Clear(1,1,0);
+		Graphics()->Clear(0.5,0.5,0.5);
 
 	GameClient()->OnRender();
 	DebugRender();
