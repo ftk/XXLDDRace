@@ -776,7 +776,7 @@ const char *CClient::ErrorString()
 
 void CClient::Render()
 {
-	if(g_Config.m_ClShowEntities || g_Config.m_ClHideQuads)
+	if(g_Config.m_ClShowEntities || !g_Config.m_ClShowQuads)
 		Graphics()->Clear(g_Config.m_ClBckRed*0.01f,g_Config.m_ClBckGreen*0.01f,g_Config.m_ClBckBlue*0.01f);
 	else if(g_Config.m_GfxClear)
 		Graphics()->Clear(0.5,0.5,0.5);
