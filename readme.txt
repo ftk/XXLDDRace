@@ -8,7 +8,7 @@ Features (server):
  - The most recent version of teeworlds
 
 Features (client):
- - Custom quit message (commands "cl_quitmessage" & "cl_quitmessage_text")
+ - Custom quit message (commands "cl_quit_message" & "cl_quit_message_text")
  - Improved freeze prediction
  - Bug fixes
  - New commands: +autohook +autohit
