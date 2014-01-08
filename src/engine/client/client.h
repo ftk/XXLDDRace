@@ -3,8 +3,6 @@
 #ifndef ENGINE_CLIENT_CLIENT_H
 #define ENGINE_CLIENT_CLIENT_H
 
-#include <cstdio>
-
 #if _MSC_VER
 #define snprintf _snprintf
 #endif
@@ -188,19 +186,6 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	volatile int m_GfxState;
 	static void GraphicsThreadProxy(void *pThis) { ((CClient*)pThis)->GraphicsThread(); }
 	void GraphicsThread();
-	
-	char * quit_message;
-
-    static void ConfigSaveCallback(IConfig *pConfig, void *pUserData)
-    {
-      CClient *pSelf = (CClient *)pUserData;
-      if(pSelf->quit_message)
-      {
-        char buf[256];
-        snprintf(buf, sizeof(buf), "quitmessage \"%s\"", pSelf->quit_message);
-        pConfig->WriteLine(buf);
-      }
-    }
 
 public:
 	IEngine *Engine() { return m_pEngine; }
@@ -299,7 +284,6 @@ public:
 
 	static void Con_Connect(IConsole::IResult *pResult, void *pUserData);
     static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
-    static void Con_SetQMsg(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Quit(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Minimize(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Ping(IConsole::IResult *pResult, void *pUserData);

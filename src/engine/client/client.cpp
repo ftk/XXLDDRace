@@ -244,7 +244,7 @@ void CSmoothTime::Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustD
 }
 
 
-CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotDelta), quit_message(0)
+CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotDelta)
 {
 	m_pEditor = 0;
 	m_pInput = 0;
@@ -552,8 +552,6 @@ void CClient::Connect(const char *pAddress)
 void CClient::DisconnectWithReason(const char *pReason)
 {
 	char aBuf[512];
-	if(!pReason)
-		pReason = quit_message;
 	str_format(aBuf, sizeof(aBuf), "disconnecting. reason='%s'", pReason?pReason:"unknown");
 	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "client", aBuf);
 
@@ -590,7 +588,10 @@ void CClient::DisconnectWithReason(const char *pReason)
 
 void CClient::Disconnect()
 {
-	DisconnectWithReason(0);
+	if (g_Config.m_ClQuitMessage)
+		DisconnectWithReason(g_Config.m_ClQuitMessageText);
+	else
+		DisconnectWithReason(0);
 }
 
 
@@ -1717,11 +1718,6 @@ void CClient::InitInterfaces()
 	//
 	m_ServerBrowser.SetBaseInfo(&m_NetClient, m_pGameClient->NetVersion());
 	m_Friends.Init();
-    
-    IConfig *pConfig = Kernel()->RequestInterface<IConfig>();
-    if(pConfig)
-        pConfig->RegisterCallback(ConfigSaveCallback, this);
-
 }
 
 void CClient::Run()
@@ -2017,25 +2013,13 @@ void CClient::Con_Connect(IConsole::IResult *pResult, void *pUserData)
 void CClient::Con_Disconnect(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
-	pSelf->DisconnectWithReason(pResult->GetString(0));
-    //pSelf->Disconnect();
+    pSelf->Disconnect();
 }
-
-void CClient::Con_SetQMsg(IConsole::IResult *pResult, void *pUserData)
-{
-    CClient *pSelf = (CClient *)pUserData;
-    if(pSelf->quit_message)
-      delete [] pSelf->quit_message;
-    pSelf->quit_message = new char[256];
-    strncpy(pSelf->quit_message, pResult->GetString(0), 255);
-    //pSelf->Disconnect();
-}
-
 
 void CClient::Con_Quit(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
-    pSelf->Quit();
+	pSelf->Quit();
 }
 
 void CClient::Con_Minimize(IConsole::IResult *pResult, void *pUserData)
@@ -2263,7 +2247,7 @@ void CClient::RegisterCommands()
 	m_pConsole->Register("exit", "", CFGFLAG_CLIENT|CFGFLAG_STORE, Con_Quit, this, "Quit Teeworlds");
 	m_pConsole->Register("minimize", "", CFGFLAG_CLIENT|CFGFLAG_STORE, Con_Minimize, this, "Minimize Teeworlds");
 	m_pConsole->Register("connect", "s", CFGFLAG_CLIENT, Con_Connect, this, "Connect to the specified host/ip");
-	m_pConsole->Register("disconnect", "s", CFGFLAG_CLIENT, Con_Disconnect, this, "Disconnect from the server");
+	m_pConsole->Register("disconnect", "", CFGFLAG_CLIENT, Con_Disconnect, this, "Disconnect from the server");
 	m_pConsole->Register("ping", "", CFGFLAG_CLIENT, Con_Ping, this, "Ping the current server");
 	m_pConsole->Register("screenshot", "", CFGFLAG_CLIENT, Con_Screenshot, this, "Take a screenshot");
 	m_pConsole->Register("rcon", "r", CFGFLAG_CLIENT, Con_Rcon, this, "Send specified command to rcon");
@@ -2274,8 +2258,6 @@ void CClient::RegisterCommands()
 	m_pConsole->Register("add_demomarker", "", CFGFLAG_CLIENT, Con_AddDemoMarker, this, "Add demo timeline marker");
 	m_pConsole->Register("add_favorite", "s", CFGFLAG_CLIENT, Con_AddFavorite, this, "Add a server as a favorite");
 	m_pConsole->Register("remove_favorite", "s", CFGFLAG_CLIENT, Con_RemoveFavorite, this, "Remove a server from favorites");
-
-    m_pConsole->Register("quitmessage", "s", CFGFLAG_CLIENT|CFGFLAG_SAVE, Con_SetQMsg, this, "Set quit message");
 
 	// used for server browser update
 	m_pConsole->Chain("br_filter_string", ConchainServerBrowserUpdate, this);
