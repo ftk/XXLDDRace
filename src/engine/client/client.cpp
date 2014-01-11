@@ -588,7 +588,7 @@ void CClient::DisconnectWithReason(const char *pReason)
 
 void CClient::Disconnect()
 {
-	if (g_Config.m_ClQuitMessage)
+	if(str_length(g_Config.m_ClQuitMessageText) > 0)
 		DisconnectWithReason(g_Config.m_ClQuitMessageText);
 	else
 		DisconnectWithReason(0);
