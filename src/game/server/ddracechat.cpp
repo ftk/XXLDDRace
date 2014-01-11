@@ -896,9 +896,9 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter* pChr = pSelf->m_apPlayers[pResult->m_ClientID]->GetCharacter();
-	//char aBuf[256];
 
-	if (!g_Config.m_SvRescue){
+    if(!g_Config.m_SvRescue)
+    {
 		pSelf->SendChatTarget(pResult->m_ClientID, "Rescue is not activated.");
 		return;
 	}
@@ -909,119 +909,127 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 		return;
 	}
 	
-	if(pChr->m_RescueOverride)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "Rescue is disabled by the map.");
-		return;
-	}
 	
-	{
-		if (!pChr->m_LastRescue || !(pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)){
+    if(pChr->m_DeepFreeze)
+    {
+        pSelf->SendChatTarget(pResult->m_ClientID, "You are deepfreezed, undeepfreeze first!");
+        return;
+    }
+    if(!pChr->IsAlive())
+    {
+        pSelf->SendChatTarget(pResult->m_ClientID, "You are not alive!");
+        return;
+    }
+    // unfreeze if pressed second time
+    if(pChr->m_RescueFlags & RESCUEFLAG_CAN_UNFREEZE)
+    {
+        pChr->m_RescueFlags &= ~RESCUEFLAG_CAN_UNFREEZE;
+        if(pChr->m_FreezeTime && pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)
+        {
+            pChr->UnFreeze();
+            return;
+        }
+    }
+    if(pChr->m_FreezeTime == 0)
+        return;
 
-			float RescueDelay = g_Config.m_SvFreezeDelay;
-			if (pChr->m_FreezeTime == 0)
-				/*pSelf->SendChatTarget(pResult->m_ClientID, "You are not freezed!");*/(void)0;
-			else if (pChr->m_DeepFreeze)
-				pSelf->SendChatTarget(pResult->m_ClientID, "You are deepfreezed, undeepfreeze first!");
-			else if (!pChr->IsAlive())
-				pSelf->SendChatTarget(pResult->m_ClientID, "You are not alive!");
-			else if (pChr->m_RescuePos == vec2 (0,0)) //hum
-				pSelf->SendChatTarget(pResult->m_ClientID, "No position saved!");
-			else
-			{
-				//not freezed
-				for(int i = 0;i <=(int)MAX_CLIENTS-1 ; i++)
-				{
-					if ( pSelf->m_apPlayers[i])
-					{
-						CCharacter* pChr2 = pSelf->m_apPlayers[i]->GetCharacter();
-						//who hooks me?
-						if (pChr2 && pChr2->Core()->m_HookedPlayer == pResult->m_ClientID)
-						{
-							//Release hook
-							pChr2->Core()->m_HookedPlayer = -1;
-							pChr2->Core()->m_HookState = HOOK_RETRACTED;
-							pChr2->Core()->m_HookPos = pChr2->Core()->m_Pos;
-						}
-					}
-				}
-				if(g_Config.m_SvRescueEffects)
-				{
-					//Blood effect
-					pChr->GameServer()->CreateDeath(pChr->m_Pos, pResult->m_ClientID);
-					//Spawn effect
-					pChr->GameServer()->CreatePlayerSpawn(pChr->m_RescuePos);
-				}
-				//"save" last rescue time
-				pChr->m_LastRescue = RescueDelay * pSelf->Server()->TickSpeed();
-				//Teleport player
-				pChr->Core()->m_Pos = pChr->m_PrevPos = pChr->m_Pos = pChr->m_RescuePos;
-                pChr->Core()->m_Vel = vec2(0.f, 0.f); // reset momentum
-                
-                if(pChr->m_RescueFlags)
-                {
-	                // disarm player
-	                if(pChr->m_RescueFlags & RESCUEFLAG_DISARM)
-	                {
-	                	bool disarmed = false;
-	                	for(int i = WEAPON_SHOTGUN; i < NUM_WEAPONS; i++)
-						{
-							if(pChr->GetWeaponGot(i) && i != WEAPON_NINJA)
-							{
-								pChr->SetWeaponGot(i, false);
-								pChr->SetWeaponAmmo(i, 0);
-								disarmed = true;
-							}
-						}
-						if(disarmed)
-							pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You have been disarmed");
-	                }
-	                // solo fix
-	                if(pChr->m_RescueFlags & RESCUEFLAG_SOLOOUT)
-	                {
-	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now in a solo part");
-	                	pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, true);
-	                }
-	                else if(pChr->m_RescueFlags & RESCUEFLAG_SOLOIN)
-	                {
-	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now out of the solo part");
-	                	pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, false);
-	                }
-	                // hit fix
-	                if(pChr->m_RescueFlags & RESCUEFLAG_NOHIT)
-	                {
-	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You can hit others");
-	                	pChr->m_Hit = CCharacter::HIT_ALL;
-	                }
-	                else if(pChr->m_RescueFlags & RESCUEFLAG_HIT)
-	                {
-	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You can't hit others");
-	                	pChr->m_Hit = CCharacter::DISABLE_HIT_GRENADE|CCharacter::DISABLE_HIT_HAMMER|
-	                		CCharacter::DISABLE_HIT_RIFLE|CCharacter::DISABLE_HIT_SHOTGUN;
-	                }
-	                // endless hook fix
-	                if(pChr->m_RescueFlags & RESCUEFLAG_NOEHOOK && !pChr->m_EndlessHook)
-	                {
-	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been activated");
-	                	pChr->m_EndlessHook = true;
-	                }
-	                else if(pChr->m_RescueFlags & RESCUEFLAG_EHOOK && pChr->m_EndlessHook)
-	                {
-	                	pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been deactivated");
-	                	pChr->m_EndlessHook = false;
-	                }
-	                pChr->m_RescueFlags = RESCUEFLAG_NONE;
-            	}
+    if(pChr->m_RescueOverride)
+    {
+        pSelf->SendChatTarget(pResult->m_ClientID, "Rescue is disabled by the map.");
+        return;
+    }
+
+    if(pChr->m_RescuePos == vec2(0,0))
+    {
+        pSelf->SendChatTarget(pResult->m_ClientID, "No position saved!");
+        return;
+    }
+
+
+    // reset players' hook
+    for(int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if(pSelf->m_apPlayers[i])
+        {
+            CCharacter* pChr2 = pSelf->m_apPlayers[i]->GetCharacter();
+            //who hooks me?
+            if(pChr2 && pChr2->Core()->m_HookedPlayer == pResult->m_ClientID)
+            {
+                //Release hook
+                pChr2->Core()->m_HookedPlayer = -1;
+                pChr2->Core()->m_HookState = HOOK_RETRACTED;
+                pChr2->Core()->m_HookPos = pChr2->Core()->m_Pos;
             }
-		}
-		else
-		{
-			//if (pChr->m_TileIndex != TILE_FREEZE && pChr->m_TileFIndex != TILE_FREEZE && pChr->Core()->m_Pos == pChr->m_RescuePos)
-			pChr->UnFreeze();
-			pChr->m_LastRescue = 0;
-		}
-	}
+        }
+    }
+    if(g_Config.m_SvRescueEffects)
+    {
+        //Blood effect
+        pChr->GameServer()->CreateDeath(pChr->m_Pos, pResult->m_ClientID);
+        //Spawn effect
+        pChr->GameServer()->CreatePlayerSpawn(pChr->m_RescuePos);
+    }
+    //Teleport player
+    pChr->Core()->m_Pos = pChr->m_PrevPos = pChr->m_Pos = pChr->m_RescuePos;
+    pChr->Core()->m_Vel = vec2(0.f, 0.f); // reset momentum
 
+    if(pChr->m_RescueFlags)
+    {
+        // disarm player
+        if(pChr->m_RescueFlags & RESCUEFLAG_DISARM)
+        {
+            bool disarmed = false;
+            for(int i = WEAPON_SHOTGUN; i < NUM_WEAPONS; i++)
+            {
+                if(pChr->GetWeaponGot(i) && i != WEAPON_NINJA)
+                {
+                    pChr->SetWeaponGot(i, false);
+                    pChr->SetWeaponAmmo(i, 0);
+                    disarmed = true;
+                }
+            }
+            if(disarmed)
+                pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You have been disarmed");
+        }
+        // solo fix
+        if(pChr->m_RescueFlags & RESCUEFLAG_SOLOOUT)
+        {
+            pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now in a solo part");
+            pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, true);
+        }
+        else if(pChr->m_RescueFlags & RESCUEFLAG_SOLOIN)
+        {
+            pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now out of the solo part");
+            pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, false);
+        }
+        // hit fix
+        if(pChr->m_RescueFlags & RESCUEFLAG_NOHIT)
+        {
+            pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You can hit others");
+            pChr->m_Hit = CCharacter::HIT_ALL;
+        }
+        else if(pChr->m_RescueFlags & RESCUEFLAG_HIT)
+        {
+            pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You can't hit others");
+            pChr->m_Hit = CCharacter::DISABLE_HIT_GRENADE|CCharacter::DISABLE_HIT_HAMMER|
+                CCharacter::DISABLE_HIT_RIFLE|CCharacter::DISABLE_HIT_SHOTGUN;
+        }
+        // endless hook fix
+        if(pChr->m_RescueFlags & RESCUEFLAG_NOEHOOK && !pChr->m_EndlessHook)
+        {
+            pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been activated");
+            pChr->m_EndlessHook = true;
+        }
+        else if(pChr->m_RescueFlags & RESCUEFLAG_EHOOK && pChr->m_EndlessHook)
+        {
+            pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "Endless hook has been deactivated");
+            pChr->m_EndlessHook = false;
+        }
+        pChr->m_RescueFlags = RESCUEFLAG_NONE;
+    }
+    //"save" last rescue time
+    pChr->m_LastRescue = ((float)g_Config.m_SvRescueDelay / 1000) * pSelf->Server()->TickSpeed();
+    pChr->m_RescueFlags |= RESCUEFLAG_CAN_UNFREEZE;
 }
 
 void CGameContext::ConHelper(IConsole::IResult *pResult, void *pUserData)
