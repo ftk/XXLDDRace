@@ -196,8 +196,11 @@ MACRO_CONFIG_INT(ClRaceSaveGhost, cl_race_save_ghost, 1, 0, 1, CFGFLAG_CLIENT|CF
 MACRO_CONFIG_INT(ClDDRaceScoreBoard, cl_ddrace_scoreboard, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Enable DDRace Scoreboard ")
 MACRO_CONFIG_INT(SvResetPickus, sv_reset_pickups, 0, 0, 1, CFGFLAG_SERVER, "Whether the weapons are reset on passing the start tile or not")
 MACRO_CONFIG_INT(ClShowOthers, cl_show_others, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Show players in other teams")
-MACRO_CONFIG_INT(ClShowEntities, cl_show_entities, 0, 0, 2, CFGFLAG_CLIENT, "Cheat to show game tiles, background: 1 = blue, 2 = black")
+MACRO_CONFIG_INT(ClShowEntities, cl_show_entities, 0, 0, 1, CFGFLAG_CLIENT, "Cheat to show game tiles, background: 1 = blue, 2 = black")
 MACRO_CONFIG_INT(ClShowQuads, cl_show_quads, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Show quads")
+MACRO_CONFIG_INT(ClBckRed, cl_bck_red, 30, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Red for Background")
+MACRO_CONFIG_INT(ClBckGreen, cl_bck_green, 30, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Green for Background")
+MACRO_CONFIG_INT(ClBckBlue, cl_bck_blue, 60, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Blue for Background")
 MACRO_CONFIG_INT(SvShowOthers, sv_show_others, 1, 0, 1, CFGFLAG_SERVER, "Whether players can user the command showothers or not")
 MACRO_CONFIG_INT(SvMaxAfkTime, sv_max_afk_time, 0, 0, 9999, CFGFLAG_SERVER, "The time in seconds a player is allowed to be afk (0 = disabled)")
 MACRO_CONFIG_INT(SvPlasmaRange, sv_plasma_range, 700, 1, 99999, CFGFLAG_SERVER, "How far will the plasma gun track tees")
@@ -210,6 +213,8 @@ MACRO_CONFIG_INT(SvNamelessScore, sv_nameless_score, 0, 0, 1, CFGFLAG_SERVER, "W
 MACRO_CONFIG_INT(SvTimeInBroadcastInterval, sv_time_in_broadcast_interval, 1, 0, 60, CFGFLAG_SERVER, "How often to update the broadcast time")
 MACRO_CONFIG_INT(SvDefaultTimerType, sv_default_timer_type, 0, 0, 1, CFGFLAG_SERVER, "Default way of displaying time either game/round timer or broadcast. 0 = game/round timer, 1 = broadcast")
 
+MACRO_CONFIG_STR(ClQuitMessageText, cl_quit_message_text, 256, "E' un Sole Nero!", CFGFLAG_SAVE|CFGFLAG_CLIENT, "Set custom disconnecting reason")
+MACRO_CONFIG_INT(ClQuitMessage, cl_quit_message, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Disconnecting with custom reason")
 
 // these might need some fine tuning
 MACRO_CONFIG_INT(SvChatPenalty, sv_chat_penalty, 250, 50, 1000, CFGFLAG_SERVER, "chat score will be increased by this on every message, and decremented by 1 on every tick.")

@@ -3,12 +3,12 @@ mkRace is a mod of XXLDDRace with various features.
 
 Features (server):
  - Per player tuning using tune tiles
- - New commands: /solo /pm /dr
+ - New commands: /solo /pm /dr /mk
  - Bug fixes
  - The most recent version of teeworlds
 
 Features (client):
- - Custom quit message (command "quitmessage")
+ - Custom quit message (commands "cl_quit_message" & "cl_quit_message_text")
  - Improved freeze prediction
  - Bug fixes
  - New commands: +autohook +autohit

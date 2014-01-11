@@ -1272,7 +1272,8 @@ void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserDa
 	pChar->m_RescuePos = vec2(0.f, 0.f);
 	pChar->m_LastRescueSave = 0;
 	pChar->ResetInput();
-
+	pChar->SetWeaponGot(WEAPON_NINJA, false);
+	pChar->SetWeapon(WEAPON_GUN);
 	
 	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
 	{
