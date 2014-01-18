@@ -193,17 +193,10 @@ int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *p
 		{
 			ThroughOffset(Pos0, Pos1, &dx, &dy);
 		}
-	for(int i = 0; i <= End; i++)
+	for(int i = 0; i < End; i++)
 	{
-		vec2 Pos;
-		if(i != End)
-		{
-			const float a = i/Distance;
-			dbg_assert(a >= 0.f && a <= 1.f, "intersect line error");
-			Pos = mix(Pos0, Pos1, a);
-		}
-		else
-			Pos = Pos1; // last check
+		float a = i/Distance;
+		vec2 Pos = mix(Pos0, Pos1, a);
 		ix = round(Pos.x);
 		iy = round(Pos.y);
 		if(CheckPoint(ix, iy) && !(AllowThrough && IsThrough(ix + dx, iy + dy)))
