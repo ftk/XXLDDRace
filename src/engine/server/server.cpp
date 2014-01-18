@@ -1554,14 +1554,13 @@ int CServer::Run()
 				// apply new input
 				for(int c = 0; c < MAX_CLIENTS; c++)
 				{
-					if(m_aClients[c].m_State == CClient::STATE_EMPTY)
+					if(m_aClients[c].m_State != CClient::STATE_INGAME)
 						continue;
 					for(int i = 0; i < 200; i++)
 					{
 						if(m_aClients[c].m_aInputs[i].m_GameTick == Tick())
 						{
-							if(m_aClients[c].m_State == CClient::STATE_INGAME)
-								GameServer()->OnClientPredictedInput(c, m_aClients[c].m_aInputs[i].m_aData);
+							GameServer()->OnClientPredictedInput(c, m_aClients[c].m_aInputs[i].m_aData);
 							break;
 						}
 					}
@@ -1609,8 +1608,17 @@ int CServer::Run()
 				ReportTime += time_freq()*ReportInterval;
 			}
 
-			// wait for incomming data
-			net_socket_read_wait(m_NetServer.Socket(), 5);
+			bool NonActive = true;
+
+			for(int c = 0; c < MAX_CLIENTS; c++)
+				if(m_aClients[c].m_State != CClient::STATE_EMPTY)
+					NonActive = false;
+
+			// wait for incoming data
+			if (NonActive)
+				net_socket_read_wait(m_NetServer.Socket(), 1000);
+			else
+				net_socket_read_wait(m_NetServer.Socket(), 5);
 		}
 	}
 	// disconnect all clients on shutdown
