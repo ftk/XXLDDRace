@@ -1954,11 +1954,9 @@ void CClient::Run()
 		// beNice
 
 		if(g_Config.m_ClCpuThrottle)
-			thread_sleep(g_Config.m_ClCpuThrottle);
-		else if(g_Config.m_DbgStress)
-			thread_sleep(3);
+			net_socket_read_wait(m_NetClient.m_Socket, g_Config.m_ClCpuThrottle);
 		else if(!m_pGraphics->WindowActive())
-			thread_sleep(5);
+			net_socket_read_wait(m_NetClient.m_Socket, 4);
 
 		if(g_Config.m_DbgHitch)
 		{
