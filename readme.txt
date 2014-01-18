@@ -16,6 +16,7 @@ Features (client):
  - Ctrl+V: clipboard paste in chat (Windows)
  - Ctrl+W and Ctrl+U shortcuts in chat
 
+Some commits have been stolen from https://github.com/def-/teeworlds/
 
 teeworlds ---> DDRace ---> XXLDDRace ---> mkRace
 
