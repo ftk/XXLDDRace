@@ -229,18 +229,19 @@ int CGameTeams::TeamMask(int Team, int ExceptID, int Asker)
 {
 	if (Team == TEAM_SUPER)
 		return -1;
-	if (m_Core.GetSolo(Asker) && ExceptID == Asker)
-		return 0;
-	if (m_Core.GetSolo(Asker))
-		return 1 << Asker;
 	int Mask = 0;
+	if (m_Core.GetSolo(Asker) && ExceptID != Asker)
+		Mask = 1 << Asker;
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 		if (i != ExceptID)
-			if ((Asker == i || !m_Core.GetSolo(i))
-					&& ((Character(i)
-							&& (m_Core.Team(i) == Team
+			if ((!(GetPlayer(i) && (GetPlayer(i)->GetTeam() == -1 || GetPlayer(i)->m_Paused))
+							&& Character(i) && !m_Core.GetSolo(Asker)
+							&& ((!m_Core.GetSolo(i) && m_Core.Team(i) == Team)
 									|| m_Core.Team(i) == TEAM_SUPER))
-							|| (GetPlayer(i) && GetPlayer(i)->GetTeam() == -1)))
+					|| ((GetPlayer(i) && (GetPlayer(i)->GetTeam() == -1 || GetPlayer(i)->m_Paused))
+							&& (GetPlayer(i)->m_SpectatorID == SPEC_FREEVIEW
+									|| GetPlayer(i)->m_SpectatorID == Asker
+									|| (m_Core.Team(GetPlayer(i)->m_SpectatorID) == Team && !m_Core.GetSolo(Asker)))))
 				Mask |= 1 << i;
 	return Mask;
 }
