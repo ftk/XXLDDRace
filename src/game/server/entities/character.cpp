@@ -1727,9 +1727,10 @@ void CCharacter::HandleTiles(int Index)
 		TUNE_TILE(0x89, LaserReach, 2*LR)
 		TUNE_TILE(0x8a, LaserReach, LR/2)
 		
-		TUNE_TILE(0x8b, LaserBounceNum, 1)
-		TUNE_TILE(0x8c, LaserBounceNum, 4)
-		TUNE_TILE(0x8d, LaserBounceNum, 0)
+		const int LBN = 100;
+		TUNE_TILE(0x8b, LaserBounceNum, LBN)
+		TUNE_TILE(0x8c, LaserBounceNum, 4*LBN)
+		TUNE_TILE(0x8d, LaserBounceNum, 0*LBN)
 		
 		#undef TUNE_TILE
 		
