@@ -1061,22 +1061,13 @@ void CMenus::RenderSettingsDDRace(CUIRect MainView)
 		g_Config.m_ClShowIDs ^= 1;
 	}
 
-	MainView.HSplitTop(20.0f, &Button, &MainView);
-	if(DoButton_CheckBox(&g_Config.m_ClDDRaceCheats, Localize("Enable DDRace cheats like zoom"), g_Config.m_ClDDRaceCheats, &Button))
+	CUIRect SubCheats;
+	MainView.HSplitTop(2.5f, 0, &MainView);
+	MainView.HSplitTop(20.0f, &SubCheats, &MainView);
+	SubCheats.VSplitLeft(30.0f, 0, &Button);
+	if(DoButton_CheckBox_DontCare(&g_Config.m_ClShowEntities, Localize("Cheat: Shows entities in game (can also be toggled via console cl_show_entities)"), g_Config.m_ClShowEntities, &Button))
 	{
-		g_Config.m_ClDDRaceCheats ^= 1;
-	}
-
-	if (g_Config.m_ClDDRaceCheats)
-	{
-		CUIRect SubCheats;
-		MainView.HSplitTop(2.5f, 0, &MainView);
-		MainView.HSplitTop(20.0f, &SubCheats, &MainView);
-		SubCheats.VSplitLeft(30.0f, 0, &Button);
-		if(DoButton_CheckBox_DontCare(&g_Config.m_ClShowEntities, Localize("Cheat: Shows entities in game (can also be toggled via console cl_show_entities)"), g_Config.m_ClShowEntities, &Button))
-		{
-			g_Config.m_ClShowEntities ^= 1;
-		}
+		g_Config.m_ClShowEntities ^= 1;
 	}
 
 	MainView.HSplitTop(10.0f, 0, &MainView);

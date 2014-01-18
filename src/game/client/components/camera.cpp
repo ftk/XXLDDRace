@@ -78,22 +78,19 @@ void CCamera::OnReset()
 	m_Zoom = 1.0f;
 }
 
-const float ZoomStep = 0.9f;
+static const float ZoomStep = 0.9f;
+
 void CCamera::ConZoomPlus(IConsole::IResult *pResult, void *pUserData)
 {
 	CCamera *pSelf = (CCamera *)pUserData;
-	CServerInfo Info;
-	pSelf->Client()->GetServerInfo(&Info);
-	if(g_Config.m_ClDDRaceCheats == 1 && str_find_nocase(Info.m_aGameType, "race"))
-		((CCamera *)pUserData)->m_Zoom *= ZoomStep;
+	if(pSelf->Client()->IsDDRaceServer())
+		pSelf->m_Zoom *= ZoomStep;
 }
 void CCamera::ConZoomMinus(IConsole::IResult *pResult, void *pUserData)
 {
 	CCamera *pSelf = (CCamera *)pUserData;
-	CServerInfo Info;
-	pSelf->Client()->GetServerInfo(&Info);
-	if(g_Config.m_ClDDRaceCheats == 1 && str_find_nocase(Info.m_aGameType, "race"))
-		((CCamera *)pUserData)->m_Zoom *= 1/ZoomStep;
+	if(pSelf->Client()->IsDDRaceServer())
+		pSelf->m_Zoom /= ZoomStep;
 }
 void CCamera::ConZoomReset(IConsole::IResult *pResult, void *pUserData)
 {
