@@ -932,6 +932,9 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
     }
     if(pChr->m_FreezeTime == 0)
         return;
+    
+    if(pChr->m_LastRescue) // sv_rescue_delay
+    	return;
 
     if(pChr->m_RescueOverride)
     {
