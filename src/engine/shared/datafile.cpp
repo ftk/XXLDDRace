@@ -6,6 +6,8 @@
 #include "datafile.h"
 #include <zlib.h>
 
+static const int CompressionLevel = 9;
+
 struct CDatafileItemType
 {
 	int m_Type;
@@ -470,7 +472,7 @@ int CDataFileWriter::AddData(int Size, void *pData)
 	unsigned long s = compressBound(Size);
 	void *pCompData = mem_alloc(s, 1); // temporary buffer that we use during compression
 
-	int Result = compress((Bytef*)pCompData, &s, (Bytef*)pData, Size); // ignore_convention
+	int Result = compress2((Bytef*)pCompData, &s, (Bytef*)pData, Size, CompressionLevel); // ignore_convention
 	if(Result != Z_OK)
 	{
 		dbg_msg("datafile", "compression error %d", Result);
