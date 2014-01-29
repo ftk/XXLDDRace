@@ -1,0 +1,1 @@
+subdirs(server client editor)
