@@ -9,18 +9,6 @@ SDL.dll
 freetype.dll
 autoexec.cfg
 
-crapnet*
-dilate*
-fake_server*
-map_resave*
-map_version*
-mastersrv*
-packetgen*
-teeworlds*
-teeworlds_srv*
-tileset_border*
-versionsrv*
-
 Debug
 bam
 build server.bat
@@ -50,3 +38,5 @@ bam.exe
 *.opensdf
 *.orig
 *DDRace*
+
+/other/icons/*.coff
