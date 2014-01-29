@@ -743,8 +743,10 @@ CConsole::CConsole(int FlagMask)
 
 	m_pStorage = 0;
 	
+	#if defined(_MSC_VER) && _MSC_VER < 1700 // workaround for msvc < 2012
 	commands.max_load_factor(0.75f);
 	commands.reserve(512);
+	#endif
 
 	// register some basic commands
 	Register("echo", "r", CFGFLAG_SERVER|CFGFLAG_CLIENT, Con_Echo, this, "Echo the text");
