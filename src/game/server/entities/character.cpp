@@ -615,7 +615,7 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 	// copy new input
 	mem_copy(&m_Input, pNewInput, sizeof(m_Input));
 	if(m_FreezeTime > 0 || m_FreezeTime == -1)
-		mem_copy(&m_FreezedInput, pNewInput, sizeof(m_Input));
+		mem_copy(&m_FreezedInput, pNewInput, sizeof(m_FreezedInput));
 	m_NumInputs++;
 
 	// it is not allowed to aim in the center
