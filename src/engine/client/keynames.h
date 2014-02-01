@@ -3,7 +3,7 @@
 /* AUTO GENERATED! DO NOT EDIT MANUALLY! */
 
 #ifndef KEYS_INCLUDE
-//TODO: review it#error do not include this header!
+#error do not include this header!
 #endif
 
 #include <string.h>

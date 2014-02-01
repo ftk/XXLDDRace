@@ -1,6 +1,0 @@
-find_package( Threads )
-aux_source_directory(. BASE_SRC)
-aux_source_directory(tl BASE_SRC)
-add_library(base STATIC ${BASE_SRC})
-target_link_libraries(base ${CMAKE_THREAD_LIBS_INIT})
-add_dependencies(base generated-files)

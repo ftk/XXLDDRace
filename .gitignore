@@ -40,7 +40,3 @@ bam.exe
 *DDRace*
 
 /other/icons/*.coff
-
-CMakeLists.txt.user*
-*.swp
-*.swo

@@ -53,7 +53,7 @@
 	#include <windows.h>
 #endif
 
-#include "SDL/SDL.h"
+#include "SDL.h"
 #ifdef main
 #undef main
 #endif
