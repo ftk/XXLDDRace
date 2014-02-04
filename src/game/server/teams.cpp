@@ -30,7 +30,8 @@ void CGameTeams::OnCharacterStart(int ClientID)
 	if (pStartingChar->m_DDRaceState == DDRACE_FINISHED)
 		pStartingChar->m_DDRaceState = DDRACE_NONE;
 	if (m_Core.Team(ClientID) == TEAM_FLOCK
-			|| m_Core.Team(ClientID) == TEAM_SUPER)
+			|| m_Core.Team(ClientID) == TEAM_SUPER
+			|| m_Core.Team(ClientID) >= 10)
 	{
 		pStartingChar->m_DDRaceState = DDRACE_STARTED;
 		pStartingChar->m_StartTime = Tick;
@@ -98,7 +99,8 @@ void CGameTeams::OnCharacterStart(int ClientID)
 void CGameTeams::OnCharacterFinish(int ClientID)
 {
 	if (m_Core.Team(ClientID) == TEAM_FLOCK
-			|| m_Core.Team(ClientID) == TEAM_SUPER)
+			|| m_Core.Team(ClientID) == TEAM_SUPER
+			|| m_Core.Team(ClientID) >= 10)
 	{
 		CPlayer* pPlayer = GetPlayer(ClientID);
 		if (pPlayer && pPlayer->IsPlaying())
