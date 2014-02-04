@@ -1902,7 +1902,8 @@ void CClient::Run()
 
 			Update();
 			
-			if(!g_Config.m_GfxAsyncRender || m_pGraphics->IsIdle())
+			if(m_pGraphics->WindowOpen() && (m_pGraphics->WindowActive() || (m_RenderFrames%10) == 0) && 
+				(!g_Config.m_GfxAsyncRender || m_pGraphics->IsIdle()))
 			{
 				m_RenderFrames++;
 
@@ -1917,21 +1918,7 @@ void CClient::Run()
 
 				m_LastRenderTime = Now;
 
-				if(g_Config.m_DbgStress)
-				{
-					if((m_RenderFrames%10) == 0)
-					{
-						if(!m_EditorActive)
-							Render();
-						else
-						{
-							m_pEditor->UpdateAndRender();
-							DebugRender();
-						}
-						m_pGraphics->Swap();
-					}
-				}
-				else
+				if(!g_Config.m_DbgStress || (m_RenderFrames%10) == 0)
 				{
 					if(!m_EditorActive)
 						Render();
