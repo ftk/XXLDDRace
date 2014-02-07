@@ -217,10 +217,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 				{
 					// make sure to sanitize the error string form the other party
 					char Str[256];
-					if(pPacket->m_DataSize < sizeof(Str))
-						str_copy(Str, (char *)pPacket->m_aChunkData + 1, pPacket->m_DataSize);
-					else
-						str_copy(Str, (char *)pPacket->m_aChunkData + 1, sizeof(Str));
+					str_copy(Str, (char *)pPacket->m_aChunkData + 1, sizeof(Str));
 					//str_sanitize_strong(Str);
 
 					// set the error string
