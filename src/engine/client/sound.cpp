@@ -13,7 +13,7 @@
 #include "sound.h"
 
 extern "C" { // wavpack
-	#include <engine/external/wavpack/wavpack.h>
+	#include <engine/external/wavpack/wavpack_local.h>
 }
 #include <math.h>
 
@@ -328,17 +328,13 @@ void CSound::RateConvert(int SampleID)
 	pSample->m_NumFrames = NumFrames;
 }
 
-int CSound::ReadData(void *pBuffer, int Size)
-{
-	return io_read(ms_File, pBuffer, Size);
-}
-
 int CSound::LoadWV(const char *pFilename)
 {
 	CSample *pSample;
 	int SampleID = -1;
 	char aError[100];
-	WavpackContext *pContext;
+	WavpackContext *pContext = NULL;
+	char FilePath[256];
 
 	// don't waste memory on sound when we are stress testing
 	if(g_Config.m_DbgStress)
@@ -351,19 +347,21 @@ int CSound::LoadWV(const char *pFilename)
 	if(!m_pStorage)
 		return -1;
 
-	ms_File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
-	if(!ms_File)
-	{
-		dbg_msg("sound/wv", "failed to open file. filename='%s'", pFilename);
-		return -1;
-	}
 
 	SampleID = AllocID();
 	if(SampleID < 0)
 		return -1;
 	pSample = &m_aSamples[SampleID];
-
-	pContext = WavpackOpenFileInput(ReadData, aError);
+	
+	int PathType = 0;
+	do
+	{
+		m_pStorage->GetCompletePath(PathType++, pFilename, FilePath, sizeof(FilePath));
+		if(!FilePath[0])
+			break;
+		pContext = WavpackOpenFileInput(FilePath, aError, 0, 0);
+	} while(!pContext);
+	
 	if (pContext)
 	{
 		int m_aSamples = WavpackGetNumSamples(pContext);
@@ -413,14 +411,13 @@ int CSound::LoadWV(const char *pFilename)
 		pSample->m_LoopStart = -1;
 		pSample->m_LoopEnd = -1;
 		pSample->m_PausedAt = 0;
+		
+		WavpackCloseFile(pContext);
 	}
 	else
 	{
 		dbg_msg("sound/wv", "failed to open %s: %s", pFilename, aError);
 	}
-
-	io_close(ms_File);
-	ms_File = NULL;
 
 	if(g_Config.m_Debug)
 		dbg_msg("sound/wv", "loaded %s", pFilename);
@@ -527,7 +524,6 @@ void CSound::StopAll()
 	lock_release(m_SoundLock);
 }
 
-IOHANDLE CSound::ms_File = 0;
 
 IEngineSound *CreateEngineSound() { return new CSound; }
 

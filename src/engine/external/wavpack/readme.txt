@@ -1,68 +1,104 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//              Copyright (c) 1998 - 2006 Conifer Software.               //
+//              Copyright (c) 1998 - 2013 Conifer Software.               //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
 
-This package contains a tiny version of the WavPack 4.40 decoder that might
-be used in a "resource limited" CPU environment or form the basis for a
-hardware decoding implementation. It is packaged with a demo command-line
-program that accepts a WavPack audio file on stdin and outputs a RIFF wav
-file to stdout. The program is standard C, and a win32 executable is
-included which was compiled under MS Visual C++ 6.0 using this command:
+This package contains all the source code required to build the WavPack
+command-line programs and the WavPack library and it has been tested on many
+platforms.
 
-cl /O1 /DWIN32 wvfilter.c wputils.c unpack.c float.c metadata.c words.c bits.c
+On Windows there are solution and project files for Visual Studio 2008 and
+additional sourcecode to build the CoolEdit/Audition plugin and the winamp
+plugin. The CoolEdit/Audition plugin provides a good example for using the
+library to both read and write WavPack files. Both 32-bit and 64-bit
+platforms are provided.
 
-WavPack data is read with a stream reading callback. No direct seeking is
-provided for, but it is possible to start decoding anywhere in a WavPack
-stream. In this case, WavPack will be able to provide the sample-accurate
-position when it synchs with the data and begins decoding. The WIN32 macro
-is used for Windows to force the stdin and stdout streams to be binary mode.
+To build everything on Linux, type:
 
-Compared to the previous version, this library has been optimized somewhat
-for improved performance in exchange for slightly larger code size. The
-library also now includes hand-optimized assembly language versions of the
-decorrelation functions for both the ColdFire (w/EMAC) and ARM processors.
+1. ./configure [--enable-mmx] [--enable-man]
+2. make
+3. make install (optionally, to install into /usr/local/bin)
 
-For demonstration purposes this uses a single static copy of the
-WavpackContext structure, so obviously it cannot be used for more than one
-file at a time. Also, this decoder will not handle "correction" files, plays
-only the first two channels of multi-channel files, and is limited in
-resolution in some large integer or floating point files (but always
-provides at least 24 bits of resolution). It also will not accept WavPack
-files from before version 4.0.
+If you are using the code directly from SVN (rather than a distribution)
+then you will need to do a ./autogen.sh before the configure step. For
+processors that support MMX, use the --enable-mmx switch to utilize MMX
+intrinsics to speed up encoding of stereo 24-bit (and higher) audio.
 
-The previous version of this library would handle float files by returning
-32-bit floating-point data (even though no floating point math was used).
-Because this library would normally be used for simply playing WavPack
-files where lossless performance (beyond 24-bits) is not relevant, I have
-changed this behavior. Now, these files will generate clipped 24-bit data.
-The MODE_FLOAT flag will still be returned by WavpackGetMode(), but the
-BitsPerSample and BytesPerSample queries will be 24 and 3, respectfully.
-What this means is that an application that can handle 24-bit data will
-now be able to handle floating point data (assuming that the MODE_FLOAT
-flag is ignored).
+Notes:
 
-To make this code viable on the greatest number of hardware platforms, the
-following are true:
+1. There are two documentation files contained in the distribution:
 
-   speed is about 5x realtime on an AMD K6 300 MHz
-      ("high" mode 16/44 stereo; normal mode is about twice that fast)
+   doc/library_use.txt    contains a detailed description of the API provided
+                          by WavPack library appropriate for read and writing
+                          WavPack files
 
-   no floating-point math required; just 32b * 32b = 32b int multiply
+   doc/file_format.txt    contains a description of the WavPack file format,
+                          including details needed for parsing WavPack blocks
+                          and interpreting the block header and flags
 
-   large data areas are static and less than 4K total
-   executable code and tables are less than 40K
-   no malloc / free usage
+   There is also a description of the WavPack algorithms in the forth edition
+   of David Salomon's book "Data Compression: The Complete Reference". The
+   section on WavPack can be found here:
 
-To maintain compatibility on various platforms, the following conventions
-are used:
+   www.wavpack.com/WavPack.pdf
 
-   a "char" must be exactly 8-bits
-   a "short" must be exactly 16-bits
-   an "int" must be at least 16-bits, but may be larger
-   the "long" type is not used to avoid problems with 64-bit compilers
+2. This code is designed to be easy to port to other platforms. File I/O is
+   done with streams and all file functions (except "fopen") are handled in
+   a wrapper in the "utils.c" module. The code is endian-independent.
 
-Questions or comments should be directed to david@wavpack.com
+   To maintain compatibility on various platforms, the following conventions
+   are used: A "short" must be 16-bits and an "int" must be 32-bits.
+   The "long" type is not used. The "char" type must be 8-bits, signed or
+   unsigned.
+
+3. For WavPack file decoding, a library interface in "wputils.c" provides all
+   the functionality required for both the winamp plugin and the "wvunpack"
+   command-line program (including the transparent decoding of "correction"
+   files). There is also an alternate entry point that uses reader callbacks
+   for all input, although in this case it is the caller's responsibility to
+   to open the "correction" file. The header file "include/wavpack.h"
+   includes everything needed while hiding all the WavPack internals from the
+   application.
+
+4. For WavPack file creation, the library interface in "wputils.c" provides
+   all the functionality for both the Audition filter and the "wavpack"
+   command-line program. No file I/O is performed by the library when creating
+   WavPack files. Instead, the user supplies a "write_block" function that
+   accepts completed WavPack blocks. It is also possible to append APEv2 tags
+   to WavPack files during creation and edit APEv2 tags on existing files
+   (although there is no support currently for "binary" fields in the tags).
+
+5. The following #define's can be optionally used to eliminate some functionality
+   to create smaller binaries. It is important that they must be specified
+   the same for the compilation of ALL files:
+   
+   NO_UNPACK       no unpacking of audio samples from WavPack files
+                    (also don't include unpack.c)
+   NO_PACK         no creating WavPack files from raw audio data
+                    (also don't include pack.c, extra1.c and extra2.c)
+   INFO_ONLY       to obtain information from WavPack files, but not audio
+                    (also don't include pack.c, extra1.c and extra2.c)
+   NO_SEEKING      to not allow seeking to a specific sample index (unpack only)
+   NO_USE_FSTREAMS to not open WavPack files by name using fstreams
+   NO_TAGS         to not read specified fields from ID3v1 and APEv2 tags and
+                    create APEv2 tags
+   VER4_ONLY       to only handle WavPack files from versions 4.0 onward
+   WIN32           required for Win32 platform
+
+6. There are alternate versions of this library available specifically designed
+   for "resource limited" CPUs or hardware encoding and decoding. There is the
+   "tiny decoder" library which works with less than 32k of code and less than
+   4k of data and has assembly language optimizations for the ARM and Freescale
+   ColdFire CPUs.  The "tiny encoder" is also designed for embedded use and
+   handles the pure lossless, lossy, and hybrid lossless modes. Neither of the
+   "tiny" versions use any memory allocation functions nor do they require
+   floating-point arithmetic support.
+
+   For applications requiring very low latency, there is a special version of
+   the library that supports a variation on the regular WavPack block format
+   to facilitate this.
+
+7. Questions or comments should be directed to david@wavpack.com
