@@ -1951,7 +1951,7 @@ void CCharacter::DDRacePostCoreTick()
 		// handle Anti-Skip tiles
 		std::list < int > Indices = GameServer()->Collision()->GetMapIndices(m_PrevPos, m_Pos);
 		if(!Indices.empty())
-			for(std::list < int >::iterator i = Indices.begin(); i != Indices.end(); i++)
+			for(std::list < int >::iterator i = Indices.begin(); i != Indices.end(); ++i)
 			{
 				HandleTiles(*i);
 				//dbg_msg("Running","%d", *i);

@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <ctime>
+#include <cinttypes>
 
 
 /*
@@ -110,7 +111,7 @@ void CScoreLogger::LogFinish(int ClientID, int Team, int StartTick)
     char Name[64], Clan[64];
     enquote(Server()->ClientName(ClientID), Name, Name + 64);
     enquote(Server()->ClientClan(ClientID), Clan, Clan + 64);
-    fprintf(gs_File, "finish %I64d \"%s\" %d %d %d %d \"%s\" \"%s\"\n",
+    fprintf(gs_File, "finish %" PRId64 " \"%s\" %d %d %d %d \"%s\" \"%s\"\n",
             (long long)UnixTime, g_Config.m_SvMap,
             ClientID, Team,
             StartTick, CurTick,
@@ -124,7 +125,7 @@ void CScoreLogger::LogCheckpoint(int ClientID, int Team, int StartTick, int Chec
     char Name[64], Clan[64];
     enquote(Server()->ClientName(ClientID), Name, Name + 64);
     enquote(Server()->ClientClan(ClientID), Clan, Clan + 64);
-    fprintf(gs_File, "checkpoint %I64d \"%s\" %d %d %d %d %d \"%s\" \"%s\"\n",
+    fprintf(gs_File, "checkpoint %" PRId64 " \"%s\" %d %d %d %d %d \"%s\" \"%s\"\n",
             (long long)UnixTime, g_Config.m_SvMap,
             ClientID, Team,
             Checkpoint,

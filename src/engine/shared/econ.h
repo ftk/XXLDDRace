@@ -21,8 +21,8 @@ class CEcon
 			STATE_AUTHED,
 		};
 
-		int m_State;
 		int64 m_TimeConnected;
+		int m_State;
 		int m_AuthTries;
 	};
 	CClient m_aClients[NET_MAX_CONSOLE_CLIENTS];

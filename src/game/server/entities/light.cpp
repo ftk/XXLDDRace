@@ -28,7 +28,7 @@ bool CLight::HitCharacter()
 	if (HitCharacters.empty())
 		return false;
 	for (std::list<CCharacter *>::iterator i = HitCharacters.begin();
-			i != HitCharacters.end(); i++)
+			i != HitCharacters.end(); ++i)
 	{
 		CCharacter * Char = *i;
 		if (m_Layer == LAYER_SWITCH

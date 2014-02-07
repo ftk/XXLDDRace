@@ -232,7 +232,7 @@ public:
 	int GetArmor() { return m_Armor; };
 	void SetArmor(int Armor) {m_Armor = Armor; };
 	CCharacterCore GetCore() { return m_Core; };
-	void SetCore(CCharacterCore Core) {m_Core = Core; };
+	void SetCore(const CCharacterCore& Core) {m_Core = Core; };
 	CCharacterCore* Core() { return &m_Core; };
 	bool GetWeaponGot(int Type) { return m_aWeapons[Type].m_Got; };
 	void SetWeaponGot(int Type, bool Value) { m_aWeapons[Type].m_Got = Value; };

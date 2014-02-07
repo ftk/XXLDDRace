@@ -177,8 +177,8 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 		if(m_Input.m_TargetX < 0)
 			a = a+pi;
 		*/
-		double a = atan2((double)m_Input.m_TargetY,(double)m_Input.m_TargetX);
-		m_Angle = round(a*256.0);
+		float a = atan2f(m_Input.m_TargetY, m_Input.m_TargetX);
+		m_Angle = round(a*256.f);
 
 		// handle jump
 		if(m_Input.m_Jump && !Freezed)
