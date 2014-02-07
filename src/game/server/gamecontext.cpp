@@ -1182,7 +1182,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if (MsgID == NETMSGTYPE_CL_SHOWOTHERS)
 		{
-			if(g_Config.m_SvShowOthers);
+			if(g_Config.m_SvShowOthers)
 			{
 				// TODO: prevent spam ?
 				CNetMsg_Cl_ShowOthers *pMsg = (CNetMsg_Cl_ShowOthers *)pRawMsg;

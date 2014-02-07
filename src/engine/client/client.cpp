@@ -1562,8 +1562,10 @@ void CClient::Update()
 					m_aSnapshots[SNAP_CURRENT] = pNext;
 
 					// set ticks
-					m_CurGameTick = m_aSnapshots[SNAP_CURRENT]->m_Tick;
-					m_PrevGameTick = m_aSnapshots[SNAP_PREV]->m_Tick;
+					if(m_aSnapshots[SNAP_CURRENT])
+						m_CurGameTick = m_aSnapshots[SNAP_CURRENT]->m_Tick;
+					if(m_aSnapshots[SNAP_PREV])
+						m_PrevGameTick = m_aSnapshots[SNAP_PREV]->m_Tick;
 
 					if(m_aSnapshots[SNAP_CURRENT] && m_aSnapshots[SNAP_PREV])
 					{
