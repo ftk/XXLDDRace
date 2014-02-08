@@ -1293,9 +1293,9 @@ void CGameContext::ConCopy(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	const int ClientID = pResult->m_ClientID;
 
-    const int ToCopy = pResult->GetInteger(0);
+    const int ToCopy = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
 
     if(!CheckClientID(ClientID))
         return;
-    pSelf->m_aInputCopy[ClientID] = CheckClientID(ToCopy) ? ToCopy : -1;
+    pSelf->m_aInputCopy[ClientID] = (CheckClientID(ToCopy) && ClientID != ToCopy) ? ToCopy : -1;
 }

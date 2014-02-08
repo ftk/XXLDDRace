@@ -658,7 +658,18 @@ void CGameContext::OnClientDirectInput(int ClientID, void *pInput)
 	{
 		if(m_aInputCopy[ClientID] != -1)
 		{
-			mem_copy(pInput, ((CServer *) Server())->m_aClients[m_aInputCopy[ClientID]].m_LatestInput.m_aData, MAX_INPUT_SIZE*sizeof(int));
+			void * InputToCopy = ((CServer *) Server())->m_aClients[m_aInputCopy[ClientID]].m_LatestInput.m_aData;
+			/*
+			if(m_aInputCopy[m_aInputCopy[ClientID]] == ClientID) // swap
+			{
+				int Tmp[MAX_INPUT_SIZE];
+				mem_copy(Tmp, pInput, MAX_INPUT_SIZE*sizeof(int));
+				mem_copy(pInput, InputToCopy, MAX_INPUT_SIZE*sizeof(int));
+				mem_copy(InputToCopy, Tmp, MAX_INPUT_SIZE*sizeof(int));
+			}
+			else // copy
+			*/
+			mem_copy(pInput, InputToCopy, MAX_INPUT_SIZE*sizeof(int));
 		}
 		m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
 	}
