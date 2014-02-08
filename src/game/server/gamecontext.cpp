@@ -58,6 +58,9 @@ void CGameContext::Construct(int Resetting)
 		m_NumMutes = 0;
 	}
 	m_ChatResponseTargetID = -1;
+	
+	for(int i = 0; i < MAX_CLIENTS; i++)
+		m_aInputCopy[i] = -1;
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -652,7 +655,13 @@ void CGameContext::OnTick()
 void CGameContext::OnClientDirectInput(int ClientID, void *pInput)
 {
 	if(!m_World.m_Paused)
+	{
+		if(m_aInputCopy[ClientID] != -1)
+		{
+			mem_copy(pInput, ((CServer *) Server())->m_aClients[m_aInputCopy[ClientID]].m_LatestInput.m_aData, MAX_INPUT_SIZE*sizeof(int));
+		}
 		m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
+	}
 }
 
 void CGameContext::OnClientPredictedInput(int ClientID, void *pInput)
@@ -767,6 +776,11 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 		if(m_apPlayers[i] && m_apPlayers[i]->m_SpectatorID == ClientID)
 			m_apPlayers[i]->m_SpectatorID = SPEC_FREEVIEW;
 	}
+	
+	m_aInputCopy[ClientID] = -1;
+	for(int i = 0; i < MAX_CLIENTS; i++)
+		if(m_aInputCopy[i] == ClientID)
+			m_aInputCopy[i] = -1;
 }
 
 void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)

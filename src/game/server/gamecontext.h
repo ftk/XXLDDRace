@@ -314,6 +314,8 @@ private:
 	static void ConSilentRename(IConsole::IResult *pResult, void *pUserData);
 	
 	static void ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData);
+	static void ConCopy(IConsole::IResult *pResult, void *pUserData);
+	int m_aInputCopy[MAX_CLIENTS];
 
 	enum
 	{

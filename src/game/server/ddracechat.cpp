@@ -1288,3 +1288,14 @@ void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserDa
 	pSelf->m_SavedPlayers.erase(iterator);
 }
 
+void CGameContext::ConCopy(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *) pUserData;
+	const int ClientID = pResult->m_ClientID;
+
+    const int ToCopy = pResult->GetInteger(0);
+
+    if(!CheckClientID(ClientID))
+        return;
+    pSelf->m_aInputCopy[ClientID] = CheckClientID(ToCopy) ? ToCopy : -1;
+}
