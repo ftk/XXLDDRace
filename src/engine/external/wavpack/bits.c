@@ -21,7 +21,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <io.h>
 #else
 #if defined(__OS2__)

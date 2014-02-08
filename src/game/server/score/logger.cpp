@@ -4,8 +4,12 @@
 
 #include <cstdio>
 #include <ctime>
-#include <cinttypes>
 
+#ifdef _MSC_VER
+#define PRId64 "lld"
+#else
+#include <cinttypes>
+#endif
 
 /*
  * Outputs a line to records.txt

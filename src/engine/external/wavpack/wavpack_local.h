@@ -15,13 +15,13 @@
 #define __has_builtin(x) 0
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #define FASTCALL __fastcall
 #else
 #define FASTCALL
 #endif
 
-#if defined(WIN32) || \
+#if defined(_WIN32) || \
     (defined(BYTE_ORDER) && defined(LITTLE_ENDIAN) && (BYTE_ORDER == LITTLE_ENDIAN))
 #define BITSTREAM_SHORTS    // use "shorts" for reading/writing bitstreams
                             //  (only works on little-endian machines)
@@ -40,7 +40,7 @@ typedef unsigned __int8 uint8_t;
 typedef __int64 int64_t;
 typedef __int32 int32_t;
 typedef __int16 int16_t;
-typedef __int8  int8_t;
+typedef signed __int8  int8_t;
 typedef float float32_t;
 #else
 #include <inttypes.h>

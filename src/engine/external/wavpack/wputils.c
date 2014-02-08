@@ -24,7 +24,7 @@
 #include <math.h>
 #include <sys/stat.h>
 
-#if defined (WIN32) || defined (__OS2__)
+#if defined (_WIN32) || defined (__OS2__)
 #include <io.h>
 #endif
 
@@ -34,7 +34,7 @@
 
 #include "wavpack_local.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define stricmp(x,y) _stricmp(x,y)
 #define fileno _fileno
 #else
@@ -162,7 +162,7 @@ WavpackContext *WavpackOpenFileInput (const char *infilename, char *error, int f
 
     if (*infilename == '-') {
         wv_id = stdin;
-#if defined(WIN32)
+#if defined(_WIN32)
         _setmode (fileno (stdin), O_BINARY);
 #endif
 #if defined(__OS2__)
