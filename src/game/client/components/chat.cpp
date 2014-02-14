@@ -21,6 +21,8 @@
 #if defined(CONF_FAMILY_WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#elif defined(CONF_FAMILY_UNIX)
+#include <stdio.h>
 #endif
 
 #include "chat.h"
@@ -189,7 +191,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 		// insert the name
 		if(pCompletionString)
 		{
-			char aBuf[256];
+			char aBuf[CLineInput::MAX_SIZE];
 			// add part before the name
 			str_copy(aBuf, m_Input.GetString(), min(static_cast<int>(sizeof(aBuf)), m_PlaceholderOffset+1));
 
@@ -253,7 +255,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 	// emacs
 	else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_u && (Input()->m_Modifier & (KEYMOD_LCTRL|KEYMOD_RCTRL)))
 	{
-		char aBuf[256];
+		char aBuf[CLineInput::MAX_SIZE];
 		str_copy(aBuf, m_Input.GetString() + m_Input.GetCursorOffset(), static_cast<int>(sizeof(aBuf)));
 		m_Input.Set(aBuf);
 		m_Input.SetCursorOffset(0);
@@ -271,7 +273,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 		//if(len > 0)
 		{
 			
-			char aBuf[256];
+			char aBuf[CLineInput::MAX_SIZE];
 			aBuf[0] = '\0';
 			if(len > 0)
 				str_copy(aBuf, str, min(static_cast<int>(sizeof(aBuf)), len+1));
@@ -291,7 +293,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 			HANDLE hnd = GetClipboardData(CF_UNICODETEXT);
 			if(hnd)
 			{
-				char aBuf[256];
+				char aBuf[CLineInput::MAX_SIZE];
 				int offset = m_Input.GetCursorOffset();
 				
 				str_copy(aBuf, m_Input.GetString(), min(static_cast<int>(sizeof(aBuf)), offset+1));
@@ -322,6 +324,32 @@ bool CChat::OnInput(IInput::CEvent Event)
 			}
 			CloseClipboard();
 		}
+	}
+	#elif defined(CONF_FAMILY_UNIX) // ctrl-v
+	else if(Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_v && (Input()->m_Modifier & (KEYMOD_LCTRL|KEYMOD_RCTRL)))
+	{
+		FILE * pipe = popen("xclip -o", "r");
+		if(pipe)
+		{
+			char aBuf[CLineInput::MAX_SIZE];
+			int offset = m_Input.GetCursorOffset();
+			// left|right ---> left[clipboard]right
+			// save left
+			str_copy(aBuf, m_Input.GetString(), min(static_cast<int>(sizeof(aBuf)), offset+1));
+			
+			char * pClipboard = aBuf + min(static_cast<int>(sizeof(aBuf)), offset);
+			const int Size = static_cast<int>(sizeof(aBuf)) - min(static_cast<int>(sizeof(aBuf)), offset);
+			
+			int BytesRead = fread(pClipboard, 1, Size - 1, pipe);
+			if(BytesRead < Size)
+				pClipboard[BytesRead] = '\0';
+			
+			// append right
+			str_append(aBuf, m_Input.GetString() + m_Input.GetCursorOffset(), sizeof(aBuf));
+			
+			pclose(pipe);
+		}
+			
 	}
 	#endif
 

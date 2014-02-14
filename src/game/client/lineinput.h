@@ -8,7 +8,13 @@
 // line input helter
 class CLineInput
 {
-	char m_Str[256];
+public:
+	enum
+	{
+		MAX_SIZE=512,
+	};
+private:
+	char m_Str[MAX_SIZE];
 	int m_Len;
 	int m_CursorPos;
 public:
