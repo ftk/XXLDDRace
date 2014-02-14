@@ -487,7 +487,6 @@ public:
 
 	virtual void SetDefaultFont(CFont *pFont)
 	{
-		dbg_msg("textrender", "default pFont set %p", pFont);
 		m_pDefaultFont = pFont;
 	}
 
