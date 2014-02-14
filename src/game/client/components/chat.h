@@ -3,6 +3,7 @@
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 #include <engine/shared/ringbuffer.h>
+#include <engine/textrender.h>
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
 
@@ -63,6 +64,8 @@ class CChat : public CComponent
 	int m_PendingChatCounter;
 	int64 m_LastChatSend;
 	int64 m_aLastSoundPlayed[CHAT_NUM];
+	
+	CFont * m_pFont;
 
 	static void ConSay(IConsole::IResult *pResult, void *pUserData);
 	static void ConSayTeam(IConsole::IResult *pResult, void *pUserData);

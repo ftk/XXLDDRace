@@ -8,6 +8,7 @@
 #include <engine/textrender.h>
 #include <engine/keys.h>
 #include <engine/shared/config.h>
+#include <engine/storage.h>
 
 #include <game/generated/protocol.h>
 #include <game/generated/client_data.h>
@@ -29,6 +30,7 @@
 
 CChat::CChat()
 {
+	m_pFont = NULL;
 	OnReset();
 }
 
@@ -386,6 +388,19 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 
 void CChat::AddLine(int ClientID, int Team, const char *pLine)
 {
+	if(!m_pFont)
+	{
+		char aFilename[512];
+		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSansMono.ttf", IOFLAG_READ, IStorage::TYPE_ALL, aFilename, sizeof(aFilename));
+		if(File)
+		{
+			io_close(File);
+			m_pFont = TextRender()->LoadFont(aFilename);
+		}
+		else
+			dbg_msg("chat", "can't find font!");
+	}
+
 	if(*pLine == 0 || (ClientID != -1 && (m_pClient->m_aClients[ClientID].m_aName[0] == '\0' || // unknown client
 		m_pClient->m_aClients[ClientID].m_ChatIgnore ||
 		(m_pClient->m_Snap.m_LocalClientID != ClientID && g_Config.m_ClShowChatFriends && !m_pClient->m_aClients[ClientID].m_Friend))))
@@ -506,6 +521,7 @@ void CChat::OnRender()
 		// render chat input
 		CTextCursor Cursor;
 		TextRender()->SetCursor(&Cursor, x, y, 8.0f, TEXTFLAG_RENDER);
+		Cursor.m_pFont = m_pFont;
 		Cursor.m_LineWidth = Width-190.0f;
 		Cursor.m_MaxLines = 2;
 
@@ -571,6 +587,7 @@ void CChat::OnRender()
 		if(m_aLines[r].m_YOffset[OffsetType] < 0.0f)
 		{
 			TextRender()->SetCursor(&Cursor, Begin, 0.0f, FontSize, 0);
+			Cursor.m_pFont = m_pFont;
 			Cursor.m_LineWidth = LineWidth;
 			TextRender()->TextEx(&Cursor, m_aLines[r].m_aName, -1);
 			TextRender()->TextEx(&Cursor, m_aLines[r].m_aText, -1);
@@ -586,6 +603,7 @@ void CChat::OnRender()
 
 		// reset the cursor
 		TextRender()->SetCursor(&Cursor, Begin, y, FontSize, TEXTFLAG_RENDER);
+		Cursor.m_pFont = m_pFont;
 		Cursor.m_LineWidth = LineWidth;
 
 		// render name
