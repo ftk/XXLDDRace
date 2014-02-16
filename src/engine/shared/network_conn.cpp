@@ -213,7 +213,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 				m_State = NET_CONNSTATE_ERROR;
 				m_RemoteClosed = 1;
 
-				if(pPacket->m_DataSize)
+				if(pPacket->m_DataSize > 1)
 				{
 					// make sure to sanitize the error string form the other party
 					char Str[256];
@@ -224,7 +224,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 					SetError(Str);
 				}
 				else
-					SetError("No reason given");
+					SetError("");
 
 				if(g_Config.m_Debug)
 					dbg_msg("conn", "closed reason='%s'", ErrorString());
