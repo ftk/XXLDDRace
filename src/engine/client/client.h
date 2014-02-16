@@ -38,8 +38,6 @@ class CSmoothTime
 	int64 m_Current;
 	int64 m_Target;
 
-	int64 m_RLast;
-	int64 m_TLast;
 	CGraph m_Graph;
 
 	int m_SpikeCounter;

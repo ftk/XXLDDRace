@@ -349,7 +349,6 @@ public:
 // client side
 class CNetClient
 {
-	NETADDR m_ServerAddr;
 	CNetConnection m_Connection;
 	CNetRecvUnpacker m_RecvUnpacker;
 public:
