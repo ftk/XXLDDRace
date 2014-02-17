@@ -345,13 +345,16 @@ bool CChat::OnInput(IInput::CEvent Event)
 			int BytesRead = fread(pClipboard, 1, Size - 1, pipe);
 			if(BytesRead < Size)
 				pClipboard[BytesRead] = '\0';
+			offset += BytesRead;
+			pclose(pipe);
 			
 			// append right
 			str_append(aBuf, m_Input.GetString() + m_Input.GetCursorOffset(), sizeof(aBuf));
 			
-			pclose(pipe);
+			m_Input.Set(aBuf);
+			if(offset < sizeof(aBuf))
+				m_Input.SetCursorOffset(offset);
 		}
-			
 	}
 	#endif
 
