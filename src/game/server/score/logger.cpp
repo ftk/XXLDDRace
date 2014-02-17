@@ -1,5 +1,5 @@
+#include <base/system.h>
 #include <game/server/score/logger.h>
-
 #include <engine/shared/config.h>
 
 #include <cstdio>
@@ -116,7 +116,7 @@ void CScoreLogger::LogFinish(int ClientID, int Team, int StartTick)
     enquote(Server()->ClientName(ClientID), Name, Name + 64);
     enquote(Server()->ClientClan(ClientID), Clan, Clan + 64);
     fprintf(gs_File, "finish %" PRId64 " \"%s\" %d %d %d %d \"%s\" \"%s\"\n",
-            (long long)UnixTime, g_Config.m_SvMap,
+            (int64)UnixTime, g_Config.m_SvMap,
             ClientID, Team,
             StartTick, CurTick,
             Name, Clan);
@@ -130,7 +130,7 @@ void CScoreLogger::LogCheckpoint(int ClientID, int Team, int StartTick, int Chec
     enquote(Server()->ClientName(ClientID), Name, Name + 64);
     enquote(Server()->ClientClan(ClientID), Clan, Clan + 64);
     fprintf(gs_File, "checkpoint %" PRId64 " \"%s\" %d %d %d %d %d \"%s\" \"%s\"\n",
-            (long long)UnixTime, g_Config.m_SvMap,
+            (int64)UnixTime, g_Config.m_SvMap,
             ClientID, Team,
             Checkpoint,
             StartTick, CurTick,

@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
+#include <base/system.h>
 #include <base/tl/sorted_array.h>
 
 #include <new>
@@ -19,15 +20,19 @@
 
 #include <game/server/entities/loltext.h>
 
-#include <stdio.h>
-#include <string.h>
 #include <engine/server/server.h>
 #include "gamemodes/DDRace.h"
 #include "score.h"
 #include "score/file_score.h"
-#include <time.h>
+#include <ctime>
 #if defined(CONF_SQL)
 #include "score/sql_score.h"
+#endif
+
+#ifdef _MSC_VER
+#define PRId64 "lld"
+#else
+#include <cinttypes>
 #endif
 
 enum
@@ -855,9 +860,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	
 				Console()->ExecuteLine(pMsg->m_pMessage + 1, ClientID);
 	
-				if(!strncmp(pMsg->m_pMessage+1, "login ", 6))
+				if(!str_comp_nocase_num(pMsg->m_pMessage+1, "login ", 6))
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "chat", "login ***");
-				else if(!strncmp(pMsg->m_pMessage+1, "register ", 9))
+				else if(!str_comp_nocase_num(pMsg->m_pMessage+1, "register ", 9))
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "chat", "register ***");
 				else if(pMsg->m_pMessage[1] != 'r' || pMsg->m_pMessage[2]) // skip "/r"
 				{
@@ -903,18 +908,20 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 	
+	
+			char aChatmsg[256];
+			char aDesc[VOTE_DESC_LENGTH];
+			char aCmd[VOTE_CMD_LENGTH];
+			aCmd[0] = 0;
+			
 			int Timeleft = pPlayer->m_LastVoteCall + Server()->TickSpeed()*60 - Now;
 			if(pPlayer->m_LastVoteCall && Timeleft > 0)
 			{
-				char aChatmsg[512] = {0};
 				str_format(aChatmsg, sizeof(aChatmsg), "You must wait %d seconds before making another vote", (Timeleft/Server()->TickSpeed())+1);
 				SendChatTarget(ClientID, aChatmsg);
 				return;
 			}
-	
-			char aChatmsg[512] = {0};
-			char aDesc[VOTE_DESC_LENGTH] = {0};
-			char aCmd[VOTE_CMD_LENGTH] = {0};
+
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 			const char *pReason = pMsg->m_Reason[0] ? pMsg->m_Reason : "No reason given";
 	
@@ -931,12 +938,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 							SendChatTarget(ClientID, "Invalid option");
 							return;
 						}
-						if(!m_apPlayers[ClientID]->m_Authed && (strncmp(pOption->m_aCommand, "sv_map ", 7) == 0 || strncmp(pOption->m_aCommand, "change_map ", 11) == 0) && time_get() < LastMapVote + (time_freq() * g_Config.m_SvVoteMapTimeDelay))
+						if(!m_apPlayers[ClientID]->m_Authed && (str_comp_num(pOption->m_aCommand, "sv_map ", 7) == 0 || str_comp_num(pOption->m_aCommand, "change_map ", 11) == 0) && time_get() < LastMapVote + (time_freq() * g_Config.m_SvVoteMapTimeDelay))
 						{
-							char chatmsg[512] = {0};
-							str_format(chatmsg, sizeof(chatmsg), "There's a %d second delay between map-votes,Please wait %I64d Second(s)", g_Config.m_SvVoteMapTimeDelay,((LastMapVote+(g_Config.m_SvVoteMapTimeDelay * time_freq()))/time_freq())-(time_get()/time_freq()));
-							SendChatTarget(ClientID, chatmsg);
-	
+							str_format(aChatmsg, sizeof(aChatmsg), "There's a %d second delay between map-votes,Please wait %" PRId64 " Second(s)", g_Config.m_SvVoteMapTimeDelay,((LastMapVote+(g_Config.m_SvVoteMapTimeDelay * time_freq()))/time_freq())-(time_get()/time_freq()));
+							SendChatTarget(ClientID, aChatmsg);
 							return;
 						}
 						str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s' (%s)", Server()->ClientName(ClientID),
@@ -975,12 +980,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				else if(!m_apPlayers[ClientID]->m_Authed && time_get() < m_apPlayers[ClientID]->m_Last_KickVote + (time_freq() * g_Config.m_SvVoteKickTimeDelay))
 				{
-					char chatmsg[512] = {0};
-					str_format(chatmsg, sizeof(chatmsg), "There's a %d second wait time between kick votes for each player please wait %I64d second(s)",
+					str_format(aChatmsg, sizeof(aChatmsg), "There's a %d second wait time between kick votes for each player please wait %" PRId64 " second(s)",
 					g_Config.m_SvVoteKickTimeDelay,
 					((m_apPlayers[ClientID]->m_Last_KickVote + (m_apPlayers[ClientID]->m_Last_KickVote*time_freq()))/time_freq())-(time_get()/time_freq())
 					);
-					SendChatTarget(ClientID, chatmsg);
+					SendChatTarget(ClientID, aChatmsg);
 					m_apPlayers[ClientID]->m_Last_KickVote = time_get();
 					return;
 				}
@@ -1023,9 +1027,8 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				{
 					SendChatTarget(ClientID, "You can't kick admins");
 					m_apPlayers[ClientID]->m_Last_KickVote = time_get();
-					char aBufKick[128];
-					str_format(aBufKick, sizeof(aBufKick), "'%s' called for vote to kick you", Server()->ClientName(ClientID));
-					SendChatTarget(KickID, aBufKick);
+					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to kick you", Server()->ClientName(ClientID));
+					SendChatTarget(KickID, aChatmsg);
 					return;
 				}
 	
@@ -1086,7 +1089,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				{
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to move '%s' to spectators (%s)", Server()->ClientName(ClientID), Server()->ClientName(SpectateID), pReason);
 					str_format(aDesc, sizeof(aDesc), "move '%s' to spectators", Server()->ClientName(SpectateID));
-				str_format(aCmd, sizeof(aCmd), "set_team %d -1 %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay);
+					str_format(aCmd, sizeof(aCmd), "set_team %d -1 %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay);
 				}
 			}
 	
@@ -1171,9 +1174,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		{
 			pPlayer->m_IsUsingDDRaceClient = true;
 	
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "%d use DDRace Client", ClientID);
-			dbg_msg("DDRace", aBuf);
+			dbg_msg("DDRace", "%d use DDRace Client", ClientID);
 	
 			//first update his teams state
 			((CGameControllerDDRace*)m_pController)->m_Teams.SendTeamsState(ClientID);

@@ -58,7 +58,7 @@ int CConsoleNetConnection::Update()
 		if((int)(sizeof(m_aBuffer)) <= m_BufferOffset)
 		{
 			m_State = NET_CONNSTATE_ERROR;
-			str_copy(m_aErrorString, "too weak connection (out of buffer)", sizeof(m_aErrorString));
+			str_copy(m_aErrorString, "too weak connection (out of console buffer)", sizeof(m_aErrorString));
 			return -1;
 		}
 
