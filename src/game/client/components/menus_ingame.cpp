@@ -14,6 +14,7 @@
 #include <game/generated/client_data.h>
 
 #include <game/localization.h>
+#include <game/client/components/countryflags.h>
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
 #include <game/client/render.h>
@@ -117,7 +118,7 @@ void CMenus::RenderGame(CUIRect MainView)
 
 void CMenus::RenderPlayers(CUIRect MainView)
 {
-	CUIRect Button, ButtonBar, Options, Player;
+	CUIRect Button, Button2, ButtonBar, Options, Player;
 	RenderTools()->DrawUIRect(&MainView, ms_ColorTabbarActive, CUI::CORNER_ALL, 10.0f);
 
 	// player options
@@ -151,21 +152,50 @@ void CMenus::RenderPlayers(CUIRect MainView)
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
+	int TotalPlayers = 0;
+
+	for(int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if(!m_pClient->m_Snap.m_paInfoByTeam[i])
+			continue;
+
+		int Index = m_pClient->m_Snap.m_paInfoByTeam[i]->m_ClientID;
+
+		if(Index == m_pClient->m_Snap.m_LocalClientID)
+			continue;
+
+		TotalPlayers++;
+	}
+
+	static int s_VoteList = 0;
+	static float s_ScrollValue = 0;
+	CUIRect List = Options;
+	//List.HSplitTop(28.0f, 0, &List);
+	UiDoListboxStart(&s_VoteList, &List, 24.0f, "", "", TotalPlayers, 1, -1, s_ScrollValue);
+
 	// options
 	static int s_aPlayerIDs[MAX_CLIENTS][2] = {{0}};
+
 	for(int i = 0, Count = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(!m_pClient->m_Snap.m_paInfoByTeam[i])
 			continue;
 
 		int Index = m_pClient->m_Snap.m_paInfoByTeam[i]->m_ClientID;
+
 		if(Index == m_pClient->m_Snap.m_LocalClientID)
 			continue;
 
-		Options.HSplitTop(28.0f, &ButtonBar, &Options);
-		if(Count++%2 == 0)
-			RenderTools()->DrawUIRect(&ButtonBar, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 10.0f);
-		ButtonBar.VSplitRight(220.0f, &Player, &ButtonBar);
+		CListboxItem Item = UiDoListboxNextItem(&m_pClient->m_aClients[Index]);
+
+		Count++;
+
+		if(!Item.m_Visible)
+			continue;
+
+		if(Count%2 == 1)
+			RenderTools()->DrawUIRect(&Item.m_Rect, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 10.0f);
+		Item.m_Rect.VSplitRight(300.0f, &Player, &Item.m_Rect);
 
 		// player info
 		Player.VSplitLeft(28.0f, &Button, &Player);
@@ -175,6 +205,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 
 		Player.HSplitTop(1.5f, 0, &Player);
 		Player.VSplitMid(&Player, &Button);
+		Item.m_Rect.VSplitRight(200.0f, &Button2, &Item.m_Rect);
 		CTextCursor Cursor;
 		TextRender()->SetCursor(&Cursor, Player.x, Player.y, 14.0f, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
 		Cursor.m_LineWidth = Player.w;
@@ -184,9 +215,15 @@ void CMenus::RenderPlayers(CUIRect MainView)
 		Cursor.m_LineWidth = Button.w;
 		TextRender()->TextEx(&Cursor, m_pClient->m_aClients[Index].m_aClan, -1);
 
+		//TextRender()->SetCursor(&Cursor, Button2.x,Button2.y, 14.0f, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
+		//Cursor.m_LineWidth = Button.w;
+		vec4 Color(1.0f, 1.0f, 1.0f, 0.5f);
+		m_pClient->m_pCountryFlags->Render(m_pClient->m_aClients[Index].m_Country, &Color,
+			Button2.x, Button2.y + Button2.h/2.0f - 0.75*Button2.h/2.0f, 1.5f*Button2.h, 0.75f*Button2.h);
+
 		// ignore button
-		ButtonBar.HMargin(2.0f, &ButtonBar);
-		ButtonBar.VSplitLeft(Width, &Button, &ButtonBar);
+		Item.m_Rect.HMargin(2.0f, &Item.m_Rect);
+		Item.m_Rect.VSplitLeft(Width, &Button, &Item.m_Rect);
 		Button.VSplitLeft((Width-Button.h)/4.0f, 0, &Button);
 		Button.VSplitLeft(Button.h, &Button, 0);
 		if(g_Config.m_ClShowChatFriends && !m_pClient->m_aClients[Index].m_Friend)
@@ -196,8 +233,8 @@ void CMenus::RenderPlayers(CUIRect MainView)
 				m_pClient->m_aClients[Index].m_ChatIgnore ^= 1;
 
 		// friend button
-		ButtonBar.VSplitLeft(20.0f, &Button, &ButtonBar);
-		ButtonBar.VSplitLeft(Width, &Button, &ButtonBar);
+		Item.m_Rect.VSplitLeft(20.0f, &Button, &Item.m_Rect);
+		Item.m_Rect.VSplitLeft(Width, &Button, &Item.m_Rect);
 		Button.VSplitLeft((Width-Button.h)/4.0f, 0, &Button);
 		Button.VSplitLeft(Button.h, &Button, 0);
 		if(DoButton_Toggle(&s_aPlayerIDs[Index][1], m_pClient->m_aClients[Index].m_Friend, &Button, true))
@@ -209,6 +246,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 		}
 	}
 
+	UiDoListboxEnd(&s_ScrollValue, 0);
 	/*
 	CUIRect bars;
 	votearea.HSplitTop(10.0f, 0, &votearea);
