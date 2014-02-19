@@ -491,13 +491,16 @@ void CControls::AutoHook()
 		intellihook = GETBIT(auto_hook_type, 2),
 		hook_once = GETBIT(auto_hook_type, 3); // only for intellihook
 	#undef GETBIT
+	
+	const int LocalID = m_pClient->m_Snap.m_LocalClientID;
+	
 	if(!intellihook)
 	{
 		// dump autohook
 		if(m_InputData.m_Hook)
 		{
-			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
-			const int hooked_player = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookedPlayer;
+			const int hook_state = m_pClient->m_aClients[LocalID].m_Predicted.m_HookState;
+			const int hooked_player = m_pClient->m_aClients[LocalID].m_Predicted.m_HookedPlayer;
 			
 			if(hook_state != HOOK_FLYING)
 			{
@@ -537,12 +540,12 @@ void CControls::AutoHook()
 			
 			// hook characters
 			if(!m_InputData.m_Hook && hook_players)
-				if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
+				if(m_pClient->IntersectCharacter(initPos, finishPos, finishPos, m_pClient->m_Tuning.m_HookFireSpeed, LocalID) != -1)
 					m_InputData.m_Hook = 1;
 		}
 		else if(!hook_once)
 		{
-			const int hook_state = m_pClient->m_aClients[m_pClient->m_Snap.m_LocalClientID].m_Predicted.m_HookState;
+			const int hook_state = m_pClient->m_aClients[LocalID].m_Predicted.m_HookState;
 			if(hook_state != HOOK_FLYING && hook_state != HOOK_GRABBED)
 				m_InputData.m_Hook = 0;
 		}

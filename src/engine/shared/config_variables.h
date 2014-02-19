@@ -200,6 +200,7 @@ MACRO_CONFIG_INT(ClShowQuads, cl_show_quads, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAV
 MACRO_CONFIG_INT(ClBckRed, cl_bck_red, 30, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Red for Background")
 MACRO_CONFIG_INT(ClBckGreen, cl_bck_green, 30, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Green for Background")
 MACRO_CONFIG_INT(ClBckBlue, cl_bck_blue, 60, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Blue for Background")
+MACRO_CONFIG_INT(ClLocalPredict, cl_local_predict, 1, 0, 1, CFGFLAG_CLIENT, "Use client data for local client")
 MACRO_CONFIG_INT(SvShowOthers, sv_show_others, 1, 0, 1, CFGFLAG_SERVER, "Whether players can user the command showothers or not")
 MACRO_CONFIG_INT(SvMaxAfkTime, sv_max_afk_time, 0, 0, 9999, CFGFLAG_SERVER, "The time in seconds a player is allowed to be afk (0 = disabled)")
 MACRO_CONFIG_INT(SvPlasmaRange, sv_plasma_range, 700, 1, 99999, CFGFLAG_SERVER, "How far will the plasma gun track tees")

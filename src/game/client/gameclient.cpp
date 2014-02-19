@@ -58,6 +58,8 @@
 #include "components/ghost.h"
 #include <base/tl/sorted_array.h>
 
+#include <algorithm>
+
 CGameClient g_GameClient;
 
 // instanciate all systems
@@ -922,18 +924,15 @@ void CGameClient::OnNewSnapshot()
 
 	// sort player infos by score
 	mem_copy(m_Snap.m_paInfoByScore, m_Snap.m_paPlayerInfos, sizeof(m_Snap.m_paInfoByScore));
-	for(int k = 0; k < MAX_CLIENTS-1; k++) // ffs, bubblesort
+	std::sort(m_Snap.m_paInfoByScore, m_Snap.m_paInfoByScore + MAX_CLIENTS, [] (const CNetObj_PlayerInfo * lhs, const CNetObj_PlayerInfo * rhs) -> bool
 	{
-		for(int i = 0; i < MAX_CLIENTS-k-1; i++)
-		{
-			if(m_Snap.m_paInfoByScore[i+1] && (!m_Snap.m_paInfoByScore[i] || m_Snap.m_paInfoByScore[i]->m_Score < m_Snap.m_paInfoByScore[i+1]->m_Score))
-			{
-				const CNetObj_PlayerInfo *pTmp = m_Snap.m_paInfoByScore[i];
-				m_Snap.m_paInfoByScore[i] = m_Snap.m_paInfoByScore[i+1];
-				m_Snap.m_paInfoByScore[i+1] = pTmp;
-			}
-		}
-	}
+		if(!lhs)
+			return false;
+		if(!rhs || lhs->m_Score < rhs->m_Score)
+			return true;
+		return false;
+	});
+
 	// sort player infos by team
 	int Teams[3] = { TEAM_RED, TEAM_BLUE, TEAM_SPECTATORS };
 	int Index = 0;
@@ -1222,18 +1221,21 @@ IGameClient *CreateGameClient()
 
 //H-Client
 // TODO: should be more general
-int CGameClient::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, float Speed/*hook speed*/)
+int CGameClient::IntersectCharacter(vec2 Pos0, vec2 Pos1, vec2& NewPos, float Speed/*hook speed*/, int ownID)
 {
 	// Find other players
-	const float ProximityRadius2 = (28.f + Radius) * (28.f + Radius);
+	const float ProximityRadius2 = (28.f + 2.f) * (28.f + 2.f);
 	float ClosestLen2 = distance2(Pos0, Pos1) * 10000.0f;
 	int ClosestID = -1;
+	
+	if (!m_Tuning.m_PlayerHooking)
+		return ClosestID;
 
 	for (int i=0; i<MAX_CLIENTS; i++)
 	{
         const CClientData& cData = m_aClients[i];
 
-        if (!cData.m_Active || !m_Snap.m_aCharacters[i].m_Active || cData.m_Team == TEAM_SPECTATORS || m_Snap.m_LocalClientID == m_Snap.m_paPlayerInfos[i]->m_ClientID)
+        if (!cData.m_Active || cData.m_Team == TEAM_SPECTATORS || i == ownID || !m_Teams.SameTeam(i, ownID))
             continue;
 
         vec2 Position = cData.m_Predicted.m_Pos;

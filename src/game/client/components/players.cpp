@@ -135,7 +135,7 @@ void CPlayers::RenderHook(
 
 		if(pPlayerChar->m_HookedPlayer != -1)
 		{
-			if(m_pClient->m_Snap.m_pLocalInfo && pPlayerChar->m_HookedPlayer == m_pClient->m_Snap.m_pLocalInfo->m_ClientID)
+			if(g_Config.m_ClLocalPredict && m_pClient->m_Snap.m_pLocalInfo && pPlayerChar->m_HookedPlayer == m_pClient->m_Snap.m_pLocalInfo->m_ClientID)
 			{
 				if(Client()->State() == IClient::STATE_DEMOPLAYBACK) // only use prediction if needed
 					HookPos = vec2(m_pClient->m_LocalCharacterPos.x, m_pClient->m_LocalCharacterPos.y);
@@ -207,11 +207,15 @@ void CPlayers::RenderPlayer(
 
 	float IntraTick = Client()->IntraGameTick();
 
-	float Angle = mix((float)Prev.m_Angle, (float)Player.m_Angle, IntraTick)/256.0f;
+	float Angle;
+	if(abs(Prev.m_Angle - Player.m_Angle) > 256 * int(pi)) // for -pi --> +pi mix gives wrong angle
+		Angle = Player.m_Angle/256.0f;
+	else
+		Angle = mix((float)Prev.m_Angle, (float)Player.m_Angle, IntraTick)/256.0f;
 
 	//float angle = 0;
 
-	if(pInfo.m_Local && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+	if(pInfo.m_Local && g_Config.m_ClLocalPredict && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
 		// just use the direct input if it's local player we are rendering
 		Angle = GetAngle(m_pClient->m_pControls->m_MousePos);
@@ -333,7 +337,7 @@ void CPlayers::RenderPlayer(
 			if(Hit && !(Hit&CCollision::COLFLAG_NOHOOK))
 				Graphics()->SetColor(130.0f/255.0f, 232.0f/255.0f, 160.0f/255.0f, 1.0f);
 
-			if(m_pClient->IntersectCharacter(initPos, finishPos, 2.0f, finishPos, m_pClient->m_Tuning.m_HookFireSpeed) != -1)
+			if(m_pClient->IntersectCharacter(initPos, finishPos, finishPos, m_pClient->m_Tuning.m_HookFireSpeed, pInfo.m_ClientID) != -1)
 				Graphics()->SetColor(1.0f, 1.0f, 0.0f, 1.0f);
 
 			IGraphics::CLineItem LineItem(Position.x, Position.y, finishPos.x, finishPos.y);
