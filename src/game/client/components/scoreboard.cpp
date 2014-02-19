@@ -236,7 +236,7 @@ void CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const ch
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
 		// make sure that we render the correct team
-		const CNetObj_PlayerInfo *pInfo = m_pClient->m_Snap.m_paInfoByScore[i];
+		const CNetObj_PlayerInfo *pInfo = m_pClient->m_Snap.m_paPlayerInfos[i];
 		if(!pInfo || pInfo->m_Team != Team)
 			continue;
 
