@@ -133,6 +133,25 @@ void CGameContext::CreateDamageInd(vec2 Pos, float Angle, int Amount, int Mask)
 	}
 }
 
+void CGameContext::CreateDamageInd2(vec2 Pos, float Offset, int Amount, int Mask, float Radius)
+{
+	Radius += 75.f;
+	if(Amount < 1)
+		Amount = 1;
+	const float step = 2 * pi / Amount;
+	for(float angle = -pi + Offset; angle < pi + Offset; angle += step)
+	{
+		vec2 TPos = Pos + GetDir(angle) * Radius;
+		CNetEvent_DamageInd *pEvent = (CNetEvent_DamageInd *)m_Events.Create(NETEVENTTYPE_DAMAGEIND, sizeof(CNetEvent_DamageInd), Mask);
+		if(pEvent)
+		{
+			pEvent->m_X = (int)TPos.x;
+			pEvent->m_Y = (int)TPos.y;
+			pEvent->m_Angle = (int)((angle)*256.0f);
+		}
+	}
+}
+
 void CGameContext::CreateHammerHit(vec2 Pos, int Mask)
 {
 	// create the event
