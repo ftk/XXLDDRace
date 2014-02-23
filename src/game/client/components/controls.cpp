@@ -324,7 +324,7 @@ int CControls::SnapInput(int *pData)
 	else 
 	{
 		if((aimbot_smooth&2 && m_InputData.m_Fire != m_LastData.m_Fire && m_InputData.m_Fire&1) ||
-			(aimbot_smooth&4 && !m_LastData.m_Hook && m_InputData.m_Hook))
+			(aimbot_smooth&4 && ((!m_LastData.m_Hook && m_InputData.m_Hook) || auto_hook)))
 				Aim();
 	}
 
@@ -529,14 +529,17 @@ void CControls::AutoHook()
 			const int Angle = round(atan2(m_MousePos.x, m_MousePos.y) * 256); // compress
 			const vec2 Direction = vec2(sin(Angle/256.f), cos(Angle/256.f)); // decompress
 			vec2 initPos = Position + Direction * 28.0f * 1.5f;
-            vec2 finishPos = Position + Direction * (m_pClient->m_Tuning.m_HookLength);
+			vec2 finishPos = Position + Direction * (m_pClient->m_Tuning.m_HookLength - 18.0f);
 			int Hit = Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true);
 			if(hook_walls && Hit && !(Hit&CCollision::COLFLAG_NOHOOK))
 			{
 				// can hook
 				m_InputData.m_Hook = 1;
 			}
-			
+			else if(!Hit)
+			{
+				finishPos += Direction * 18.0f;
+			}
 			
 			// hook characters
 			if(!m_InputData.m_Hook && hook_players)
