@@ -1904,7 +1904,7 @@ void CClient::Run()
 
 			Update();
 			
-			if(m_pGraphics->WindowOpen() && (m_pGraphics->WindowActive() || (m_RenderFrames%10) == 0) && 
+			if(m_pGraphics->WindowOpen() && 
 				(!g_Config.m_GfxAsyncRender || m_pGraphics->IsIdle()))
 			{
 				m_RenderFrames++;
@@ -1942,11 +1942,11 @@ void CClient::Run()
 
 		// beNice
 
-		if(g_Config.m_ClCpuThrottle)
+		if(!m_pGraphics->WindowActive())
+			net_socket_read_wait(m_NetClient.m_Socket, 10);
+		else if(g_Config.m_ClCpuThrottle)
 			net_socket_read_wait(m_NetClient.m_Socket, g_Config.m_ClCpuThrottle);
-		else if(!m_pGraphics->WindowActive())
-			net_socket_read_wait(m_NetClient.m_Socket, 4);
-
+		
 		if(g_Config.m_DbgHitch)
 		{
 			thread_sleep(g_Config.m_DbgHitch);
