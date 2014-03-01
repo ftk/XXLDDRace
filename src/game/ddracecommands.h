@@ -30,9 +30,9 @@ CONSOLE_COMMAND("move_raw", "ii", CFGFLAG_SERVER|CMDFLAG_TEST, ConMoveRaw, this,
 CONSOLE_COMMAND("force_pause", "vi", CFGFLAG_SERVER, ConForcePause, this, "Force v to pause for i seconds")
 CONSOLE_COMMAND("force_unpause", "v", CFGFLAG_SERVER, ConForcePause, this, "Set force-pause timer of v to 0.")
 
-CONSOLE_COMMAND("mute", "", CFGFLAG_SERVER, ConMute, this, "");
-CONSOLE_COMMAND("muteid", "vi", CFGFLAG_SERVER, ConMuteID, this, "");
-CONSOLE_COMMAND("muteip", "si", CFGFLAG_SERVER, ConMuteIP, this, "");
+CONSOLE_COMMAND("mute", "", CFGFLAG_SERVER, ConMute, this, "Do not use");
+CONSOLE_COMMAND("muteid", "vi?i", CFGFLAG_SERVER, ConMuteID, this, "Mute by id");
+CONSOLE_COMMAND("muteip", "si?i", CFGFLAG_SERVER, ConMuteIP, this, "Mute by IP");
 CONSOLE_COMMAND("unmute", "i", CFGFLAG_SERVER, ConUnmute, this, "");
 CONSOLE_COMMAND("mutes", "", CFGFLAG_SERVER, ConMutes, this, "");
 
