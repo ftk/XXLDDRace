@@ -326,7 +326,7 @@ void CCharacter::FireWeapon()
 		// Timer stuff to avoid shrieking orchestra caused by unfreeze-plasma
 		if(m_PainSoundTimer<=0)
 		{
-				m_PainSoundTimer = 1 * Server()->TickSpeed();
+				m_PainSoundTimer = Server()->TickSpeed() / 2;
 				GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG, Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()));
 		}
 		return;
@@ -425,6 +425,23 @@ void CCharacter::FireWeapon()
 				Msg.AddInt(((int *)&p)[i]);
 
 			Server()->SendMsg(&Msg, 0, m_pPlayer->GetCID());
+
+			vec2 TargetPos = vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY);
+			if(GetPlayer()->m_Paused)
+			{
+				if(GetPlayer()->m_SpectatorID != SPEC_FREEVIEW && GameServer()->m_apPlayers[GetPlayer()->m_SpectatorID] && GameServer()->m_apPlayers[GetPlayer()->m_SpectatorID]->GetCharacter())
+				{
+					TargetPos += GameServer()->m_apPlayers[GetPlayer()->m_SpectatorID]->GetCharacter()->m_Pos;
+				}
+			}
+			else
+			{
+				TargetPos += m_Pos;
+			}
+			
+			GameServer()->CreateDamageInd2(TargetPos,
+						       0.f, 4,
+						       Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()), 5.f);
 
 			if (!(g_Config.m_SvSilentXXL && m_FastReload))
 				GameServer()->CreateSound(m_Pos, SOUND_GUN_FIRE, Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID()));

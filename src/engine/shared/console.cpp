@@ -220,13 +220,13 @@ void CConsole::SetPrintOutputLevel(int Index, int OutputLevel)
 
 void CConsole::Print(int Level, const char *pFrom, const char *pStr)
 {
-	dbg_msg(pFrom ,"%s", pStr);
+	dbg_msg(pFrom, "%s", pStr);
+	char aBuf[1024];
+	str_format(aBuf, sizeof(aBuf), "[%s]: %s", pFrom, pStr);
 	for(int i = 0; i < m_NumPrintCB; ++i)
 	{
 		if(Level <= m_aPrintCB[i].m_OutputLevel && m_aPrintCB[i].m_pfnPrintCallback)
 		{
-			char aBuf[1024];
-			str_format(aBuf, sizeof(aBuf), "[%s]: %s", pFrom, pStr);
 			m_aPrintCB[i].m_pfnPrintCallback(aBuf, m_aPrintCB[i].m_pPrintCallbackUserdata);
 		}
 	}
