@@ -7,13 +7,13 @@
 bool CBinds::CBindsSpecial::OnInput(IInput::CEvent Event)
 {
 	// don't handle invalid events and keys that arn't set to anything
-	if(Event.m_Key >= KEY_F1 && Event.m_Key <= KEY_F15 && m_pBinds->m_aaKeyBindings[Event.m_Key][0] != 0)
+	if(Event.m_Key >= KEY_F1 && Event.m_Key <= KEY_F15 && !m_pBinds->m_aKeyBindings[Event.m_Key].empty())
 	{
 		int Stroke = 0;
 		if(Event.m_Flags&IInput::FLAG_PRESS)
 			Stroke = 1;
 
-		m_pBinds->GetConsole()->ExecuteLineStroked(Stroke, m_pBinds->m_aaKeyBindings[Event.m_Key]);
+		m_pBinds->GetConsole()->ExecuteLineStroked(Stroke, m_pBinds->m_aKeyBindings[Event.m_Key].c_str());
 		return true;
 	}
 
@@ -22,7 +22,6 @@ bool CBinds::CBindsSpecial::OnInput(IInput::CEvent Event)
 
 CBinds::CBinds()
 {
-	mem_zero(m_aaKeyBindings, sizeof(m_aaKeyBindings));
 	m_SpecialBinds.m_pBinds = this;
 }
 
@@ -31,12 +30,12 @@ void CBinds::Bind(int KeyID, const char *pStr)
 	if(KeyID < 0 || KeyID >= KEY_LAST)
 		return;
 
-	str_copy(m_aaKeyBindings[KeyID], pStr, sizeof(m_aaKeyBindings[KeyID]));
-	char aBuf[256];
-	if(!m_aaKeyBindings[KeyID][0])
+	m_aKeyBindings[KeyID] = pStr;
+	char aBuf[1024];
+	if(m_aKeyBindings[KeyID].empty())
 		str_format(aBuf, sizeof(aBuf), "unbound %s (%d)", Input()->KeyName(KeyID), KeyID);
 	else
-		str_format(aBuf, sizeof(aBuf), "bound %s (%d) = %s", Input()->KeyName(KeyID), KeyID, m_aaKeyBindings[KeyID]);
+		str_format(aBuf, sizeof(aBuf), "bound %s (%d) = %s", Input()->KeyName(KeyID), KeyID, m_aKeyBindings[KeyID].c_str());
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 }
 
@@ -44,26 +43,26 @@ void CBinds::Bind(int KeyID, const char *pStr)
 bool CBinds::OnInput(IInput::CEvent e)
 {
 	// don't handle invalid events and keys that arn't set to anything
-	if(e.m_Key <= 0 || e.m_Key >= KEY_LAST || m_aaKeyBindings[e.m_Key][0] == 0)
+	if(e.m_Key <= 0 || e.m_Key >= KEY_LAST || m_aKeyBindings[e.m_Key].empty())
 		return false;
 
 	int Stroke = 0;
 	if(e.m_Flags&IInput::FLAG_PRESS)
 		Stroke = 1;
-	Console()->ExecuteLineStroked(Stroke, m_aaKeyBindings[e.m_Key]);
+	Console()->ExecuteLineStroked(Stroke, m_aKeyBindings[e.m_Key].c_str());
 	return true;
 }
 
 void CBinds::UnbindAll()
 {
 	for(int i = 0; i < KEY_LAST; i++)
-		m_aaKeyBindings[i][0] = 0;
+		m_aKeyBindings[i].clear();
 }
 
 const char *CBinds::Get(int KeyID)
 {
 	if(KeyID > 0 && KeyID < KEY_LAST)
-		return m_aaKeyBindings[KeyID];
+		return m_aKeyBindings[KeyID].c_str();
 	return "";
 }
 
@@ -189,9 +188,9 @@ void CBinds::ConDumpBinds(IConsole::IResult *pResult, void *pUserData)
 	char aBuf[1024];
 	for(int i = 0; i < KEY_LAST; i++)
 	{
-		if(pBinds->m_aaKeyBindings[i][0] == 0)
+		if(pBinds->m_aKeyBindings[i].empty())
 			continue;
-		str_format(aBuf, sizeof(aBuf), "%s (%d) = %s", pBinds->Input()->KeyName(i), i, pBinds->m_aaKeyBindings[i]);
+		str_format(aBuf, sizeof(aBuf), "%s (%d) = %s", pBinds->Input()->KeyName(i), i, pBinds->m_aKeyBindings[i].c_str());
 		pBinds->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 	}
 }
@@ -225,12 +224,12 @@ void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 	pConfig->WriteLine("unbindall");
 	for(int i = 0; i < KEY_LAST; i++)
 	{
-		if(pSelf->m_aaKeyBindings[i][0] == 0)
+		if(pSelf->m_aKeyBindings[i].empty())
 			continue;
 		str_format(aBuffer, sizeof(aBuffer), "bind %s ", pSelf->Input()->KeyName(i));
 
 		// process the string. we need to escape some characters
-		const char *pSrc = pSelf->m_aaKeyBindings[i];
+		const char *pSrc = pSelf->m_aKeyBindings[i].c_str();
 		char *pDst = aBuffer + str_length(aBuffer);
 		*pDst++ = '"';
 		while(*pSrc && pDst < pEnd)

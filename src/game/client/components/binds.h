@@ -4,10 +4,11 @@
 #define GAME_CLIENT_COMPONENTS_BINDS_H
 #include <game/client/component.h>
 #include <engine/keys.h>
+#include <string>
 
 class CBinds : public CComponent
 {
-	char m_aaKeyBindings[KEY_LAST][128];
+	std::string m_aKeyBindings[KEY_LAST];
 
 	int GetKeyID(const char *pKeyName);
 
