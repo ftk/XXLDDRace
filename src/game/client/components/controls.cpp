@@ -209,8 +209,8 @@ static void ConAimbotPredict(IConsole::IResult *pResult, void *pUserData)
 }
 static void ConAimbotPredictDistance(IConsole::IResult *pResult, void *pUserData)
 {
-    CControls *pSelf = (CControls *)pUserData;
-    pSelf->aimbot_predict_dist = pResult->GetFloat(0);
+	CControls *pSelf = (CControls *)pUserData;
+	pSelf->aimbot_predict_dist = pResult->GetFloat(0);
 }
 
 static void ConfigSaveCallback(class IConfig *pConfig, void *pUserData)
@@ -251,13 +251,13 @@ void CControls::OnConsoleInit()
 	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
 	{ static CAimbot s_Set = {m_pClient, this}; Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, (void *)&s_Set, "Aimbot lock to the nearest player"); }
-    Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
-    Console()->Register("aimbot_dist", "f", CFGFLAG_CLIENT, ConAimbotPredictDistance, this, "Set aimbot prediction distance multiplier");
+	Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
+	Console()->Register("aimbot_dist", "f", CFGFLAG_CLIENT, ConAimbotPredictDistance, this, "Set aimbot prediction distance multiplier");
     
-    Console()->Register("aimbot_smooth", "i", CFGFLAG_CLIENT, ([](IConsole::IResult *pResult, void *pUserData)
-    {
-		((CControls *)pUserData)->aimbot_smooth = pResult->GetInteger(0);
-    }), this, "Toggle smoother visual aim (0=on input send, 1=on render, 2=stealth");
+	Console()->Register("aimbot_smooth", "i", CFGFLAG_CLIENT, ([](IConsole::IResult *pResult, void *pUserData)
+								   {
+									   ((CControls *)pUserData)->aimbot_smooth = pResult->GetInteger(0);
+								   }), this, "Toggle smoother visual aim (0=on input send, 1=on render, 2=stealth");
     
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
@@ -467,10 +467,10 @@ void CControls::Aim()
 			
 			pos += vel * aimbot_predict;
 			//pos_local += vel_local * aimbot_predict;
-            float dist = distance(pos, pos_local);
+			float dist = distance(pos, pos_local);
             
-            pos += vel * (dist * aimbot_predict_dist);
-            //pos_local += vel_local * (dist * aimbot_predict_dist);
+			pos += vel * (dist * aimbot_predict_dist);
+			//pos_local += vel_local * (dist * aimbot_predict_dist);
 		}
 		
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
