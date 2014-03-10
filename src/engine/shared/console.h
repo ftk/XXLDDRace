@@ -7,6 +7,9 @@
 #include "memheap.h"
 //#include <map>
 #include <unordered_map>
+#include <queue>
+#include <vector>
+#include <functional>
 
 class CConsole : public IConsole
 {
@@ -178,6 +181,23 @@ class CConsole : public IConsole
 
 	void AddCommandSorted(CCommand *pCommand);
 	CCommand *FindCommand(const char *pName, int FlagMask);
+
+private:
+	// timers
+	struct Timer
+	{
+		char command[CONSOLE_MAX_STR_LENGTH];
+		int64 time;
+		int OwnerID;
+		int stroke;
+
+		bool operator>(const Timer& rhs) const { return time > rhs.time; }
+	};
+	std::priority_queue<Timer, std::vector<Timer>, std::greater<Timer> > m_Timers; // min-heap
+public:
+	static void ConSetTimer(IResult *pResult, void *pUserData);
+	void ProcessTimers();
+
 
 public:
 	CConsole(int FlagMask);

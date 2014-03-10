@@ -776,7 +776,10 @@ CConsole::CConsole(int FlagMask)
 			str_format(buf, sizeof(buf), "size: %u load: %f", self->commands.size(), self->commands.load_factor());
 			self->Print(IConsole::OUTPUT_LEVEL_STANDARD, "test", buf);
 		}), this, "Total amount of commands");*/
-	
+
+	Register("set_timer", "iir", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConSetTimer, this, "Exec command after n ms (the first argument is stroke)");
+	Register("+set_timer", "ir", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConSetTimer, this, "Exec command after n ms");
+
 	// TODO: this should disappear
 	#define MACRO_CONFIG_INT(Name,ScriptName,Def,Min,Max,Flags,Desc) \
 	{ \
@@ -1142,4 +1145,34 @@ void CConsole::ConSubAdminCommandStatus(IResult *pResult, void *pUser)
 	}
 	if(Used > 0)
 		pConsole->Print(OUTPUT_LEVEL_STANDARD, "Console", aBuf);
+}
+
+void CConsole::ProcessTimers()
+{
+	if(m_Timers.empty())
+		return;
+	int64 CurTime = time_get();
+
+	while(!m_Timers.empty() && m_Timers.top().time <= CurTime)
+	{
+		const Timer& t = m_Timers.top();
+		if(t.stroke == 0 || t.stroke == 1)
+			ExecuteLineStroked(t.stroke, t.command, t.OwnerID);
+		else
+			ExecuteLine(t.command, t.OwnerID);
+		//dbg_msg("console/timers", "executed timer %s at %d", m_Timers.top().command, m_Timers.top().time);
+		m_Timers.pop();
+	}
+}
+
+void CConsole::ConSetTimer(IResult *pResult, void *pUser)
+{
+	Timer t;
+	t.OwnerID = pResult->m_ClientID;
+	int64 CurTime = time_get();
+
+	t.time = CurTime + (pResult->GetInteger(1) * time_freq()) / 1000LL;
+	t.stroke = pResult->GetInteger(0);
+	str_copy(t.command, pResult->GetString(2), sizeof(t.command));
+	((CConsole *)pUser)->m_Timers.push(std::move(t));
 }

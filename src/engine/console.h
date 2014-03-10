@@ -100,6 +100,8 @@ public:
 
 	bool m_Cheated;
 	virtual void SetFlagMask(int FlagMask) = 0;
+
+	virtual void ProcessTimers() = 0;
 };
 
 extern IConsole *CreateConsole(int FlagMask);

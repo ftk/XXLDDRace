@@ -1546,6 +1546,8 @@ int CServer::Run()
 				}
 			}
 
+			m_pConsole->ProcessTimers();
+
 			while(t > TickStartTime(m_CurrentGameTick+1))
 			{
 				m_CurrentGameTick++;

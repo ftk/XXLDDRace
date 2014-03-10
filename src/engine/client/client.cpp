@@ -1829,6 +1829,8 @@ void CClient::Run()
 			m_aCmdConnect[0] = 0;
 		}
 
+		m_pConsole->ProcessTimers();
+
 		// update input
 		if(Input()->Update())
 			break;	// SDL_QUIT
