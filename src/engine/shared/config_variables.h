@@ -112,6 +112,8 @@ MACRO_CONFIG_STR(DbgStressServer, dbg_stress_server, 32, "localhost", CFGFLAG_CL
 MACRO_CONFIG_INT(DbgResizable, dbg_resizable, 0, 0, 0, CFGFLAG_CLIENT, "Enables window resizing")
 
 MACRO_CONFIG_INT(ClWalkSpeed, cl_walk_speed, 100, 1, 100000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Walk animation speed(inv)")
+MACRO_CONFIG_STR(LicenseKey, license, 16, "", CFGFLAG_SAVE|CFGFLAG_CLIENT, "License key")
+
 // DDRace
 
 MACRO_CONFIG_STR(SvWelcome, sv_welcome, 64, "", CFGFLAG_SERVER, "Message that will be displayed to players who join the server")

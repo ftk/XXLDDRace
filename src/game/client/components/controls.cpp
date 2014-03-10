@@ -6,6 +6,7 @@
 #include <base/math.h>
 
 #include <engine/config.h>
+#include <engine/license.h>
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 
@@ -164,7 +165,7 @@ static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 	}
 	else if(pSelf->pControls->aimbot != -1)
 		return;
-	if(!pSelf->pClient->IsDDRaceServer())
+	if(!pSelf->pClient->IsDDRaceServer() && !(LicenseType&2))
 		return;
 	
 	int64 mindist = 1000000000LL;

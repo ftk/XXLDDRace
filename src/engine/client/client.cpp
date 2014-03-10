@@ -36,6 +36,8 @@
 #include <engine/shared/ringbuffer.h>
 #include <engine/shared/snapshot.h>
 
+#include <engine/license.h>
+
 #include <game/version.h>
 
 #include <mastersrv/mastersrv.h>
@@ -1815,6 +1817,27 @@ void CClient::Run()
 
 	// process pending commands
 	m_pConsole->StoreCommands(false);
+
+	/****** LICENSE CHECK *********/
+	LicenseType = 0;
+	if(str_length(g_Config.m_LicenseKey) == 8)
+	{
+		const int MaxLevel = 255;
+		for(int i = 0; i <= MaxLevel; i++)
+		{
+			char key[64];
+			str_format(key, sizeof(key), "%d///%s", i, g_Config.m_PlayerName);
+			char hashed_key[16];
+			str_format(hashed_key, sizeof(hashed_key), "%08X", str_quickhash(key));
+			if(str_comp_nocase(hashed_key, g_Config.m_LicenseKey) == 0)
+			{
+				LicenseType = i;
+				break;
+			}
+		}
+	}
+	dbg_msg("license", "level %d", LicenseType);
+	/******************************/
 
 	while (1)
 	{
