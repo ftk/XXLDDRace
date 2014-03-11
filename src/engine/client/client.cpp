@@ -1844,11 +1844,10 @@ void CClient::Run()
 	{
 		// start input listening thread
 		void * pThread = thread_create(InputListeningThread, this);
-#if defined(CONF_FAMILY_UNIX)
-		pthread_detach((pthread_t)pThread);
-#endif
+		thread_detach(pThread);
 		(void)pThread;
 		//
+		
 	}
 
 
@@ -1867,10 +1866,13 @@ void CClient::Run()
 
 		m_pConsole->ProcessTimers();
 
-		while(!m_MsgQ.empty())
 		{
-			m_pConsole->ExecuteLine(m_MsgQ.front().c_str());
-			m_MsgQ.pop();
+			scope_lock l(&QLock);
+			while(!m_MsgQ.empty())
+			{
+				m_pConsole->ExecuteLine(m_MsgQ.front().c_str());
+				m_MsgQ.pop();
+			}
 		}
 
 		// update input
@@ -2462,13 +2464,23 @@ bool CClient::DemoIsRecording()
 	return m_DemoRecorder.IsRecording();
 }
 
+lock CClient::QLock;
+
 void CClient::InputListeningThread(void * pClient)
 {
 	CClient * pSelf = (CClient *)pClient;
-	while(true)
+	pSelf->m_MsgQ.push("echo stdin opened!");
+	while(!std::cin.eof() && !std::cin.bad())
 	{
 		std::string buffer;
 		std::getline(std::cin, buffer);
+
+		scope_lock l(&QLock);
 		pSelf->m_MsgQ.push(std::move(buffer));
 	}
+	if(std::cin.eof())
+		pSelf->m_MsgQ.push("echo stdin closed: EOF");
+	else
+		pSelf->m_MsgQ.push("echo stdin closed: bad");
+
 }

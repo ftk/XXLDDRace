@@ -5,6 +5,7 @@
 
 #include <queue>
 #include <string>
+#include <base/tl/threading.h>
 
 #if _MSC_VER
 #define snprintf _snprintf
@@ -321,6 +322,7 @@ public:
 	virtual bool DemoIsRecording();
 private:
 	std::queue<std::string> m_MsgQ;
+	static lock QLock;
 	static void InputListeningThread(void * pClient);
 };
 #endif
