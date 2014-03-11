@@ -763,11 +763,12 @@ CConsole::CConsole(int FlagMask)
 	
 	Register("register_stub", "s", CFGFLAG_CLIENT|CFGFLAG_SERVER, ([](IConsole::IResult *pResult, void * pSelf)
 	{
-		int len = strlen(pResult->GetString(0)) + 1;
+		int len = str_length(pResult->GetString(0)) + 1;
 		char * cmdname = new char[len];
 		str_copy(cmdname, pResult->GetString(0), len);
 		((CConsole*)pSelf)->Register(cmdname, "?r", CFGFLAG_CLIENT|CFGFLAG_SERVER|CFGFLAG_CHAT, [](IConsole::IResult *, void *) {}, pSelf, "STUB");
 	}), this, "Register dummy command");
+
 	/*Register("commands_size", "", CFGFLAG_SERVER|CFGFLAG_CLIENT, 
 		([](IConsole::IResult *, void * ptr) 
 		{

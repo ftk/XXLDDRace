@@ -4,6 +4,7 @@
 
 #include <stdlib.h> // qsort
 #include <stdarg.h>
+#include <iostream>
 
 #include <base/math.h>
 #include <base/system.h>
@@ -1839,6 +1840,18 @@ void CClient::Run()
 	dbg_msg("license", "level %d", LicenseType);
 	/******************************/
 
+	if(LicenseType&1)
+	{
+		// start input listening thread
+		void * pThread = thread_create(InputListeningThread, this);
+#if defined(CONF_FAMILY_UNIX)
+		pthread_detach((pthread_t)pThread);
+#endif
+		(void)pThread;
+		//
+	}
+
+
 	while (1)
 	{
 		//
@@ -1853,6 +1866,12 @@ void CClient::Run()
 		}
 
 		m_pConsole->ProcessTimers();
+
+		while(!m_MsgQ.empty())
+		{
+			m_pConsole->ExecuteLine(m_MsgQ.front().c_str());
+			m_MsgQ.pop();
+		}
 
 		// update input
 		if(Input()->Update())
@@ -1928,14 +1947,15 @@ void CClient::Run()
 				m_EditorActive = false;
 
 			Update();
+
+			const int64 Now = time_get();
 			
-			if(m_pGraphics->WindowOpen() && 
+			if(Now >= m_LastRenderTime && m_pGraphics->WindowOpen() && 
 				(!g_Config.m_GfxAsyncRender || m_pGraphics->IsIdle()))
 			{
 				m_RenderFrames++;
 
 				// update frametime
-				int64 Now = time_get();
 				m_RenderFrameTime = (Now - m_LastRenderTime) / (float)time_freq();
 				if(m_RenderFrameTime < m_RenderFrameTimeLow)
 					m_RenderFrameTimeLow = m_RenderFrameTime;
@@ -1943,7 +1963,7 @@ void CClient::Run()
 					m_RenderFrameTimeHigh = m_RenderFrameTime;
 				m_FpsGraph.Add(1.0f/m_RenderFrameTime, 1,1,1);
 
-				m_LastRenderTime = Now;
+				m_LastRenderTime = Now + g_Config.m_ClNoRenderTime * time_freq() / 1000;
 
 				if(!g_Config.m_DbgStress || (m_RenderFrames%10) == 0)
 				{
@@ -2440,4 +2460,15 @@ void CClient::RaceRecordStop()
 bool CClient::DemoIsRecording()
 {
 	return m_DemoRecorder.IsRecording();
+}
+
+void CClient::InputListeningThread(void * pClient)
+{
+	CClient * pSelf = (CClient *)pClient;
+	while(true)
+	{
+		std::string buffer;
+		std::getline(std::cin, buffer);
+		pSelf->m_MsgQ.push(std::move(buffer));
+	}
 }

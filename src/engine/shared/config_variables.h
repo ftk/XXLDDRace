@@ -216,6 +216,7 @@ MACRO_CONFIG_INT(SvTimeInBroadcastInterval, sv_time_in_broadcast_interval, 1, 0,
 MACRO_CONFIG_INT(SvDefaultTimerType, sv_default_timer_type, 0, 0, 1, CFGFLAG_SERVER, "Default way of displaying time either game/round timer or broadcast. 0 = game/round timer, 1 = broadcast")
 
 MACRO_CONFIG_STR(ClQuitMessageText, cl_quit_message, 256, "", CFGFLAG_SAVE|CFGFLAG_CLIENT, "Set custom disconnecting reason")
+MACRO_CONFIG_INT(ClNoRenderTime, cl_norender_time, 0, 0, 999, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Don't render for x ms after swapping buffers")
 
 // these might need some fine tuning
 MACRO_CONFIG_INT(SvChatPenalty, sv_chat_penalty, 250, 50, 1000, CFGFLAG_SERVER, "chat score will be increased by this on every message, and decremented by 1 on every tick.")

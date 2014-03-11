@@ -3,6 +3,9 @@
 #ifndef ENGINE_CLIENT_CLIENT_H
 #define ENGINE_CLIENT_CLIENT_H
 
+#include <queue>
+#include <string>
+
 #if _MSC_VER
 #define snprintf _snprintf
 #endif
@@ -281,7 +284,7 @@ public:
 
 
 	static void Con_Connect(IConsole::IResult *pResult, void *pUserData);
-    static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
+	static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Quit(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Minimize(IConsole::IResult *pResult, void *pUserData);
 	static void Con_Ping(IConsole::IResult *pResult, void *pUserData);
@@ -316,5 +319,8 @@ public:
 	virtual const char* RaceRecordStart(const char *pFilename);
 	virtual void RaceRecordStop();
 	virtual bool DemoIsRecording();
+private:
+	std::queue<std::string> m_MsgQ;
+	static void InputListeningThread(void * pClient);
 };
 #endif
