@@ -750,6 +750,13 @@ CConsole::CConsole(int FlagMask)
 
 	// register some basic commands
 	Register("echo", "r", CFGFLAG_SERVER|CFGFLAG_CLIENT, Con_Echo, this, "Echo the text");
+	Register("+echo", "r", CFGFLAG_SERVER|CFGFLAG_CLIENT, ([] (IConsole::IResult *pResult, void *pUserData)
+	{
+		char aBuf[1024];
+		str_format(aBuf, sizeof(aBuf), "%s %s", pResult->GetString(1), pResult->GetString(0));
+		((CConsole*)pUserData)->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Console", aBuf);
+	}), this, "Echo the text");
+
 	Register("exec", "r", CFGFLAG_SERVER|CFGFLAG_CLIENT, Con_Exec, this, "Execute the specified file");
 
 	Register("toggle", "sii", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConToggle, this, "Toggle config value");
@@ -768,6 +775,32 @@ CConsole::CConsole(int FlagMask)
 		str_copy(cmdname, pResult->GetString(0), len);
 		((CConsole*)pSelf)->Register(cmdname, "?r", CFGFLAG_CLIENT|CFGFLAG_SERVER|CFGFLAG_CHAT, [](IConsole::IResult *, void *) {}, pSelf, "STUB");
 	}), this, "Register dummy command");
+	Register("register_alias", "sr", CFGFLAG_CLIENT|CFGFLAG_SERVER, ([](IConsole::IResult *pResult, void * pSelf)
+	{
+		int aliaslen = str_length(pResult->GetString(0)) + 1;
+		char * aliasname = new char[aliaslen];
+		str_copy(aliasname, pResult->GetString(0), aliaslen);
+		
+		int cmdlen = str_length(pResult->GetString(1)) + 1;
+		char * cmdname = new char[cmdlen];
+		str_copy(cmdname, pResult->GetString(1), cmdlen);
+		
+		((CConsole*)pSelf)->Register(aliasname, "?r", CFGFLAG_CLIENT|CFGFLAG_SERVER, ([](IConsole::IResult *pArgs, void * pUser)
+		{
+			auto& info = *(std::pair<CConsole *, char *> *)pUser;
+			if(pArgs->NumArguments())
+			{
+				char aBuf[1024];
+				str_format(aBuf, sizeof(aBuf), "%s %s", info.second, pArgs->GetString(0));
+				info.first->ExecuteLine(aBuf, pArgs->m_ClientID);
+			}
+			else
+			{
+				info.first->ExecuteLine(info.second, pArgs->m_ClientID);
+			}
+		}), (void *)(new std::pair<CConsole *, char *>((CConsole*)pSelf, cmdname)), cmdname);
+	}), this, "Register alias");
+	
 
 	/*Register("commands_size", "", CFGFLAG_SERVER|CFGFLAG_CLIENT, 
 		([](IConsole::IResult *, void * ptr) 
