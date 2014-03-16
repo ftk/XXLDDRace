@@ -330,14 +330,6 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 
 	m_PlayerFlags = NewInput->m_PlayerFlags;
 
-	if(m_pCharacter)
-	{
-		if(m_Paused < PAUSED_PAUSED)
-			m_pCharacter->OnDirectInput(NewInput);
-		else
-			m_pCharacter->ResetInput();
-	}
-
 	if(!m_pCharacter && m_Team != TEAM_SPECTATORS && (NewInput->m_Fire&1))
 		m_Spawning = true;
 
@@ -352,6 +344,24 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 		m_LatestActivity.m_TargetX = NewInput->m_TargetX;
 		m_LatestActivity.m_TargetY = NewInput->m_TargetY;
 		m_LastActionTick = Server()->Tick();
+	}
+	
+	if(m_pCharacter)
+	{
+		if(m_Paused >= PAUSED_SPEC)
+		{
+			NewInput->m_TargetX = m_UnpausedActivity.m_TargetX;
+			NewInput->m_TargetY = m_UnpausedActivity.m_TargetY;
+		}
+		else
+		{
+			m_UnpausedActivity.m_TargetX = NewInput->m_TargetX;
+			m_UnpausedActivity.m_TargetY = NewInput->m_TargetY;
+		}
+		if(m_Paused < PAUSED_PAUSED)
+			m_pCharacter->OnDirectInput(NewInput);
+		else
+			m_pCharacter->ResetInput();
 	}
 }
 

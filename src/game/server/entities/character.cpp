@@ -426,7 +426,7 @@ void CCharacter::FireWeapon()
 
 			Server()->SendMsg(&Msg, 0, m_pPlayer->GetCID());
 
-			vec2 TargetPos = vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY);
+			vec2 TargetPos = vec2(GetPlayer()->m_LatestActivity.m_TargetX, GetPlayer()->m_LatestActivity.m_TargetY);
 			if(GetPlayer()->m_Paused)
 			{
 				if(GetPlayer()->m_SpectatorID != SPEC_FREEVIEW && GameServer()->m_apPlayers[GetPlayer()->m_SpectatorID] && GameServer()->m_apPlayers[GetPlayer()->m_SpectatorID]->GetCharacter())

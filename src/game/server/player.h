@@ -91,7 +91,7 @@ public:
 	{
 		int m_TargetX;
 		int m_TargetY;
-	} m_LatestActivity;
+	} m_LatestActivity, m_UnpausedActivity;
 
 	// network latency calculations
 	struct
