@@ -115,9 +115,9 @@ static void ConMouseGet(IConsole::IResult *pResult, void *pUserData)
 	float x = pSelf->m_MousePos->x, y = pSelf->m_MousePos->y;
 	float angle = atan2(y, x) / pi * 180.f;
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "a: %.4f  x: %.4f  y: %.4f  tx: %.4f  ty: %.4f", angle, x, y,
+	str_format(aBuf, sizeof(aBuf), "mouse a: %.4f  x: %.4f  y: %.4f  tx: %.4f  ty: %.4f", angle, x, y,
 		pSelf->m_TargetPos->x, pSelf->m_TargetPos->y);
-	pSelf->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
+	pSelf->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "controls", aBuf);
 
 }
 

@@ -1866,13 +1866,15 @@ void CClient::Run()
 
 		m_pConsole->ProcessTimers();
 
+		if(!m_MsgQ.empty())
 		{
 			scope_lock l(&QLock);
-			while(!m_MsgQ.empty())
+			do
 			{
 				m_pConsole->ExecuteLine(m_MsgQ.front().c_str());
 				m_MsgQ.pop();
 			}
+			while(!m_MsgQ.empty());
 		}
 
 		// update input
@@ -2421,6 +2423,8 @@ int main(int argc, const char **argv) // ignore_convention
 	// run the client
 	dbg_msg("client", "starting...");
 	pClient->Run();
+
+	dbg_msg("client", "quitting...");
 
 	// write down the config and quit
 	pConfig->Save();
