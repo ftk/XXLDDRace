@@ -441,7 +441,7 @@ static void Evolve(CNetObj_Character *pCharacter, int Tick, bool PredictFreeze)
 	while(pCharacter->m_Tick < Tick)
 	{
 		pCharacter->m_Tick++;
-		TempCore.Tick(false, false, PredictFreeze);
+		TempCore.Tick(false, CGameClient::IsCharacterFreezed(*pCharacter), PredictFreeze);
 		TempCore.Move();
 		TempCore.Quantize();
 	}
@@ -1029,17 +1029,18 @@ void CGameClient::OnPredict()
 				continue;
 
 			mem_zero(&World.m_apCharacters[c]->m_Input, sizeof(World.m_apCharacters[c]->m_Input));
+
+			const bool IsFreezed = m_IsDDRace && IsCharacterFreezed(m_Snap.m_aCharacters[c].m_Cur);
 			if(m_Snap.m_LocalClientID == c)
 			{
 				// apply player input
 				int *pInput = Client()->GetInput(Tick);
 				if(pInput)
 					World.m_apCharacters[c]->m_Input = *((CNetObj_PlayerInput*)pInput);
-				bool freezed = m_IsDDRace && (m_Snap.m_aCharacters[c].m_Cur.m_Armor != 10 || m_Snap.m_SpecInfo.m_Active);
-				World.m_apCharacters[c]->Tick(true, freezed, m_IsDDRace);
+				World.m_apCharacters[c]->Tick(true, IsFreezed, m_IsDDRace);
 			}
 			else
-				World.m_apCharacters[c]->Tick(false, false, m_IsDDRace);
+				World.m_apCharacters[c]->Tick(false, IsFreezed, m_IsDDRace);
 
 		}
 
