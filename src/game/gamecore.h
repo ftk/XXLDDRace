@@ -207,7 +207,7 @@ public:
 
 	void Init(CWorldCore *pWorld, CCollision *pCollision, CTeamsCore* pTeams, CTuningParams* pTuning = 0);
 	void Reset();
-	void Tick(bool UseInput, bool Freezed = false, bool PredictFreeze = false);
+	void Tick(bool UseInput, bool Freezed = false, bool Predict = false);
 	void Move();
 
 	void Read(const CNetObj_CharacterCore *pObjCore);

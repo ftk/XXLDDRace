@@ -84,10 +84,10 @@ void CCharacterCore::Reset()
 	//m_FreezeTick = 0;
 }
 
-void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
+void CCharacterCore::Tick(bool UseInput, bool Freezed, bool Predict)
 {
 	// Freeze - reset input (client)
-	// PredictFreeze - try to reset input if player is in freeze tile (client)
+	// Predict - try to reset input if player is in freeze tile (client)
 	float PhysSize = 28.0f;
 	int MapIndex = Collision()->GetPureMapIndex(m_Pos);;
 	int MapIndexL = Collision()->GetPureMapIndex(vec2(m_Pos.x + (28/2)+4,m_Pos.y));
@@ -127,6 +127,8 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 	m_TileSFlagsT = (UseInput && IsRightTeam(MapIndexT))?Collision()->GetDTileFlags(MapIndexT):0;
 	m_TriggeredEvents = 0;
 
+	vec2 PrevPos = m_Pos;
+
 	// get ground state
 	bool Grounded = false;
 	if(m_pCollision->CheckPoint(m_Pos.x+PhysSize/2, m_Pos.y+PhysSize/2+5))
@@ -142,7 +144,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 	float Accel = Grounded ? m_pTuning->m_GroundControlAccel : m_pTuning->m_AirControlAccel;
 	float Friction = Grounded ? m_pTuning->m_GroundFriction : m_pTuning->m_AirFriction;
 
-	if(PredictFreeze)
+	if(Predict)
 	{
 		if(!Freezed && (m_TileIndex == TILE_FREEZE || m_TileFIndex == TILE_FREEZE))
 		{
@@ -450,6 +452,37 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool PredictFreeze)
 						Temp.y = 0;
 					m_Vel = Temp;
 				}
+			}
+		}
+		if(Predict)
+		{
+			if(((m_TileIndex == TILE_STOP && m_TileFlags == ROTATION_270) || (m_TileIndexL == TILE_STOP && m_TileFlagsL == ROTATION_270) || (m_TileIndexL == TILE_STOPS && (m_TileFlagsL == ROTATION_90 || m_TileFlagsL ==ROTATION_270)) || (m_TileIndexL == TILE_STOPA) || (m_TileFIndex == TILE_STOP && m_TileFFlags == ROTATION_270) || (m_TileFIndexL == TILE_STOP && m_TileFFlagsL == ROTATION_270) || (m_TileFIndexL == TILE_STOPS && (m_TileFFlagsL == ROTATION_90 || m_TileFFlagsL == ROTATION_270)) || (m_TileFIndexL == TILE_STOPA) || (m_TileSIndex == TILE_STOP && m_TileSFlags == ROTATION_270) || (m_TileSIndexL == TILE_STOP && m_TileSFlagsL == ROTATION_270) || (m_TileSIndexL == TILE_STOPS && (m_TileSFlagsL == ROTATION_90 || m_TileSFlagsL == ROTATION_270)) || (m_TileSIndexL == TILE_STOPA)) && m_Vel.x > 0)
+			{
+				if((int)m_pCollision->GetPos(MapIndexL).x < (int)m_Pos.x)
+					m_Pos = PrevPos;
+				m_Vel.x = 0;
+			}
+			if(((m_TileIndex == TILE_STOP && m_TileFlags == ROTATION_90) || (m_TileIndexR == TILE_STOP && m_TileFlagsR == ROTATION_90) || (m_TileIndexR == TILE_STOPS && (m_TileFlagsR == ROTATION_90 || m_TileFlagsR == ROTATION_270)) || (m_TileIndexR == TILE_STOPA) || (m_TileFIndex == TILE_STOP && m_TileFFlags == ROTATION_90) || (m_TileFIndexR == TILE_STOP && m_TileFFlagsR == ROTATION_90) || (m_TileFIndexR == TILE_STOPS && (m_TileFFlagsR == ROTATION_90 || m_TileFFlagsR == ROTATION_270)) || (m_TileFIndexR == TILE_STOPA) || (m_TileSIndex == TILE_STOP && m_TileSFlags == ROTATION_90) || (m_TileSIndexR == TILE_STOP && m_TileSFlagsR == ROTATION_90) || (m_TileSIndexR == TILE_STOPS && (m_TileSFlagsR == ROTATION_90 || m_TileSFlagsR == ROTATION_270)) || (m_TileSIndexR == TILE_STOPA)) && m_Vel.x < 0)
+			{
+				if((int)m_pCollision->GetPos(MapIndexR).x)
+					if((int)m_pCollision->GetPos(MapIndexR).x < (int)m_Pos.x)
+						m_Pos = PrevPos;
+				m_Vel.x = 0;
+			}
+			if(((m_TileIndex == TILE_STOP && m_TileFlags == ROTATION_180) || (m_TileIndexB == TILE_STOP && m_TileFlagsB == ROTATION_180) || (m_TileIndexB == TILE_STOPS && (m_TileFlagsB == ROTATION_0 || m_TileFlagsB == ROTATION_180)) || (m_TileIndexB == TILE_STOPA) || (m_TileFIndex == TILE_STOP && m_TileFFlags == ROTATION_180) || (m_TileFIndexB == TILE_STOP && m_TileFFlagsB == ROTATION_180) || (m_TileFIndexB == TILE_STOPS && (m_TileFFlagsB == ROTATION_0 || m_TileFFlagsB == ROTATION_180)) || (m_TileFIndexB == TILE_STOPA) || (m_TileSIndex == TILE_STOP && m_TileSFlags == ROTATION_180) || (m_TileSIndexB == TILE_STOP && m_TileSFlagsB == ROTATION_180) || (m_TileSIndexB == TILE_STOPS && (m_TileSFlagsB == ROTATION_0 || m_TileSFlagsB == ROTATION_180)) || (m_TileSIndexB == TILE_STOPA)) && m_Vel.y < 0)
+			{
+				if((int)m_pCollision->GetPos(MapIndexB).y)
+					if((int)m_pCollision->GetPos(MapIndexB).y < (int)m_Pos.y)
+						m_Pos = PrevPos;
+				m_Vel.y = 0;
+			}
+			if(((m_TileIndex == TILE_STOP && m_TileFlags == ROTATION_0) || (m_TileIndexT == TILE_STOP && m_TileFlagsT == ROTATION_0) || (m_TileIndexT == TILE_STOPS && (m_TileFlagsT == ROTATION_0 || m_TileFlagsT == ROTATION_180)) || (m_TileIndexT == TILE_STOPA) || (m_TileFIndex == TILE_STOP && m_TileFFlags == ROTATION_0) || (m_TileFIndexT == TILE_STOP && m_TileFFlagsT == ROTATION_0) || (m_TileFIndexT == TILE_STOPS && (m_TileFFlagsT == ROTATION_0 || m_TileFFlagsT == ROTATION_180)) || (m_TileFIndexT == TILE_STOPA) || (m_TileSIndex == TILE_STOP && m_TileSFlags == ROTATION_0) || (m_TileSIndexT == TILE_STOP && m_TileSFlagsT == ROTATION_0) || (m_TileSIndexT == TILE_STOPS && (m_TileSFlagsT == ROTATION_0 || m_TileSFlagsT == ROTATION_180)) || (m_TileSIndexT == TILE_STOPA)) && m_Vel.y > 0)
+			{
+				if((int)m_pCollision->GetPos(MapIndexT).y)
+					if((int)m_pCollision->GetPos(MapIndexT).y < (int)m_Pos.y)
+						m_Pos = PrevPos;
+				m_Vel.y = 0;
+				m_Jumped = 0;
 			}
 		}
 	}
