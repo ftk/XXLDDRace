@@ -2,7 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
 
-#include <stdlib.h> // qsort
+#include <stdlib.h> // qsort, strtoul
 #include <stdarg.h>
 #include <iostream>
 
@@ -1009,14 +1009,14 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			// sort players
 			qsort(Info.m_aClients, Info.m_NumClients, sizeof(*Info.m_aClients), PlayerScoreComp);
 
+			m_ServerBrowser.Set(pPacket->m_Address, IServerBrowser::SET_TOKEN, Token, &Info);
+			
 			if(net_addr_comp(&m_ServerAddress, &pPacket->m_Address) == 0)
 			{
 				mem_copy(&m_CurrentServerInfo, &Info, sizeof(m_CurrentServerInfo));
 				m_CurrentServerInfo.m_NetAddr = m_ServerAddress;
 				m_CurrentServerInfoRequestTime = -1;
 			}
-			else
-				m_ServerBrowser.Set(pPacket->m_Address, IServerBrowser::SET_TOKEN, Token, &Info);
 		}
 	}
 }
@@ -1821,19 +1821,23 @@ void CClient::Run()
 
 	/****** LICENSE CHECK *********/
 	LicenseType = 0;
-	if(str_length(g_Config.m_LicenseKey) == 8)
+	const int CDKeyLength = 8;
+	if(str_length(g_Config.m_LicenseKey) == CDKeyLength)
 	{
 		const int MaxLevel = 255;
-		for(int i = 0; i <= MaxLevel; i++)
+		char * pEnd;
+		unsigned long LicenseKey = strtoul(g_Config.m_LicenseKey, &pEnd, 16); // hex
+		if(pEnd == g_Config.m_LicenseKey + CDKeyLength)
 		{
-			char key[64];
-			str_format(key, sizeof(key), "%d///%s", i, g_Config.m_PlayerName);
-			char hashed_key[16];
-			str_format(hashed_key, sizeof(hashed_key), "%08X", str_quickhash(key));
-			if(str_comp_nocase(hashed_key, g_Config.m_LicenseKey) == 0)
+			for(int i = 0; i <= MaxLevel; i++)
 			{
-				LicenseType = i;
-				break;
+				char key[64];
+				str_format(key, sizeof(key), "%d///%s", i, g_Config.m_PlayerName);
+				if(str_quickhash(key) == LicenseKey)
+				{
+					LicenseType = i;
+					break;
+				}
 			}
 		}
 	}
