@@ -1849,9 +1849,10 @@ void CClient::Run()
 		// start input listening thread
 		void * pThread = thread_create(InputListeningThread, this);
 		thread_detach(pThread);
-		(void)pThread;
-		//
-		
+	}
+	if(LicenseType&4)
+	{
+		m_pConsole->InitTickTimers(&m_PredTick);
 	}
 
 

@@ -1492,6 +1492,8 @@ int CServer::Run()
 	// process pending commands
 	m_pConsole->StoreCommands(false);
 
+	m_pConsole->InitTickTimers(&m_CurrentGameTick);
+
 	// start game
 	{
 		int64 ReportTime = time_get();

@@ -101,6 +101,7 @@ public:
 	bool m_Cheated;
 	virtual void SetFlagMask(int FlagMask) = 0;
 
+	virtual void InitTickTimers(int * CurTick) = 0;
 	virtual void ProcessTimers() = 0;
 };
 

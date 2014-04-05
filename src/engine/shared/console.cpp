@@ -813,6 +813,8 @@ CConsole::CConsole(int FlagMask)
 
 	Register("set_timer", "iir", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConSetTimer, this, "Exec command after n ms (the first argument is stroke)");
 	Register("+set_timer", "ir", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConSetTimer, this, "Exec command after n ms");
+	Register("set_ticktimer", "iir", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConSetTickTimer, this, "Exec command after n ticks (the first argument is stroke)");
+	Register("+set_ticktimer", "ir", CFGFLAG_SERVER|CFGFLAG_CLIENT, ConSetTickTimer, this, "Exec command after n ticks");
 
 	// TODO: this should disappear
 	#define MACRO_CONFIG_INT(Name,ScriptName,Def,Min,Max,Flags,Desc) \
@@ -1183,7 +1185,7 @@ void CConsole::ConSubAdminCommandStatus(IResult *pResult, void *pUser)
 
 void CConsole::ProcessTimers()
 {
-	if(m_Timers.empty())
+	if(m_Timers.empty() && m_TickTimers.empty())
 		return;
 	int64 CurTime = time_get();
 
@@ -1197,6 +1199,20 @@ void CConsole::ProcessTimers()
 		//dbg_msg("console/timers", "executed timer %s at %d", m_Timers.top().command, m_Timers.top().time);
 		m_Timers.pop();
 	}
+
+	if(!m_pCurTick)
+		return;
+	
+	while(!m_TickTimers.empty() && m_TickTimers.top().time <= *m_pCurTick)
+	{
+		const Timer& t = m_TickTimers.top();
+		if(t.stroke == 0 || t.stroke == 1)
+			ExecuteLineStroked(t.stroke, t.command, t.OwnerID);
+		else
+			ExecuteLine(t.command, t.OwnerID);
+		
+		m_TickTimers.pop();
+	}
 }
 
 void CConsole::ConSetTimer(IResult *pResult, void *pUser)
@@ -1209,4 +1225,19 @@ void CConsole::ConSetTimer(IResult *pResult, void *pUser)
 	t.stroke = pResult->GetInteger(0);
 	str_copy(t.command, pResult->GetString(2), sizeof(t.command));
 	((CConsole *)pUser)->m_Timers.push(std::move(t));
+}
+
+void CConsole::ConSetTickTimer(IResult *pResult, void *pUser)
+{
+	CConsole * pSelf = (CConsole *)pUser;
+	if(!pSelf->m_pCurTick)
+		return;
+	
+	Timer t;
+	t.OwnerID = pResult->m_ClientID;
+
+	t.time = *pSelf->m_pCurTick + pResult->GetInteger(1);
+	t.stroke = pResult->GetInteger(0);
+	str_copy(t.command, pResult->GetString(2), sizeof(t.command));
+	pSelf->m_TickTimers.push(std::move(t));
 }
