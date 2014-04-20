@@ -194,7 +194,7 @@ private:
 		bool operator>(const Timer& rhs) const { return time > rhs.time; }
 	};
 	std::priority_queue<Timer, std::vector<Timer>, std::greater<Timer> > m_Timers, m_TickTimers; // min-heap
-	int * m_pCurTick = NULL;
+	int * m_pCurTick;
 public:
 	static void ConSetTimer(IResult *pResult, void *pUserData);
 	static void ConSetTickTimer(IResult *pResult, void *pUserData);

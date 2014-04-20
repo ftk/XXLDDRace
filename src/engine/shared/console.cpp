@@ -742,6 +742,8 @@ CConsole::CConsole(int FlagMask)
 	m_NumPrintCB = 0;
 
 	m_pStorage = 0;
+
+	m_pCurTick = NULL;
 	
 	#if defined(_MSC_VER) && _MSC_VER < 1700 // workaround for msvc < 2012
 	commands.max_load_factor(0.75f);
