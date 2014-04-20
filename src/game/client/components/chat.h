@@ -67,6 +67,8 @@ class CChat : public CComponent
 	
 	CFont * m_pFont;
 
+	float m_ChatboxHeight, m_ChatboxWidth;
+
 	static void ConSay(IConsole::IResult *pResult, void *pUserData);
 	static void ConSayTeam(IConsole::IResult *pResult, void *pUserData);
 	static void ConChat(IConsole::IResult *pResult, void *pUserData);

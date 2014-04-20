@@ -400,8 +400,6 @@ void CChat::AddLine(int ClientID, int Team, const char *pLine)
 			io_close(File);
 			m_pFont = TextRender()->LoadFont(aFilename);
 		}
-		else
-			dbg_msg("chat", "can't find font!");
 	}
 
 	if(*pLine == 0 || (ClientID != -1 && (m_pClient->m_aClients[ClientID].m_aName[0] == '\0' || // unknown client
@@ -573,13 +571,27 @@ void CChat::OnRender()
 
 	y -= 8.0f;
 
-	int64 Now = time_get();
-	float LineWidth = m_pClient->m_pScoreboard->Active() ? 90.0f : 200.0f;
-	float HeightLimit = m_pClient->m_pScoreboard->Active() ? 230.0f : m_Show ? 50.0f : 200.0f;
-	float Begin = x;
-	float FontSize = 6.0f;
+	const int64 Now = time_get();
+	const float LineWidth = m_pClient->m_pScoreboard->Active() ? 90.0f : 200.0f;
+	const float HeightLimit = m_pClient->m_pScoreboard->Active() ? 230.0f : m_Show ? 50.0f : 200.0f;
+	const float Begin = x;
+	const float FontSize = 6.0f;
 	CTextCursor Cursor;
-	int OffsetType = m_pClient->m_pScoreboard->Active() ? 1 : 0;
+	const int OffsetType = m_pClient->m_pScoreboard->Active() ? 1 : 0;
+
+	// draw chatbox
+	if(m_ChatboxHeight && m_ChatboxWidth > Begin)
+	{
+		Graphics()->TextureSet(-1);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.3f);
+		RenderTools()->DrawRoundRect(Begin, y - m_ChatboxHeight, m_ChatboxWidth, m_ChatboxHeight + 3.f, 3.0f);
+		Graphics()->QuadsEnd();
+	}
+
+	m_ChatboxHeight = y;
+	m_ChatboxWidth = 0;
+
 	for(int i = 0; i < MAX_LINES; i++)
 	{
 		int r = ((m_CurrentLine-i)+MAX_LINES)%MAX_LINES;
@@ -636,7 +648,13 @@ void CChat::OnRender()
 			TextRender()->TextColor(1.0f, 1.0f, 1.0f, Blend);
 
 		TextRender()->TextEx(&Cursor, m_aLines[r].m_aText, -1);
+
+		if(Cursor.m_LineCount > 1)
+			m_ChatboxWidth = LineWidth;
+		else if(m_ChatboxWidth < Cursor.m_X)
+			m_ChatboxWidth = Cursor.m_X;
 	}
+	m_ChatboxHeight -= y;
 
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
