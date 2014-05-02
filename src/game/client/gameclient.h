@@ -263,7 +263,7 @@ public:
 
 	static bool IsCharacterFreezed(const CNetObj_Character& pChar)
 	{
-		return (pChar.m_Weapon == WEAPON_NINJA && pChar.m_AmmoCount == 0);
+		return (pChar.m_Weapon == WEAPON_NINJA && pChar.m_AmmoCount == 0 && (pChar.m_Emote == EMOTE_BLINK || pChar.m_Emote == EMOTE_PAIN));
 	}
 
 	int IntersectCharacter(vec2 Pos0, vec2 Pos1, vec2& NewPos, float Speed, int ownID);
