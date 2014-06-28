@@ -4,7 +4,7 @@
 
 #include <stdlib.h> // qsort, strtoul
 #include <stdarg.h>
-#include <iostream>
+#include <cstdio>
 
 #include <base/math.h>
 #include <base/system.h>
@@ -2479,15 +2479,17 @@ void CClient::InputListeningThread(void * pClient)
 {
 	CClient * pSelf = (CClient *)pClient;
 	pSelf->m_MsgQ.push("echo stdin opened!");
-	while(!std::cin.eof() && !std::cin.bad())
+	
+	while(!feof(stdin) && !ferror(stdin))
 	{
-		std::string buffer;
-		std::getline(std::cin, buffer);
-
+		char buffer[1024];
+		fgets(buffer, sizeof(buffer), stdin);
+		
 		scope_lock l(&QLock);
-		pSelf->m_MsgQ.push(std::move(buffer));
+		pSelf->m_MsgQ.push(buffer);
 	}
-	if(std::cin.eof())
+	
+	if(feof(stdin))
 		pSelf->m_MsgQ.push("echo stdin closed: EOF");
 	else
 		pSelf->m_MsgQ.push("echo stdin closed: bad");
