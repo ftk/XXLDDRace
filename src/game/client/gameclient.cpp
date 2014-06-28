@@ -441,7 +441,7 @@ static void Evolve(CNetObj_Character *pCharacter, int Tick, bool PredictFreeze)
 	while(pCharacter->m_Tick < Tick)
 	{
 		pCharacter->m_Tick++;
-		TempCore.Tick(false, CGameClient::IsCharacterFreezed(*pCharacter), PredictFreeze);
+		TempCore.Tick(false, false, PredictFreeze);
 		TempCore.Move();
 		TempCore.Quantize();
 	}
