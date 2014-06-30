@@ -1959,20 +1959,18 @@ void CClient::Run()
 
 			const int64 Now = time_get();
 			
-			if(Now >= m_LastRenderTime && m_pGraphics->WindowOpen() && 
-				(!g_Config.m_GfxAsyncRender || m_pGraphics->IsIdle()))
+			if(Now >= (m_LastRenderTime + g_Config.m_ClNoRenderTime * time_freq() / 1000)
+			   && m_pGraphics->WindowOpen() && (!g_Config.m_GfxAsyncRender || m_pGraphics->IsIdle()))
 			{
 				m_RenderFrames++;
-
-				// update frametime
 				m_RenderFrameTime = (Now - m_LastRenderTime) / (float)time_freq();
 				if(m_RenderFrameTime < m_RenderFrameTimeLow)
 					m_RenderFrameTimeLow = m_RenderFrameTime;
 				if(m_RenderFrameTime > m_RenderFrameTimeHigh)
 					m_RenderFrameTimeHigh = m_RenderFrameTime;
-				m_FpsGraph.Add(1.0f/m_RenderFrameTime, 1,1,1);
 
-				m_LastRenderTime = Now + g_Config.m_ClNoRenderTime * time_freq() / 1000;
+				// update frametime
+				m_LastRenderTime = Now;
 
 				if(!g_Config.m_DbgStress || (m_RenderFrames%10) == 0)
 				{
@@ -2025,7 +2023,11 @@ void CClient::Run()
 		}*/
 
 		// update local time
-		m_LocalTime = (time_get()-m_LocalStartTime)/(float)time_freq();
+		{
+			const float PrevTime = m_LocalTime;
+			m_LocalTime = (time_get()-m_LocalStartTime)/(float)time_freq();
+			m_FpsGraph.Add(1.0f/(m_LocalTime - PrevTime), 1,1,1);
+		}
 	}
 
 	GameClient()->OnShutdown();
