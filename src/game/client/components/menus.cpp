@@ -647,7 +647,7 @@ void CMenus::RenderLoading()
 
 	// make sure that we don't render for each little thing we load
 	// because that will slow down loading if we have vsync
-	if(time_get()-LastLoadRender < time_freq()/60)
+	if(time_get()-LastLoadRender < time_freq()/30)
 		return;
 
 	LastLoadRender = time_get();
@@ -659,8 +659,6 @@ void CMenus::RenderLoading()
 	CUIRect Screen = *UI()->Screen();
 	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
 
-	RenderBackground();
-
 	float w = 700;
 	float h = 200;
 	float x = Screen.w/2-w/2;
@@ -670,6 +668,10 @@ void CMenus::RenderLoading()
 
 	Graphics()->TextureSet(-1);
 	Graphics()->QuadsBegin();
+	Graphics()->SetColor(ms_GuiColor.r, ms_GuiColor.g, ms_GuiColor.b, 1.0);
+	IGraphics::CQuadItem QuadItem(0, 0, Screen.w, Screen.h);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);	
+
 	Graphics()->SetColor(0,0,0,0.50f);
 	RenderTools()->DrawRoundRect(x, y, w, h, 40.0f);
 	Graphics()->QuadsEnd();
@@ -700,50 +702,6 @@ void CMenus::RenderNews(CUIRect MainView)
 
 void CMenus::OnInit()
 {
-
-	/*
-	array<string> my_strings;
-	array<string>::range r2;
-	my_strings.add("4");
-	my_strings.add("6");
-	my_strings.add("1");
-	my_strings.add("3");
-	my_strings.add("7");
-	my_strings.add("5");
-	my_strings.add("2");
-
-	for(array<string>::range r = my_strings.all(); !r.empty(); r.pop_front())
-		dbg_msg("", "%s", r.front().cstr());
-
-	sort(my_strings.all());
-
-	dbg_msg("", "after:");
-	for(array<string>::range r = my_strings.all(); !r.empty(); r.pop_front())
-		dbg_msg("", "%s", r.front().cstr());
-
-
-	array<int> myarray;
-	myarray.add(4);
-	myarray.add(6);
-	myarray.add(1);
-	myarray.add(3);
-	myarray.add(7);
-	myarray.add(5);
-	myarray.add(2);
-
-	for(array<int>::range r = myarray.all(); !r.empty(); r.pop_front())
-		dbg_msg("", "%d", r.front());
-
-	sort(myarray.all());
-	sort_verify(myarray.all());
-
-	dbg_msg("", "after:");
-	for(array<int>::range r = myarray.all(); !r.empty(); r.pop_front())
-		dbg_msg("", "%d", r.front());
-
-	exit(-1);
-	// */
-
 	if(g_Config.m_ClShowWelcome)
 		m_Popup = POPUP_LANGUAGE;
 	g_Config.m_ClShowWelcome = 0;
@@ -1577,49 +1535,53 @@ void CMenus::RenderBackground()
 		gs_TextureBlob = Graphics()->LoadTexture("blob.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 
 
-	float sw = 300*Graphics()->ScreenAspect();
-	float sh = 300;
+	const float sw = 300*Graphics()->ScreenAspect();
+	const float sh = 300;
 	Graphics()->MapScreen(0, 0, sw, sh);
 
 	// render background color
 	Graphics()->TextureSet(-1);
 	Graphics()->QuadsBegin();
-		//vec4 bottom(gui_color.r*0.3f, gui_color.g*0.3f, gui_color.b*0.3f, 1.0f);
-		//vec4 bottom(0, 0, 0, 1.0f);
-		vec4 Bottom(ms_GuiColor.r, ms_GuiColor.g, ms_GuiColor.b, 1.0f);
-		vec4 Top(ms_GuiColor.r, ms_GuiColor.g, ms_GuiColor.b, 1.0f);
-		IGraphics::CColorVertex Array[4] = {
-			IGraphics::CColorVertex(0, Top.r, Top.g, Top.b, Top.a),
-			IGraphics::CColorVertex(1, Top.r, Top.g, Top.b, Top.a),
-			IGraphics::CColorVertex(2, Bottom.r, Bottom.g, Bottom.b, Bottom.a),
-			IGraphics::CColorVertex(3, Bottom.r, Bottom.g, Bottom.b, Bottom.a)};
-		Graphics()->SetColorVertex(Array, 4);
-		IGraphics::CQuadItem QuadItem(0, 0, sw, sh);
-		Graphics()->QuadsDrawTL(&QuadItem, 1);
+	//vec4 bottom(gui_color.r*0.3f, gui_color.g*0.3f, gui_color.b*0.3f, 1.0f);
+	//vec4 bottom(0, 0, 0, 1.0f);
+	vec4 Bottom(ms_GuiColor.r, ms_GuiColor.g, ms_GuiColor.b, 1.0f);
+	vec4 Top(ms_GuiColor.r, ms_GuiColor.g, ms_GuiColor.b, 1.0f);
+	IGraphics::CColorVertex Array[4] = {
+		IGraphics::CColorVertex(0, Top.r, Top.g, Top.b, Top.a),
+		IGraphics::CColorVertex(1, Top.r*2, Top.g*2, Top.b*2, Top.a),
+		IGraphics::CColorVertex(2, Bottom.r, Bottom.g, Bottom.b, Bottom.a),
+		IGraphics::CColorVertex(3, Bottom.r/2, Bottom.g/2, Bottom.b/2, Bottom.a)};
+	Graphics()->SetColorVertex(Array, 4);
+	IGraphics::CQuadItem QuadItem(0, 0, sw, sh);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
 	// render the tiles
 	Graphics()->TextureSet(-1);
 	Graphics()->QuadsBegin();
-		float Size = 15.0f;
-		float OffsetTime = fmod((-m_MousePos.y + m_MousePos.x)*0.003f, 2.0f);
-		for(int y = -2; y < (int)(sw/Size); y++)
-			for(int x = -2; x < (int)(sh/Size); x++)
-			{
-				Graphics()->SetColor(0,0,0,0.045f);
-				IGraphics::CQuadItem QuadItem((x-OffsetTime)*Size*2+(y&1)*Size, (y+OffsetTime)*Size, Size, Size);
-				Graphics()->QuadsDrawTL(&QuadItem, 1);
-			}
+	const float Size = 10.0f,
+		OffsetTime = fmod(Client()->LocalTime()*0.15f, 2.0f);
+	Graphics()->QuadsSetRotation(OffsetTime * pi);
+	for(int y = -2; y < (int)(sw/Size); y++)
+		for(int x = -2; x < (int)(sh/Size); x++)
+		{
+			Graphics()->SetColor(0,0,0,0.07f);
+			IGraphics::CQuadItem QuadItem((x-OffsetTime)*Size*2+(y&1)*Size, (y+OffsetTime)*Size, Size, Size);
+			Graphics()->QuadsDrawTL(&QuadItem, 1);
+		}
 	Graphics()->QuadsEnd();
 
-	// render border fade
-	Graphics()->TextureSet(gs_TextureBlob);
-	Graphics()->QuadsBegin();
-		Graphics()->SetColor(0,0,0,0.5f);
-		QuadItem = IGraphics::CQuadItem(-100, -100, sw+200, sh+200);
+	if(sw >= sh)
+	{
+		// render background image ( 1.0 aspect ratio)
+		Graphics()->TextureSet(gs_TextureBlob);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1,1,1,0.1f);
+		QuadItem = IGraphics::CQuadItem((sw - sh) / 2, 0, sh, sh);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
-
+		Graphics()->QuadsEnd();
+	}
+	
 	// restore screen
 	{CUIRect Screen = *UI()->Screen();
 	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);}

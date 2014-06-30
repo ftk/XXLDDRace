@@ -82,33 +82,23 @@
          stdDeviation="17.028522"
          id="feGaussianBlur5626" />
     </filter>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient5610"
-       id="linearGradient5653"
-       gradientUnits="userSpaceOnUse"
-       x1="1280"
-       y1="108.31113"
-       x2="1280"
-       y2="1516.4076"
-       gradientTransform="matrix(0.26666667,0,0,0.35555556,170.66667,-32.853339)" />
   </defs>
   <sodipodi:namedview
      bordercolor="#666666"
      borderlayer="true"
      borderopacity="1.0"
-     pagecolor="#000000"
+     pagecolor="#ffffff"
      showgrid="false"
      showguides="true"
      id="namedview631"
-     inkscape:pageopacity="1"
+     inkscape:pageopacity="0"
      inkscape:zoom="1.0198655"
      inkscape:cx="372.48249"
      inkscape:cy="267.10582"
-     inkscape:window-width="1920"
-     inkscape:window-height="1007"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="1360"
+     inkscape:window-height="716"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <metadata
@@ -128,7 +118,7 @@
      y="-7.6293945e-06"
      x="1.2e-06"
      width="512"
-     style="fill:url(#linearGradient5653);fill-opacity:1"
+     style="fill:none;fill-opacity:1"
      height="512" />
   <path
      transform="matrix(0.82567071,0,0,0.82567071,-122.78683,25.21341)"
