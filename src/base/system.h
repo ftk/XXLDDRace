@@ -463,7 +463,7 @@ int64 time_get();
 	Returns:
 		Returns the frequency of the high resolution timer.
 */
-int64 time_freq();
+int64 time_freq() __attribute__ ((const));
 
 /*
 	Function: time_timestamp
