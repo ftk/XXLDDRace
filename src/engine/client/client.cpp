@@ -2350,7 +2350,8 @@ int main(int argc, const char **argv) // ignore_convention
 		}
 	}
 	if(!debug)
-		FreeConsole();
+		ShowWindow(GetConsoleWindow(), SW_HIDE);
+		//FreeConsole();
 #endif
 
 	CClient *pClient = CreateClient();
