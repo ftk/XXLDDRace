@@ -28,9 +28,9 @@ int CSnapshot::GetItemIndex(int Key)
 	return -1;
 }
 
-int CSnapshot::Crc()
+unsigned CSnapshot::Crc()
 {
-	int Crc = 0;
+	unsigned Crc = 0;
 
 	for(int i = 0; i < m_NumItems; i++)
 	{
@@ -38,7 +38,7 @@ int CSnapshot::Crc()
 		int Size = GetItemSize(i);
 
 		for(int b = 0; b < Size/4; b++)
-			Crc += pItem->Data()[b];
+			Crc += (unsigned)pItem->Data()[b];
 	}
 	return Crc;
 }
