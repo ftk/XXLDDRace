@@ -53,14 +53,26 @@ bool CLineInput::Manipulate(IInput::CEvent e, char *pStr, int StrMaxSize, int *p
 
 	if(e.m_Flags&IInput::FLAG_PRESS)
 	{
-		if (k == KEY_BACKSPACE && CursorPos > 0)
+		// backspace, ctrl+backspace, ctrl+w
+		if ((k == KEY_BACKSPACE || (k == KEY_w && e.GetKeyMods()&(KEYMOD_LCTRL|KEYMOD_RCTRL))) && CursorPos > 0)
 		{
-			int NewCursorPos = str_utf8_rewind(pStr, CursorPos);
+			int NewCursorPos;
+			if(e.GetKeyMods()&(KEYMOD_LCTRL|KEYMOD_RCTRL))
+				NewCursorPos = str_skip_word_backward(pStr, CursorPos);
+			else
+				NewCursorPos = str_utf8_rewind(pStr, CursorPos);
 			int CharSize = CursorPos-NewCursorPos;
 			mem_move(pStr+NewCursorPos, pStr+CursorPos, Len - NewCursorPos - CharSize + 1); // +1 == null term
 			CursorPos = NewCursorPos;
 			Len -= CharSize;
 			Changes = true;
+		}
+		// ctrl+u
+		else if(k == KEY_u && e.GetKeyMods()&(KEYMOD_LCTRL|KEYMOD_RCTRL))
+		{
+			mem_move(pStr, pStr+CursorPos, Len - CursorPos + 1); // +1 == null term
+			Len -= CursorPos;
+			CursorPos = 0;
 		}
 		else if (k == KEY_DELETE && CursorPos < Len)
 		{
@@ -71,9 +83,19 @@ bool CLineInput::Manipulate(IInput::CEvent e, char *pStr, int StrMaxSize, int *p
 			Changes = true;
 		}
 		else if (k == KEY_LEFT && CursorPos > 0)
-			CursorPos = str_utf8_rewind(pStr, CursorPos);
+		{
+			if(e.GetKeyMods()&(KEYMOD_LCTRL|KEYMOD_RCTRL))
+				CursorPos = str_skip_word_backward(pStr, CursorPos);
+			else
+				CursorPos = str_utf8_rewind(pStr, CursorPos);
+		}
 		else if (k == KEY_RIGHT && CursorPos < Len)
-			CursorPos = str_utf8_forward(pStr, CursorPos);
+		{
+			if(e.GetKeyMods()&(KEYMOD_LCTRL|KEYMOD_RCTRL))
+				CursorPos = str_skip_word_forward(pStr, CursorPos);
+			else
+				CursorPos = str_utf8_forward(pStr, CursorPos);
+		}
 		else if (k == KEY_HOME)
 			CursorPos = 0;
 		else if (k == KEY_END)

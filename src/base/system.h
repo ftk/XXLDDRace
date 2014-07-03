@@ -99,7 +99,7 @@ void dbg_msg(const char *sys, const char *fmt, ...) __attribute__(( format(print
 	See Also:
 		<mem_free>
 */
-void *mem_alloc_debug(const char *filename, int line, unsigned size, unsigned alignment);
+void *mem_alloc_debug(const char *filename, int line, unsigned size, unsigned alignment) __attribute__((malloc));
 #define mem_alloc(s,a) mem_alloc_debug(__FILE__, __LINE__, (s), (a))
 
 /*
@@ -1300,6 +1300,10 @@ int str_utf8_encode(char *ptr, int chr);
 		- The string is treated as zero-terminated utf8 string.
 */
 int str_utf8_check(const char *str);
+
+
+int str_skip_word_forward(const char *str, int pos);
+int str_skip_word_backward(const char *str, int pos);
 
 #ifdef __cplusplus
 }

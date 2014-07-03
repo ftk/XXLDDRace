@@ -14,9 +14,11 @@ public:
 	class CEvent
 	{
 	public:
-		int m_Flags;
+		unsigned m_Flags; // first 2 bits : FLAG_PRESS, FLAG_RELEASE, other: KEYMOD_ modifilers
 		int m_Unicode;
 		int m_Key;
+
+		unsigned GetKeyMods() const { return m_Flags >> 2; }
 	};
 
 protected:
@@ -46,9 +48,15 @@ public:
 	enum
 	{
 		FLAG_PRESS=1,
-		FLAG_RELEASE=2,
-		FLAG_REPEAT=4
+		FLAG_RELEASE=2
 	};
+
+	static unsigned SetKeyMods(unsigned Flags, unsigned KeyMod)
+	{
+		Flags &= 3u; // clear everything except first 2 bits
+		Flags |= KeyMod << 2;
+		return Flags;
+	}
 
 	// events
 	int NumEvents() const { return m_NumEvents; }
@@ -81,7 +89,6 @@ public:
 
 	virtual void MouseRelative(float *x, float *y) = 0;
 	
-	int m_Modifier;
 };
 
 

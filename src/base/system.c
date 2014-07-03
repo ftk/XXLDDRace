@@ -187,6 +187,12 @@ static const int MEM_GUARD_VAL = 0xbaadc0de;
 
 void *mem_alloc_debug(const char *filename, int line, unsigned size, unsigned alignment)
 {
+	memory_stats.total_allocations++;
+	memory_stats.active_allocations++;
+
+	#ifdef CONF_RELEASE
+	return malloc(size);
+	#else
 	/* TODO: fix alignment */
 	/* TODO: add debugging */
 	MEMTAIL *tail;
@@ -200,8 +206,6 @@ void *mem_alloc_debug(const char *filename, int line, unsigned size, unsigned al
 	header->line = line;
 
 	memory_stats.allocated += header->size;
-	memory_stats.total_allocations++;
-	memory_stats.active_allocations++;
 
 	tail->guard = MEM_GUARD_VAL;
 
@@ -213,12 +217,18 @@ void *mem_alloc_debug(const char *filename, int line, unsigned size, unsigned al
 
 	/*dbg_msg("mem", "++ %p", header+1); */
 	return header+1;
+	#endif
 }
 
 void mem_free(void *p)
 {
 	if(p)
 	{
+		memory_stats.active_allocations--;
+
+		#ifdef CONF_RELEASE
+		free(p);
+		#else
 		MEMHEADER *header = (MEMHEADER *)p - 1;
 		MEMTAIL *tail = (MEMTAIL *)(((char*)(header+1))+header->size);
 
@@ -226,7 +236,6 @@ void mem_free(void *p)
 			dbg_msg("mem", "!! %p", p);
 		/* dbg_msg("mem", "-- %p", p); */
 		memory_stats.allocated -= header->size;
-		memory_stats.active_allocations--;
 
 		if(header->prev)
 			header->prev->next = header->next;
@@ -236,6 +245,7 @@ void mem_free(void *p)
 			header->next->prev = header->prev;
 
 		free(header);
+		#endif
 	}
 }
 
@@ -2031,6 +2041,27 @@ unsigned str_quickhash(const char *str)
 	for(; *str; str++)
 		hash = ((hash << 5) + hash) + (*str); /* hash * 33 + c */
 	return hash;
+}
+
+int str_skip_word_forward(const char *str, int pos)
+{
+	while(str[pos] && (str[pos] == ' ' || str[pos] == '\t' || str[pos] == '\n' || str[pos] == '\r'))
+		pos = str_utf8_forward(str, pos);
+	while(str[pos] && !(str[pos] == ' ' || str[pos] == '\t' || str[pos] == '\n' || str[pos] == '\r'))
+		pos = str_utf8_forward(str, pos);
+	return pos;
+}
+
+int str_skip_word_backward(const char *str, int pos)
+{
+	if(!pos)
+		return 0;
+	--pos;
+	while(pos > 0 && (str[pos] == ' ' || str[pos] == '\t' || str[pos] == '\n' || str[pos] == '\r'))
+		pos = str_utf8_rewind(str, pos);
+	while(pos > 0 && !(str[pos] == ' ' || str[pos] == '\t' || str[pos] == '\n' || str[pos] == '\r'))
+		pos = str_utf8_rewind(str, pos);
+	return (!pos) ? 0 : (pos + 1);
 }
 
 

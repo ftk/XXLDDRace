@@ -161,12 +161,11 @@ int CInput::Update()
 					if(Event.key.keysym.unicode < 0xE000 || Event.key.keysym.unicode > 0xF8FF)	// ignore_convention
 						AddEvent(Event.key.keysym.unicode, 0, 0); // ignore_convention
 					Key = Event.key.keysym.sym; // ignore_convention
-					m_Modifier = Event.key.keysym.mod;
+					Action = SetKeyMods(IInput::FLAG_PRESS, Event.key.keysym.mod);
 					break;
 				case SDL_KEYUP:
-					Action = IInput::FLAG_RELEASE;
 					Key = Event.key.keysym.sym; // ignore_convention
-					m_Modifier = Event.key.keysym.mod;
+					Action = SetKeyMods(IInput::FLAG_RELEASE, Event.key.keysym.mod);
 					break;
 
 				// handle mouse buttons
@@ -201,7 +200,7 @@ int CInput::Update()
 			if(Key != -1)
 			{
 				m_aInputCount[m_InputCurrent][Key].m_Presses++;
-				if(Action == IInput::FLAG_PRESS)
+				if(Action & IInput::FLAG_PRESS)
 					m_aInputState[m_InputCurrent][Key] = 1;
 				AddEvent(0, Key, Action);
 			}
