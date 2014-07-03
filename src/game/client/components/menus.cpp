@@ -75,6 +75,8 @@ CMenus::CMenus()
 	m_FriendlistSelectedIndex = -1;
 
 	m_DDRacePage = PAGE_BROWSER;
+
+	m_ReconnectTime = 0;
 }
 
 vec4 CMenus::ButtonColorMul(const void *pID)
@@ -851,9 +853,19 @@ int CMenus::Render()
 		}
 		else if(m_Popup == POPUP_DISCONNECTED)
 		{
-			pTitle = Localize("Disconnected");
+			if(!m_ReconnectTime)
+			{
+				m_ReconnectTime = time_get() + 10 * time_freq();
+			}
+			else if(time_get() >= m_ReconnectTime)
+			{
+				Client()->Connect(g_Config.m_UiServerAddress);
+				m_ReconnectTime = 0;
+			}
+			str_format(aBuf, sizeof(aBuf), Localize("Reconnect in %.1f seconds"), float(m_ReconnectTime - time_get()) / time_freq());
+			pTitle = aBuf;
 			pExtraText = Client()->ErrorString();
-			pButtonText = Localize("Ok");
+			pButtonText = Localize("Abort");
 			ExtraAlign = -1;
 		}
 		else if(m_Popup == POPUP_PURE)
@@ -1289,6 +1301,8 @@ int CMenus::Render()
 
 		if(m_Popup == POPUP_NONE)
 			UI()->SetActiveItem(0);
+		if(m_Popup != POPUP_DISCONNECTED)
+			m_ReconnectTime = 0;
 	}
 
 	return 0;

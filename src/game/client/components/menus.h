@@ -334,5 +334,7 @@ private:
 
 	// found in menus_settings.cpp
 	void RenderSettingsDDRace(CUIRect MainView);
+
+	int64 m_ReconnectTime;
 };
 #endif
