@@ -2414,7 +2414,17 @@ int main(int argc, const char **argv) // ignore_convention
 	pClient->InitInterfaces();
 
 	// execute config file
-	pConsole->ExecuteFile("settings.cfg");
+	{
+		// try mkrace.cfg, if it doesnt exist load settings.cfg
+		IOHANDLE file = pStorage->OpenFile("mkrace.cfg", IOFLAG_READ, IStorage::TYPE_ALL);
+		if(file)
+		{
+			io_close(file);
+			pConsole->ExecuteFile("mkrace.cfg");
+		}
+		else
+			pConsole->ExecuteFile("settings.cfg");
+	}
 
 	// execute autoexec file
 	pConsole->ExecuteFile("autoexec.cfg");
