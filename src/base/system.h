@@ -1311,6 +1311,7 @@ int str_skip_word_backward(const char *str, int pos);
 	  Returns length of the string.
 */
 int get_clipboard_data(char *dest, int size);
+
 #ifdef __cplusplus
 }
 #endif
