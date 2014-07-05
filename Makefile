@@ -1,9 +1,9 @@
 ARCH ?= 64
-CPPFLAGS := -m$(ARCH) -flto -O3 -msse2 -msse3 -msse4.2 -mfpmath=both -mavx -pipe -fno-exceptions -fvisibility=internal \
+CPPFLAGS := -m$(ARCH) -flto -O3 -mfpmath=both -mavx -mpclmul -pipe -fno-exceptions -fvisibility=internal \
 -Wall -DCONF_RELEASE -DNO_VIZ -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" -I "other/sdl/include" -I "other/freetype/include"
 CXXFLAGS := -std=c++11 -fno-rtti
 CFLAGS :=
-LDFLAGS := -m$(ARCH) -flto -O3 -march=native -s -static-libgcc -static-libstdc++
+LDFLAGS := -m$(ARCH) -flto -O3 -s -static-libgcc -static-libstdc++
 
 CC := gcc
 CXX := g++

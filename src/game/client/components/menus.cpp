@@ -515,7 +515,7 @@ int CMenus::DoKeyReader(void *pID, const CUIRect *pRect, int Key)
 		if(Key == 0)
 			DoButton_KeySelect(pID, "", 0, pRect);
 		else
-			DoButton_KeySelect(pID, Input()->KeyName(Key), 0, pRect);
+			DoButton_KeySelect(pID, IInput::KeyName(Key), 0, pRect);
 	}
 	return NewKey;
 }
@@ -1425,27 +1425,9 @@ void CMenus::OnStateChange(int NewState, int OldState)
 	}
 }
 
-extern "C" void font_debug_render();
 
 void CMenus::OnRender()
 {
-	/*
-	// text rendering test stuff
-	render_background();
-
-	CTextCursor cursor;
-	TextRender()->SetCursor(&cursor, 10, 10, 20, TEXTFLAG_RENDER);
-	TextRender()->TextEx(&cursor, "ようこそ - ガイド", -1);
-
-	TextRender()->SetCursor(&cursor, 10, 30, 15, TEXTFLAG_RENDER);
-	TextRender()->TextEx(&cursor, "ようこそ - ガイド", -1);
-
-	//Graphics()->TextureSet(-1);
-	Graphics()->QuadsBegin();
-	Graphics()->QuadsDrawTL(60, 60, 5000, 5000);
-	Graphics()->QuadsEnd();
-	return;*/
-
 	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		SetActive(true);
 
@@ -1573,13 +1555,13 @@ void CMenus::RenderBackground()
 	// render the tiles
 	Graphics()->TextureSet(-1);
 	Graphics()->QuadsBegin();
-	const float Size = 10.0f,
-		OffsetTime = fmod(Client()->LocalTime()*0.15f, 2.0f);
+	const float OffsetTime = fmod(Client()->LocalTime()*0.15f, 2.0f);
+	const float Size = 10;
 	Graphics()->QuadsSetRotation(OffsetTime * pi);
+	Graphics()->SetColor(0,0,0,0.07f);
 	for(int y = -2; y < (int)(sw/Size); y++)
 		for(int x = -2; x < (int)(sh/Size); x++)
 		{
-			Graphics()->SetColor(0,0,0,0.07f);
 			IGraphics::CQuadItem QuadItem((x-OffsetTime)*Size*2+(y&1)*Size, (y+OffsetTime)*Size, Size, Size);
 			Graphics()->QuadsDrawTL(&QuadItem, 1);
 		}

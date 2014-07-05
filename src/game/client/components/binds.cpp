@@ -47,9 +47,9 @@ void CBinds::Bind(int KeyID, const char *pStr)
 	m_aKeyBindings[KeyID].line = pStr;
 	char aBuf[1024];
 	if(m_aKeyBindings[KeyID].line.empty())
-		str_format(aBuf, sizeof(aBuf), "unbound %s (%d)", Input()->KeyName(KeyID), KeyID);
+		str_format(aBuf, sizeof(aBuf), "unbound %s (%d)", IInput::KeyName(KeyID), KeyID);
 	else
-		str_format(aBuf, sizeof(aBuf), "bound %s (%d) = %s", Input()->KeyName(KeyID), KeyID, m_aKeyBindings[KeyID].line.c_str());
+		str_format(aBuf, sizeof(aBuf), "bound %s (%d) = %s", IInput::KeyName(KeyID), KeyID, m_aKeyBindings[KeyID].line.c_str());
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 }
 
@@ -140,7 +140,7 @@ const char *CBinds::GetKey(const char *pBindStr)
 			continue;
 
 		if(str_comp(pBind, pBindStr) == 0)
-			return Input()->KeyName(KeyId);
+			return IInput::KeyName(KeyId);
 	}
 
 	return "";
@@ -263,7 +263,7 @@ void CBinds::ConDumpBinds(IConsole::IResult *pResult, void *pUserData)
 	{
 		if(pBinds->m_aKeyBindings[i].empty())
 			continue;
-		str_format(aBuf, sizeof(aBuf), "%s (%d) = %s", pBinds->Input()->KeyName(i), i, pBinds->m_aKeyBindings[i].line.c_str());
+		str_format(aBuf, sizeof(aBuf), "%s (%d) = %s", IInput::KeyName(i), i, pBinds->m_aKeyBindings[i].line.c_str());
 		pBinds->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 	}
 }
@@ -281,7 +281,7 @@ int CBinds::GetKeyID(const char *pKeyName)
 	// search for key
 	for(int i = 0; i < KEY_LAST; i++)
 	{
-		if(str_comp(pKeyName, Input()->KeyName(i)) == 0)
+		if(str_comp(pKeyName, IInput::KeyName(i)) == 0)
 			return i;
 	}
 

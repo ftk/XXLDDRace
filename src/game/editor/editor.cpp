@@ -3883,7 +3883,7 @@ void CEditor::Render()
 			{
 				if(NKeys)
 					TextRender()->TextEx(&Cursor, " + ", -1);
-				TextRender()->TextEx(&Cursor, Input()->KeyName(i), -1);
+				TextRender()->TextEx(&Cursor, IInput::KeyName(i), -1);
 				NKeys++;
 			}
 		}
