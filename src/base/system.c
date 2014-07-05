@@ -2064,6 +2064,51 @@ int str_skip_word_backward(const char *str, int pos)
 	return (!pos) ? 0 : (pos + 1);
 }
 
+int get_clipboard_data(char *dest, int size)
+{
+	if(!size)
+		return 0;
+	dest[0] = '\0';
+#if defined(CONF_FAMILY_WINDOWS) // ctrl + v
+	if(IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(NULL))
+	{
+		HANDLE hnd = GetClipboardData(CF_UNICODETEXT);
+		int len = 0;
+		if(hnd)
+		{
+			/* utf-16 to utf-8 */
+			wchar_t * str = (wchar_t *)(GlobalLock(hnd));
+			char ch[4];
+			while(*str)
+			{
+				int charSize = str_utf8_encode(ch, (int)(*str++));
+				if(len + charSize < size)
+				{
+					mem_copy(dest+len, ch, charSize);
+					len += charSize;
+				}
+				else
+					break;
+			}
+			dest[len] = '\0';
+			GlobalUnlock(hnd);
+		}
+		CloseClipboard();
+		return len;
+	}
+#elif defined(CONF_FAMILY_UNIX) /* Xorg, needs xclip installed */
+	FILE * pipe = popen("xclip -o", "r");
+	if(pipe)
+	{
+		int BytesRead = fread(dest, 1, size - 1, pipe);
+		if(BytesRead >= 0 && BytesRead < size)
+			dest[BytesRead] = '\0';
+		pclose(pipe);
+		return BytesRead;	        
+	}
+#endif
+	return 0;
+}
 
 #if defined(__cplusplus)
 }

@@ -1305,6 +1305,12 @@ int str_utf8_check(const char *str);
 int str_skip_word_forward(const char *str, int pos);
 int str_skip_word_backward(const char *str, int pos);
 
+/*
+	  Get utf-8 encoded string from clipboard
+	  Windows and Xorg (via xclip) are supported
+	  Returns length of the string.
+*/
+int get_clipboard_data(char *dest, int size);
 #ifdef __cplusplus
 }
 #endif
