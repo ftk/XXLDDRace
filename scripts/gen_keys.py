@@ -37,13 +37,19 @@ print >>f, "\tKEY_MOUSE_8 = %d,"%(highestid+8); keynames[highestid+8] = "mouse8"
 print >>f, "\tKEY_MOUSE_WHEEL_UP = %d,"%(highestid+9); keynames[highestid+9] = "mousewheelup"
 print >>f, "\tKEY_MOUSE_WHEEL_DOWN = %d,"%(highestid+10); keynames[highestid+10] = "mousewheeldown"
 print >>f, "\tKEY_MOUSE_9 = %d,"%(highestid+11); keynames[highestid+11] = "mouse9"
+key_last = highestid + 12
 print >>f, "\tKEY_LAST,"
+keynames = keynames[0:key_last]
+
+# key mods
 for line in open("scripts/SDL_keysym.h"):
 	l = line.strip().split("=")
-	if len(l) == 2 and "MODK_" in line:
-		key = l[0].strip().replace("MODK_", "KEYMOD_"
-		value = int(l[1].split(",")[0].strip())
-		print >>f, "\t%s = %d,"%(key, value)
+	if len(l) == 2 and "KMOD_" in line:
+		key = l[0].strip().replace("KMOD_", "KEYMOD_")
+		value = l[1].split(",")[0].strip()
+		print >>f, "\t%s = %s,"%(key, value)
+
+print >>f, "\tKEYMOD_TOTAL = 12," # const, see below
 
 print >>f, "};"
 print >>f, ""
@@ -57,15 +63,33 @@ print >>f, '#ifndef KEYS_INCLUDE'
 print >>f, '#error do not include this header!'
 print >>f, '#endif'
 print >>f, ''
-print >>f, "#include <string.h>"
+print >>f, "#include <engine/keys.h>"
 print >>f, ""
-print >>f, "const char g_aaKeyStrings[512][16] ="
+print >>f, "const char * g_aaKeyStrings[KEY_LAST] ="
 print >>f, "{"
 for n in keynames:
 	print >>f, '\t"%s",'%n
 
 print >>f, "};"
 print >>f, ""
+
+print >>f, """
+const unsigned g_aaKeymods[KEYMOD_TOTAL][2] =
+{
+	{KEYMOD_NONE, 0},
+	{KEYMOD_LSHIFT, KEY_LSHIFT},
+	{KEYMOD_RSHIFT, KEY_RSHIFT},
+	{KEYMOD_LCTRL, KEY_LCTRL},
+	{KEYMOD_RCTRL, KEY_RCTRL},
+	{KEYMOD_LALT, KEY_LALT},
+	{KEYMOD_RALT, KEY_RALT},
+	{KEYMOD_LMETA, KEY_LMETA},
+	{KEYMOD_RMETA, KEY_RMETA},
+	{KEYMOD_NUM, KEY_NUMLOCK},
+	{KEYMOD_CAPS, KEY_CAPSLOCK},
+	{KEYMOD_MODE, KEY_MODE},
+};
+""";
 
 f.close()
 

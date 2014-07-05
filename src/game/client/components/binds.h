@@ -4,11 +4,21 @@
 #define GAME_CLIENT_COMPONENTS_BINDS_H
 #include <game/client/component.h>
 #include <engine/keys.h>
+#include <engine/input.h>
 #include <string>
+#include <forward_list>
+#include <utility>
 
 class CBinds : public CComponent
 {
-	std::string m_aKeyBindings[KEY_LAST];
+	struct Bind
+	{
+		std::string line;
+		std::forward_list<std::pair<unsigned, std::string> > modbinds;
+		bool empty() const { return line.empty() && modbinds.empty(); }
+		void clear() { line.clear(); modbinds.clear(); }
+	};
+	Bind m_aKeyBindings[KEY_LAST];
 
 	int GetKeyID(const char *pKeyName);
 
@@ -33,6 +43,7 @@ public:
 	CBindsSpecial m_SpecialBinds;
 
 	void Bind(int KeyID, const char *pStr);
+	void Bind(unsigned KeyID, unsigned KeyMods, const char *pStr);
 	void SetDefaults();
 	void UnbindAll();
 	const char *Get(int KeyID);
@@ -44,5 +55,9 @@ public:
 	// DDRace
 
 	void SetDDRaceBinds(bool FreeOnly);
+
+	static std::string KeyCombName(unsigned Key, unsigned Keymods);
+	static std::pair<unsigned, unsigned> KeyCombByName(const std::string& KeyComb);
+
 };
 #endif

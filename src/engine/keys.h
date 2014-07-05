@@ -1,5 +1,3 @@
-/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
-/* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_KEYS_H
 #define ENGINE_KEYS_H
 /* AUTO GENERATED! DO NOT EDIT MANUALLY! */
@@ -250,19 +248,20 @@ enum
 	KEY_MOUSE_WHEEL_DOWN = 332,
 	KEY_MOUSE_9 = 333,
 	KEY_LAST,
-	KEYMOD_NONE  = 0x0000,
-	KEYMOD_LSHIFT= 0x0001,
-	KEYMOD_RSHIFT= 0x0002,
+	KEYMOD_NONE = 0x0000,
+	KEYMOD_LSHIFT = 0x0001,
+	KEYMOD_RSHIFT = 0x0002,
 	KEYMOD_LCTRL = 0x0040,
 	KEYMOD_RCTRL = 0x0080,
-	KEYMOD_LALT  = 0x0100,
-	KEYMOD_RALT  = 0x0200,
+	KEYMOD_LALT = 0x0100,
+	KEYMOD_RALT = 0x0200,
 	KEYMOD_LMETA = 0x0400,
 	KEYMOD_RMETA = 0x0800,
-	KEYMOD_NUM   = 0x1000,
-	KEYMOD_CAPS  = 0x2000,
-	KEYMOD_MODE  = 0x4000,
+	KEYMOD_NUM = 0x1000,
+	KEYMOD_CAPS = 0x2000,
+	KEYMOD_MODE = 0x4000,
 	KEYMOD_RESERVED = 0x8000,
+	KEYMOD_TOTAL = 12,
 };
 
 #endif

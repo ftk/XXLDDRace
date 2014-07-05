@@ -13,7 +13,21 @@ bool CBinds::CBindsSpecial::OnInput(IInput::CEvent Event)
 		if(Event.m_Flags&IInput::FLAG_PRESS)
 			Stroke = 1;
 
-		m_pBinds->GetConsole()->ExecuteLineStroked(Stroke, m_pBinds->m_aKeyBindings[Event.m_Key].c_str());
+		if(!m_pBinds->m_aKeyBindings[Event.m_Key].line.empty())
+			m_pBinds->GetConsole()->ExecuteLineStroked(Stroke, m_pBinds->m_aKeyBindings[Event.m_Key].line.c_str());
+		
+		if(!m_pBinds->m_aKeyBindings[Event.m_Key].modbinds.empty())
+		{
+			unsigned Mods = Event.GetKeyMods(); 
+			for(const auto& pair : m_pBinds->m_aKeyBindings[Event.m_Key].modbinds)
+			{
+				bool exec = (Mods & pair.first) == pair.first;
+				if(!pair.first) // binds "+key" can only execute when no keymods applied
+					exec = Mods == 0;
+				if(exec)
+					m_pBinds->GetConsole()->ExecuteLineStroked(Stroke, pair.second.c_str());
+			}
+		}
 		return true;
 	}
 
@@ -30,12 +44,49 @@ void CBinds::Bind(int KeyID, const char *pStr)
 	if(KeyID < 0 || KeyID >= KEY_LAST)
 		return;
 
-	m_aKeyBindings[KeyID] = pStr;
+	m_aKeyBindings[KeyID].line = pStr;
 	char aBuf[1024];
-	if(m_aKeyBindings[KeyID].empty())
+	if(m_aKeyBindings[KeyID].line.empty())
 		str_format(aBuf, sizeof(aBuf), "unbound %s (%d)", Input()->KeyName(KeyID), KeyID);
 	else
-		str_format(aBuf, sizeof(aBuf), "bound %s (%d) = %s", Input()->KeyName(KeyID), KeyID, m_aKeyBindings[KeyID].c_str());
+		str_format(aBuf, sizeof(aBuf), "bound %s (%d) = %s", Input()->KeyName(KeyID), KeyID, m_aKeyBindings[KeyID].line.c_str());
+	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
+}
+
+void CBinds::Bind(unsigned KeyID, unsigned KeyMods, const char *pStr)
+{
+	if(KeyID >= KEY_LAST)
+		return;
+
+	std::string * line = NULL;
+	for(auto it = m_aKeyBindings[KeyID].modbinds.begin(), before = m_aKeyBindings[KeyID].modbinds.before_begin();
+	    it != m_aKeyBindings[KeyID].modbinds.end(); before = it, ++it)
+	{
+		if(it->first == KeyMods)
+		{
+			if(pStr[0])
+			{
+				line = &(it->second);
+				*line = pStr;
+			}
+			else // unbind
+				m_aKeyBindings[KeyID].modbinds.erase_after(before);
+			break;
+		}
+	}
+	if(!line && pStr[0])
+	{
+	        m_aKeyBindings[KeyID].modbinds.push_front(std::make_pair(KeyMods, std::string(pStr)));
+		line = &(m_aKeyBindings[KeyID].modbinds.front().second);
+	}
+		
+
+	const std::string KeyName = KeyCombName(KeyID, KeyMods);
+	char aBuf[1024];
+	if(!line)
+		str_format(aBuf, sizeof(aBuf), "unbound %s (%d:%u)", KeyName.c_str(), KeyID, KeyMods);
+	else
+		str_format(aBuf, sizeof(aBuf), "bound %s (%d:%u) = %s", KeyName.c_str(), KeyID, KeyMods, line->c_str());
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 }
 
@@ -49,7 +100,21 @@ bool CBinds::OnInput(IInput::CEvent e)
 	int Stroke = 0;
 	if(e.m_Flags&IInput::FLAG_PRESS)
 		Stroke = 1;
-	Console()->ExecuteLineStroked(Stroke, m_aKeyBindings[e.m_Key].c_str());
+	if(!m_aKeyBindings[e.m_Key].line.empty())
+		Console()->ExecuteLineStroked(Stroke, m_aKeyBindings[e.m_Key].line.c_str());
+
+	if(!m_aKeyBindings[e.m_Key].modbinds.empty())
+	{
+		unsigned Mods = e.GetKeyMods(); 
+		for(const auto& pair : m_aKeyBindings[e.m_Key].modbinds)
+		{
+			bool exec = (Mods & pair.first) == pair.first;
+			if(!pair.first) // binds "+key" can only execute when no keymods applied
+				exec = Mods == 0;
+			if(exec)
+			        Console()->ExecuteLineStroked(Stroke, pair.second.c_str());
+		}
+	}
 	return true;
 }
 
@@ -62,7 +127,7 @@ void CBinds::UnbindAll()
 const char *CBinds::Get(int KeyID)
 {
 	if(KeyID > 0 && KeyID < KEY_LAST)
-		return m_aKeyBindings[KeyID].c_str();
+		return m_aKeyBindings[KeyID].line.c_str();
 	return "";
 }
 
@@ -143,7 +208,8 @@ void CBinds::ConBind(IConsole::IResult *pResult, void *pUserData)
 {
 	CBinds *pBinds = (CBinds *)pUserData;
 	const char *pKeyName = pResult->GetString(0);
-	int id = pBinds->GetKeyID(pKeyName);
+	std::pair<unsigned, unsigned> KeyComb = KeyCombByName(pKeyName);
+	unsigned id = KeyComb.first, keymods = KeyComb.second;
 
 	if(!id)
 	{
@@ -153,7 +219,10 @@ void CBinds::ConBind(IConsole::IResult *pResult, void *pUserData)
 		return;
 	}
 
-	pBinds->Bind(id, pResult->GetString(1));
+	if(!keymods && pKeyName[0] != '+')
+		pBinds->Bind(id, pResult->GetString(1));
+	else
+		pBinds->Bind(id, keymods, pResult->GetString(1));
 }
 
 
@@ -161,7 +230,8 @@ void CBinds::ConUnbind(IConsole::IResult *pResult, void *pUserData)
 {
 	CBinds *pBinds = (CBinds *)pUserData;
 	const char *pKeyName = pResult->GetString(0);
-	int id = pBinds->GetKeyID(pKeyName);
+	std::pair<unsigned, unsigned> KeyComb = KeyCombByName(pKeyName);
+	unsigned id = KeyComb.first, keymods = KeyComb.second;
 
 	if(!id)
 	{
@@ -170,8 +240,11 @@ void CBinds::ConUnbind(IConsole::IResult *pResult, void *pUserData)
 		pBinds->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 		return;
 	}
-
-	pBinds->Bind(id, "");
+	
+	if(!keymods && pKeyName[0] != '+')
+		pBinds->Bind(id, "");
+	else
+		pBinds->Bind(id, keymods, "");
 }
 
 
@@ -190,7 +263,7 @@ void CBinds::ConDumpBinds(IConsole::IResult *pResult, void *pUserData)
 	{
 		if(pBinds->m_aKeyBindings[i].empty())
 			continue;
-		str_format(aBuf, sizeof(aBuf), "%s (%d) = %s", pBinds->Input()->KeyName(i), i, pBinds->m_aKeyBindings[i].c_str());
+		str_format(aBuf, sizeof(aBuf), "%s (%d) = %s", pBinds->Input()->KeyName(i), i, pBinds->m_aKeyBindings[i].line.c_str());
 		pBinds->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 	}
 }
@@ -219,17 +292,16 @@ void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 {
 	CBinds *pSelf = (CBinds *)pUserData;
 
-	char aBuffer[256];
-	char *pEnd = aBuffer+sizeof(aBuffer)-8;
 	pConfig->WriteLine("unbindall");
-	for(int i = 0; i < KEY_LAST; i++)
-	{
-		if(pSelf->m_aKeyBindings[i].empty())
-			continue;
-		str_format(aBuffer, sizeof(aBuffer), "bind %s ", pSelf->Input()->KeyName(i));
+
+	auto write_bind = [] (IConfig *pConfig, const char * key, const char * line) {
+		char aBuffer[1024];
+		char *pEnd = aBuffer+sizeof(aBuffer)-8;
+		
+		str_format(aBuffer, sizeof(aBuffer), "bind %s ", key);
+		const char *pSrc = line;
 
 		// process the string. we need to escape some characters
-		const char *pSrc = pSelf->m_aKeyBindings[i].c_str();
 		char *pDst = aBuffer + str_length(aBuffer);
 		*pDst++ = '"';
 		while(*pSrc && pDst < pEnd)
@@ -241,7 +313,22 @@ void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 		*pDst++ = '"';
 		*pDst++ = 0;
 
-		pConfig->WriteLine(aBuffer);
+		pConfig->WriteLine(aBuffer);		
+	};
+	
+	for(int i = 0; i < KEY_LAST; i++)
+	{
+		if(pSelf->m_aKeyBindings[i].empty())
+			continue;
+
+		if(!pSelf->m_aKeyBindings[i].line.empty())
+			write_bind(pConfig, IInput::KeyName(i), pSelf->m_aKeyBindings[i].line.c_str());
+		
+		for(const auto& pair : pSelf->m_aKeyBindings[i].modbinds)
+		{
+			const std::string key = KeyCombName(i, pair.first);
+			write_bind(pConfig, key.c_str(), pair.second.c_str());
+		}
 	}
 }
 
@@ -249,6 +336,7 @@ void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 
 void CBinds::SetDDRaceBinds(bool FreeOnly)
 {
+	#if 0
 	if(!FreeOnly)
 	{
 		Bind(KEY_KP_PLUS, "zoom+");
@@ -338,4 +426,58 @@ void CBinds::SetDDRaceBinds(bool FreeOnly)
 			Bind(KEY_EQUALS, "spectate_next");
 	}
 		g_Config.m_ClDDRaceBindsSet = 1;
+		#endif
+}
+
+std::pair<unsigned, unsigned> CBinds::KeyCombByName(const std::string& KeyComb) 
+{
+	// parse key combination, e.g. lshift+k; lctrl+lshift+space; +space
+	unsigned Key = 0, Keymods = 0;
+	std::size_t lastidx = 0;
+	std::size_t idx = KeyComb.find_first_of('+', 0);
+	while(idx != std::string::npos)
+	{
+		if(idx == 0) // +key
+		{
+			lastidx = 1;
+			break;
+		}
+		const std::string KeymodName = KeyComb.substr(lastidx, idx - lastidx);
+		for(int i = 1; i < KEYMOD_TOTAL; i++)
+		{
+			if(IInput::KeyName(g_aaKeymods[i][1]) == KeymodName)
+				Keymods |= g_aaKeymods[i][0];
+		}
+		lastidx = idx + 1;
+		idx = KeyComb.find_first_of('+', lastidx);
+	}
+	// guess key name
+	const std::string Name = KeyComb.substr(lastidx);
+	for(int i = 0; i < KEY_LAST; i++)
+	{
+		if(IInput::KeyName(i) == Name)
+		{
+			Key = i;
+			break;
+		}
+	}
+	return std::make_pair(Key, Keymods);
+}
+
+std::string CBinds::KeyCombName(unsigned Key, unsigned Keymods)
+{
+	// generate key combination
+	std::string result;
+	for(int i = 1; i < KEYMOD_TOTAL; i++)
+	{
+		if((Keymods & g_aaKeymods[i][0]) == g_aaKeymods[i][0])
+		{
+			result += IInput::KeyName(g_aaKeymods[i][1]);
+			result += '+';
+		}
+	}
+	if(result.empty())
+		result += '+';
+	result += IInput::KeyName(Key);
+	return result;
 }

@@ -4,8 +4,10 @@
 #define ENGINE_INPUT_H
 
 #include "kernel.h"
+#include "keys.h"
 
-extern const char g_aaKeyStrings[512][16];
+extern const char * g_aaKeyStrings[KEY_LAST];
+extern const unsigned g_aaKeymods[KEYMOD_TOTAL][2];
 
 class IInput : public IInterface
 {
@@ -36,9 +38,9 @@ protected:
 	{
 		unsigned char m_Presses;
 		unsigned char m_Releases;
-	} m_aInputCount[2][1024];
+	} m_aInputCount[2][KEY_LAST];
 
-	unsigned char m_aInputState[2][1024];
+	unsigned char m_aInputState[2][KEY_LAST];
 	int m_InputCurrent;
 	bool m_InputDispatched;
 
@@ -76,11 +78,11 @@ public:
 	}
 
 	// keys
-	int KeyPressed(int Key) { return m_aInputState[m_InputCurrent][Key]; }
-	int KeyReleases(int Key) { return m_aInputCount[m_InputCurrent][Key].m_Releases; }
-	int KeyPresses(int Key) { return m_aInputCount[m_InputCurrent][Key].m_Presses; }
-	int KeyDown(int Key) { return KeyPressed(Key)&&!KeyWasPressed(Key); }
-	const char *KeyName(int Key) { return (Key >= 0 && Key < 512) ? g_aaKeyStrings[Key] : g_aaKeyStrings[0]; }
+	int KeyPressed(unsigned Key) { return (Key < KEY_LAST) ? m_aInputState[m_InputCurrent][Key] : 0; }
+	int KeyReleases(unsigned Key) { return (Key < KEY_LAST) ? m_aInputCount[m_InputCurrent][Key].m_Releases : 0; }
+	int KeyPresses(unsigned Key) { return (Key < KEY_LAST) ? m_aInputCount[m_InputCurrent][Key].m_Presses : 0; }
+	int KeyDown(unsigned Key) { return (Key < KEY_LAST) ? (KeyPressed(Key)&&!KeyWasPressed(Key)) : 0; }
+	static const char *KeyName(unsigned Key) { return (Key < KEY_LAST) ? g_aaKeyStrings[Key] : g_aaKeyStrings[0]; }
 
 	//
 	virtual void MouseModeRelative() = 0;
