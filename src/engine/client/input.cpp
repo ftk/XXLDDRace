@@ -181,14 +181,15 @@ int CInput::Update()
 					// fall through
 				case SDL_MOUSEBUTTONDOWN:
 					if(Event.button.button == SDL_BUTTON_LEFT) Key = KEY_MOUSE_1; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_RIGHT) Key = KEY_MOUSE_2; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_MIDDLE) Key = KEY_MOUSE_3; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_WHEELUP) Key = KEY_MOUSE_WHEEL_UP; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_WHEELDOWN) Key = KEY_MOUSE_WHEEL_DOWN; // ignore_convention
-					if(Event.button.button == 6) Key = KEY_MOUSE_6; // ignore_convention
-					if(Event.button.button == 7) Key = KEY_MOUSE_7; // ignore_convention
-					if(Event.button.button == 8) Key = KEY_MOUSE_8; // ignore_convention
-					if(Event.button.button == 9) Key = KEY_MOUSE_9; // ignore_convention
+					else if(Event.button.button == SDL_BUTTON_RIGHT) Key = KEY_MOUSE_2; // ignore_convention
+					else if(Event.button.button == SDL_BUTTON_MIDDLE) Key = KEY_MOUSE_3; // ignore_convention
+					else if(Event.button.button == SDL_BUTTON_WHEELUP) Key = KEY_MOUSE_WHEEL_UP; // ignore_convention
+					else if(Event.button.button == SDL_BUTTON_WHEELDOWN) Key = KEY_MOUSE_WHEEL_DOWN; // ignore_convention
+					else if(Event.button.button == 6) Key = KEY_MOUSE_6; // ignore_convention
+					else if(Event.button.button == 7) Key = KEY_MOUSE_7; // ignore_convention
+					else if(Event.button.button == 8) Key = KEY_MOUSE_8; // ignore_convention
+					else if(Event.button.button == 9) Key = KEY_MOUSE_9; // ignore_convention
+					Action = SetKeyMods(Action, SDL_GetModState());
 					break;
 
 				// other messages
