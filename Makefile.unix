@@ -1,0 +1,50 @@
+ARCH ?= 64
+CPPFLAGS := -m$(ARCH) -flto -O3 -mfpmath=both -mavx -pipe -fno-exceptions -fvisibility=internal \
+-Wall -DCONF_RELEASE -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" $(shell sdl-config --cflags) $(shell freetype-config --cflags)
+CXXFLAGS := -std=c++11 -fno-rtti
+CFLAGS :=
+LDFLAGS := -m$(ARCH) -flto -O3 -s
+
+CC := gcc
+CXX := g++
+LD := $(CXX)
+PYTHON ?= python
+
+
+all: XXLDDRace XXLDDRace-Server versionsrv mastersrv banmaster
+
+include common.mk
+
+generated := $(generated_h) $(generated_cpp)
+
+
+.PHONY: all clean distclean
+
+
+clean:
+	-rm $(sort $(all_objs) XXLDDRace XXLDDRace-Server)
+distclean: clean
+	-rm $(generated)
+	-rm -rf objs/
+
+
+
+
+# rules for target files
+
+XXLDDRace: $(client_objs)
+	$(LD) $(LDFLAGS) -o '$@' $^ -lpthread -lX11 -lGL -lGLU $(shell freetype-config --libs) $(shell sdl-config --libs)
+
+XXLDDRace-Server: $(server_objs)
+	$(LD) $(LDFLAGS) -o '$@' $^ -lpthread 
+
+#versionsrv: $(versionsrv_objs)
+#	$(LD) $(LDFLAGS) -o '$@' $^
+#mastersrv: $(mastersrv_objs)
+#	$(LD) $(LDFLAGS) -o '$@' $^
+#banmaster: $(banmaster_objs)
+#	$(LD) $(LDFLAGS) -o '$@' $^
+.SECONDEXPANSION:
+versionsrv mastersrv banmaster: $$($$(patsubst %,%_objs,$$@))
+	$(LD) $(LDFLAGS) -o '$@' $^ -lpthread
+

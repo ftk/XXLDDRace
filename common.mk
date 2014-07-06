@@ -1,21 +1,11 @@
-ARCH ?= 64
-CPPFLAGS := -m$(ARCH) -flto -O3 -mfpmath=both -mavx -mpclmul -pipe -fno-exceptions -fvisibility=internal \
--Wall -DCONF_RELEASE -DNO_VIZ -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" -I "other/sdl/include" -I "other/freetype/include"
-CXXFLAGS := -std=c++11 -fno-rtti
-CFLAGS :=
-LDFLAGS := -m$(ARCH) -flto -O3 -s -static-libgcc -static-libstdc++
-
-CC := gcc
-CXX := g++
-LD := $(CXX)
-PYTHON ?= python
-WINDRES ?= windres
 
 srcs_to_objs = $(patsubst src/%.c,objs/%.o,$(patsubst src/%.cpp,objs/%.o,$(1)))
 def_objs_var = $(1)_objs := $(call srcs_to_objs,$($(1)_srcs))
+srcs_to_deps = $(patsubst src/%.c,objs/%.d,$(patsubst src/%.cpp,objs/%.d,$(1)))
+def_deps_var = $(1)_deps := $(call srcs_to_deps,$($(1)_srcs))
 
+# define source dirs and files
 
-headers := $(wildcard src/engine/external/wavpack/*.h src/engine/external/zlib/*.h src/engine/external/pnglite/*.h src/engine/external/md5/*.h src/engine/shared/*.h src/base/*.h src/base/tl/*.h src/game/*.h)
 
 wavpack := $(wildcard src/engine/external/wavpack/*.c)
 zlib := $(wildcard src/engine/external/zlib/*.c)
@@ -38,8 +28,6 @@ banmaster := $(wildcard src/banmaster/*.cpp)
 
 generated_h := src/game/generated/protocol.h src/game/generated/server_data.h src/game/generated/client_data.h src/game/generated/nethash.cpp
 generated_cpp := src/game/generated/protocol.cpp src/game/generated/server_data.cpp src/game/generated/client_data.cpp 
-generated := $(generated_h) $(generated_cpp) other/icons/teeworlds_srv_gcc.coff other/icons/teeworlds_gcc.coff
-
 
 
 targets := client server versionsrv mastersrv banmaster
@@ -50,36 +38,31 @@ versionsrv_srcs := $(engine) $(versionsrv)
 mastersrv_srcs := $(engine) $(mastersrv)
 banmaster_srcs := $(engine) $(banmaster)
 
+# define obj files and dep files
 
 # client_objs = client_srcs (.cpp, .c -> .o)
 $(foreach var,$(targets),$(eval $(call def_objs_var,$(strip $(var)))))
+# client_deps = client_srcs (.cpp, .c -> .d)
+$(foreach var,$(targets),$(eval $(call def_deps_var,$(strip $(var)))))
 
 all_objs := $(foreach var,$(targets),$($(addsuffix _objs,$(var))))
+all_deps := $(foreach var,$(targets),$($(addsuffix _deps,$(var))))
 
-all: XXLDDRace.exe XXLDDRace-Server.exe versionsrv.exe mastersrv.exe banmaster.exe
 
-XXLDDRace.exe: $(client_objs) other/icons/teeworlds_gcc.coff
-	$(LD) $(LDFLAGS) -o '$@' $^ -Lother/sdl/lib$(ARCH) -Lother/freetype/lib$(ARCH) -lws2_32 -lgdi32 -lopengl32 -lglu32 -lfreetype -lSDL -lSDLmain
+###
 
-XXLDDRace-Server.exe: $(server_objs) other/icons/teeworlds_srv_gcc.coff
-	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
-
-#versionsrv.exe: $(versionsrv_objs)
-#	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
-#mastersrv.exe: $(mastersrv_objs)
-#	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
-#banmaster.exe: $(banmaster_objs)
-#	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+# prereqs for all objs
+# mkdir if needed
 .SECONDEXPANSION:
-versionsrv.exe mastersrv.exe banmaster.exe: $$($$(patsubst %.exe,%_objs,$$@))
-	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+$(all_objs): $(generated_h) | $$(dir $$@)
+
+# rules for obj dirs
+$(sort $(dir $(all_objs))):
+	mkdir -p '$@'
 
 
-# all objs depend on headers
-$(all_objs): $(generated_h) $(headers)
 
-clean:
-	-rm $(sort $(all_objs) XXLDDRace.exe XXLDDRace-Server.exe $(generated) )
+# rules for generating source and headers
 
 src/game/generated/protocol.h:
 	$(PYTHON) datasrc/compile.py network_header > $@
@@ -97,14 +80,19 @@ src/game/generated/client_data.cpp:
 	$(PYTHON) datasrc/compile.py client_content_source > $@
 
 # rules for c, cpp files
+
+# light
+#objs/%.o: src/%.c
+#	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o '$@' '$<'
+
+# pro (generate dependencies)
 objs/%.o: src/%.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o '$@' '$<'
+	$(CC) -MMD -MP -c $(CPPFLAGS) $(CFLAGS) -o '$@' '$<'
 objs/%.o: src/%.cpp
-	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o '$@' '$<'
+	$(CXX) -MMD -MP -c $(CPPFLAGS) $(CXXFLAGS) -o '$@' '$<'
 
-%.coff: %.rc
-	$(WINDRES) -i $< -o $@
+# dependencies for source files
 
-
-
-.PHONY: all clean
+ifndef fast
+-include $(all_deps)
+endif

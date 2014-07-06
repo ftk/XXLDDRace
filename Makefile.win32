@@ -1,0 +1,4 @@
+
+ARCH := 32
+
+include Makefile.win64
