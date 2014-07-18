@@ -2186,12 +2186,12 @@ void CGameContext::OnPostSnap()
 
 bool CGameContext::IsClientReady(int ClientID)
 {
-	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_IsReady ? true : false;
+	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_IsReady;
 }
 
 bool CGameContext::IsClientPlayer(int ClientID)
 {
-	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS ? false : true;
+	return m_apPlayers[ClientID] && !(m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS || m_apPlayers[ClientID]->m_Paused >= CPlayer::PAUSED_PAUSED);
 }
 
 const char *CGameContext::GameType() { return m_pController && m_pController->m_pGameType ? m_pController->m_pGameType : ""; }
