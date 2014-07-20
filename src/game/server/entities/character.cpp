@@ -300,9 +300,7 @@ void CCharacter::FireWeapon()
 	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 
 	bool FullAuto = false;
-	if(m_FastReload && (m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_RIFLE || m_ActiveWeapon == WEAPON_HAMMER||m_ActiveWeapon == WEAPON_GUN))
-			FullAuto = true;
-	if(m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_RIFLE)
+	if(m_FastReload || m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_RIFLE)
 		FullAuto = true;
 
 
@@ -317,8 +315,8 @@ void CCharacter::FireWeapon()
 	if(!WillFire)
 		return;
 
-	// check for ammo
-	if(!m_aWeapons[m_ActiveWeapon].m_Ammo)
+	// check if in freeze (allow pistol to be fired anyway)
+	if(!m_aWeapons[m_ActiveWeapon].m_Ammo && m_ActiveWeapon != WEAPON_GUN)
 	{
 		/*// 125ms is a magical limit of how fast a human can click
 		m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
@@ -1066,9 +1064,7 @@ void CCharacter::Snap(int SnappingClient)
 	{
 		pCharacter->m_Health = m_Health;
 		pCharacter->m_Armor = m_Armor;
-		if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
-			//pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
-			pCharacter->m_AmmoCount = (!m_FreezeTime)?m_aWeapons[m_ActiveWeapon].m_Ammo:0;
+		pCharacter->m_AmmoCount = (!m_FreezeTime)?abs(m_aWeapons[m_ActiveWeapon].m_Ammo):0;
 	}
 
 	if(pCharacter->m_Emote == EMOTE_NORMAL)
