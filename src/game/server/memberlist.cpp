@@ -11,7 +11,6 @@
 #include <fstream>
 
 
-static LOCK gs_MemberLock = 0;
 
 std::string SaveMemberFile()
 {
@@ -27,25 +26,18 @@ CMemberList::CPlayerMember::CPlayerMember(const char *pName, const char *pPass, 
 
 CMemberList::CMemberList(CGameContext *pGameServer) : m_pGameServer(pGameServer), m_pServer((CServer*)pGameServer->Server())
 {
-	if(gs_MemberLock == 0)
-		gs_MemberLock = lock_create();
-
 	Init();
 }
 
 CMemberList::~CMemberList()
 {
-	lock_wait(gs_MemberLock);
-
 	// clear list
 	m_List.clear();
-
-	lock_release(gs_MemberLock);
 }
 
 void CMemberList::Init()
 {
-	lock_wait(gs_MemberLock);
+	m_List.clear();
 	std::ifstream f("MemberList.dtb");
 
 	while(!f.eof() && !f.fail())
@@ -60,13 +52,11 @@ void CMemberList::Init()
 		}
 	}
 	f.close();
-	lock_release(gs_MemberLock);
 }
 
 void CMemberList::SaveListThread(void *pUser)
 {
 	CMemberList *pSelf = (CMemberList *)pUser;
-	lock_wait(gs_MemberLock);
 	std::ofstream f("MemberList.dtb");
 
 	if(!f.fail())
@@ -76,24 +66,14 @@ void CMemberList::SaveListThread(void *pUser)
 		{
 			f << r.front().m_aName << std::endl << r.front().m_aPass << std::endl << r.front().m_AuthLvl << std::endl;
 			t++;
-			//if(t%50 == 0)
-				//thread_sleep(1);
 		}
 	}
 	f.close();
-	lock_release(gs_MemberLock);
 }
 
 void CMemberList::Save()
 {
-/*
-	void *pSaveThread = thread_create(SaveListThread, this);
-#if defined(CONF_FAMILY_UNIX)
-	pthread_detach((pthread_t)pSaveThread);
-#endif
-	*/
 	SaveListThread(this);
-
 }
 
 CMemberList::CPlayerMember *CMemberList::SearchName(const char *pName, int *pPosition, bool NoCase)
@@ -130,7 +110,6 @@ CMemberList::CPlayerMember *CMemberList::SearchName(const char *pName, int *pPos
 void CMemberList::UpdatePlayer(int ClientID, const char* pPass, int AuthLvl)
 {
 	const char *pName = Server()->ClientName(ClientID);
-	lock_wait(gs_MemberLock);
 	CPlayerMember *pPlayer = SearchList(ClientID, 0);
 
 	if(pPlayer)
@@ -144,7 +123,6 @@ void CMemberList::UpdatePlayer(int ClientID, const char* pPass, int AuthLvl)
 	else
 		m_List.add(CPlayerMember(pName, pPass, AuthLvl));
 
-	lock_release(gs_MemberLock);
 	Save();
 }
 
@@ -156,8 +134,6 @@ void CMemberList::LoadMember(int ClientID, CGameContext *pSelf)
 	{
 		if (pSelf->m_apPlayers[ClientID]->m_Authed > pPlayer->m_AuthLvl && pSelf->m_apPlayers[ClientID]->m_Authed != 0)
 			pPlayer->m_AuthLvl = pSelf->m_apPlayers[ClientID]->m_Authed;
-		lock_wait(gs_MemberLock);
-		lock_release(gs_MemberLock);
 		Save();
 
 		// set Level

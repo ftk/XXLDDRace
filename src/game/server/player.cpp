@@ -67,13 +67,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	int dd, mm, yy;
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	/*
-	strftime (d,sizeof(y),"%d",timeinfo);
-	strftime (m,sizeof(m),"%m",timeinfo);
-	strftime (y,sizeof(y),"%Y",timeinfo);
-	dd = atoi(d);
-	mm = atoi(m);
-	yy = atoi(y);*/
+        
 	dd = timeinfo->tm_mday;
 	mm = timeinfo->tm_mon + 1;
 	yy = 1900 + timeinfo->tm_year;
@@ -103,7 +97,6 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_LastRainbow = 0;
 	m_Helped = 0;
 	m_Invisible = false;
-	m_LastLogin = 0;
 }
 
 CPlayer::~CPlayer()

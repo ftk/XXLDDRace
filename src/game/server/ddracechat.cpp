@@ -1119,32 +1119,17 @@ void CGameContext::ConJumps(IConsole::IResult *pResult, void *pUserData)
 
 void CGameContext::ConRegister(IConsole::IResult *pResult, void *pUserData)
 {
-	if(!CheckClientID(pResult->GetInteger(0))) return;
+	if(!CheckClientID(pResult->m_ClientID)) return;
 	CGameContext *pSelf = (CGameContext *)pUserData;
-
-	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->GetInteger(0)];
-	if(!pPlayer)
-		return;
 
 	pSelf->MemberList->Register(pResult->m_ClientID, pResult->GetString(0), pSelf);
 }
 
 void CGameContext::ConLogin(IConsole::IResult *pResult, void *pUserData)
 {
-	if(!CheckClientID(pResult->GetInteger(0))) return;
+	if(!CheckClientID(pResult->m_ClientID)) return;
 	CGameContext *pSelf = (CGameContext *)pUserData;
 
-	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->GetInteger(0)];
-	if(!pPlayer)
-		return;
-
-	if(pPlayer->m_LastLogin + 5 * pSelf->Server()->TickSpeed() - pSelf->Server()->Tick() > 0)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You can login every 5 seconds only");
-		return;
-	}
-
-	pPlayer->m_LastLogin = pSelf->Server()->Tick();
 	pSelf->MemberList->Login(pResult->m_ClientID, pResult->GetString(0), pSelf);
 }
 
