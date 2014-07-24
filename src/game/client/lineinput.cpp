@@ -73,6 +73,7 @@ bool CLineInput::Manipulate(IInput::CEvent e, char *pStr, int StrMaxSize, int *p
 			mem_move(pStr, pStr+CursorPos, Len - CursorPos + 1); // +1 == null term
 			Len -= CursorPos;
 			CursorPos = 0;
+			Changes = true;
 		}
 		else if (k == KEY_DELETE && CursorPos < Len)
 		{
@@ -100,6 +101,21 @@ bool CLineInput::Manipulate(IInput::CEvent e, char *pStr, int StrMaxSize, int *p
 			CursorPos = 0;
 		else if (k == KEY_END)
 			CursorPos = Len;
+		// ctrl+v -- paste
+		else if(k == KEY_v && e.GetKeyMods()&(KEYMOD_LCTRL|KEYMOD_RCTRL))
+		{
+			char aBuf[MAX_SIZE];
+			str_copy(aBuf, pStr + CursorPos, sizeof(aBuf));
+			int size = get_clipboard_data(pStr + CursorPos, MAX_SIZE - CursorPos);
+			if(size >= 0 && size < MAX_SIZE - CursorPos) // success
+			{
+				CursorPos += size;
+				Len += size;
+				str_copy(pStr + CursorPos, aBuf, MAX_SIZE - CursorPos);
+			}
+			Changes = true;
+		}
+
 	}
 
 	*pCursorPosPtr = CursorPos;
