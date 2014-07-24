@@ -188,7 +188,7 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 
 		// find the current command
 		{
-			char aBuf[64] = {0};
+			char aBuf[64];
 			const char *pSrc = GetString();
 			int i = 0;
 			for(; i < (int)sizeof(aBuf)-1 && *pSrc && *pSrc != ' '; i++, pSrc++)
@@ -214,8 +214,8 @@ void CGameConsole::CInstance::PrintLine(const char *pLine)
 {
 	int Len = str_length(pLine);
 
-	if (Len > 255)
-		Len = 255;
+	if(Len > 511)
+		Len = 511;
 
 	CBacklogEntry *pEntry = m_Backlog.Allocate(sizeof(CBacklogEntry)+Len);
 	pEntry->m_YOffset = -1.0f;
@@ -438,7 +438,7 @@ void CGameConsole::OnRender()
 		x = Cursor.m_X;
 
 		//hide rcon password
-		char aInputString[256];
+		char aInputString[CLineInput::MAX_SIZE];
 		str_copy(aInputString, pConsole->m_Input.GetString(), sizeof(aInputString));
 		if(m_ConsoleType == CONSOLETYPE_REMOTE && Client()->State() == IClient::STATE_ONLINE && !Client()->RconAuthed())
 		{
