@@ -1,8 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
-#include <base/tl/string.h>
-
 #include <engine/engine.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
@@ -18,13 +16,6 @@
 #include <game/client/components/scoreboard.h>
 #include <game/client/components/sounds.h>
 #include <game/localization.h>
-
-#if defined(CONF_FAMILY_WINDOWS)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#elif defined(CONF_FAMILY_UNIX)
-#include <stdio.h>
-#endif
 
 #include "chat.h"
 
