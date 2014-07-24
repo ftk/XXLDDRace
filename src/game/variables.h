@@ -57,6 +57,9 @@ MACRO_CONFIG_INT(UiColorAlpha, ui_color_alpha, 228, 0, 255, CFGFLAG_CLIENT|CFGFL
 
 MACRO_CONFIG_INT(GfxNoclip, gfx_noclip, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Disable clipping")
 
+MACRO_CONFIG_INT(UiMonospaceChat, ui_monospace_chat, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Monospace font in chat")
+MACRO_CONFIG_INT(UiBgChat, ui_bg_chat, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Dark background for the chat box")
+
 // server
 MACRO_CONFIG_INT(SvWarmup, sv_warmup, 0, 0, 0, CFGFLAG_SERVER, "Number of seconds to do warmup before round starts")
 MACRO_CONFIG_STR(SvMotd, sv_motd, 900, "", CFGFLAG_SERVER, "Message of the day to display for the clients")

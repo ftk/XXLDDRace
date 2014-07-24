@@ -45,8 +45,8 @@ $(foreach var,$(targets),$(eval $(call def_objs_var,$(strip $(var)))))
 # client_deps = client_srcs (.cpp, .c -> .d)
 $(foreach var,$(targets),$(eval $(call def_deps_var,$(strip $(var)))))
 
-all_objs := $(foreach var,$(targets),$($(addsuffix _objs,$(var))))
-all_deps := $(foreach var,$(targets),$($(addsuffix _deps,$(var))))
+all_objs := $(sort $(foreach var,$(targets),$($(addsuffix _objs,$(var)))))
+all_deps := $(sort $(foreach var,$(targets),$($(addsuffix _deps,$(var)))))
 
 
 ###

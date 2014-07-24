@@ -135,6 +135,10 @@ bool CChat::OnInput(IInput::CEvent Event)
 				AddEntry = true;
 			}
 
+			// don't add to history if it is the same as last line
+			if(AddEntry && m_History.Last() && str_comp(m_History.Last()->m_aText, m_Input.GetString()) == 0)
+				AddEntry = false;
+
 			if(AddEntry)
 			{
 				CHistoryEntry *pEntry = m_History.Allocate(sizeof(CHistoryEntry)+m_Input.GetLength());
@@ -358,7 +362,7 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 
 void CChat::AddLine(int ClientID, int Team, const char *pLine)
 {
-	if(!m_pFont)
+	if(!m_pFont && g_Config.m_UiMonospaceChat)
 	{
 		char aFilename[512];
 		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSansMono.ttf", IOFLAG_READ, IStorage::TYPE_ALL, aFilename, sizeof(aFilename));
@@ -547,7 +551,7 @@ void CChat::OnRender()
 	const int OffsetType = m_pClient->m_pScoreboard->Active() ? 1 : 0;
 
 	// draw chatbox
-	if(m_ChatboxHeight && m_ChatboxWidth > Begin)
+	if(g_Config.m_UiBgChat && m_ChatboxHeight && m_ChatboxWidth > Begin)
 	{
 		Graphics()->TextureSet(-1);
 		Graphics()->QuadsBegin();
