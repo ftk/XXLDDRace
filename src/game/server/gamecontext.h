@@ -368,6 +368,10 @@ public:
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
 
+	static CPlayerRescueState GetPlayerState(CCharacter * pChar);
+	static void ApplyPlayerState(const CPlayerRescueState& state, CCharacter * pChar);
+
+
 };
 
 inline int CmaskAll() { return -1; }

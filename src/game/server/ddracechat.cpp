@@ -1194,17 +1194,17 @@ void CGameContext::ConSolo(IConsole::IResult *pResult, void *pUserData)
 
 void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 {
-    CGameContext *pSelf = (CGameContext *) pUserData;
+	CGameContext *pSelf = (CGameContext *) pUserData;
     
-    int to = pResult->GetInteger(0);
+	int to = pResult->GetInteger(0);
     
-    if (!CheckClientID(to))
-        return;
-    if(CheckClientID(pResult->m_ClientID) && pSelf->ProcessSpamProtection(pResult->m_ClientID))
-    	return;
+	if(!CheckClientID(to))
+		return;
+	if(CheckClientID(pResult->m_ClientID) && pSelf->ProcessSpamProtection(pResult->m_ClientID))
+		return;
     
-    char message[256] = "<PM>: ";
-    str_append(message, pResult->GetString(1), sizeof(message) / sizeof(message[0]));
+	char message[512] = "<PM>: ";
+	str_append(message, pResult->GetString(1), sizeof(message));
     
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Team = 1;
@@ -1215,61 +1215,37 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 	if(CheckClientID(pResult->m_ClientID))
 	{
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pResult->m_ClientID);
-		str_format(message, sizeof(message) / sizeof(message[0]), "\"%s\" -> \"%s\" : %s", 
-			pSelf->Server()->ClientName(pResult->m_ClientID),
-			pSelf->Server()->ClientName(to),
-			pResult->GetString(1));
+		str_format(message, sizeof(message), "\"%s\" -> \"%s\" : %s", 
+			   pSelf->Server()->ClientName(pResult->m_ClientID),
+			   pSelf->Server()->ClientName(to),
+			   pResult->GetString(1));
 
 	}
 	else
 	{
-		str_format(message, sizeof(message) / sizeof(message[0]), "%d -> \"%s\" : %s", 
-			pResult->m_ClientID,
-			pSelf->Server()->ClientName(to),
-			pResult->GetString(1));
+		str_format(message, sizeof(message), "%d -> \"%s\" : %s", 
+			   pResult->m_ClientID,
+			   pSelf->Server()->ClientName(to),
+			   pResult->GetString(1));
 	}
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "pmchat", message);
 }
 
 void CGameContext::ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData)
-{
-    CGameContext *pSelf = (CGameContext *) pUserData;
-    const int ClientID = pResult->m_ClientID;
-    CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
-    if(!pChar)
-    	return;
-    auto iterator = pSelf->m_SavedPlayers.find(pSelf->Server()->ClientName(ClientID));
-    if(iterator == pSelf->m_SavedPlayers.end())
-    	return;
+{ 
+	CGameContext *pSelf = (CGameContext *) pUserData;
+	const int ClientID = pResult->m_ClientID;
+	CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
+	if(!pChar)
+		return;
+	auto iterator = pSelf->m_SavedPlayers.find(pSelf->Server()->ClientName(ClientID));
+	if(iterator == pSelf->m_SavedPlayers.end())
+		return;
     
 	CPlayerRescueState& state = iterator->second;
 	if(state.Pos == vec2(0.f, 0.f))
 		return;
-	
-	pChar->Core()->m_Pos = pChar->m_PrevPos = pChar->m_Pos = state.Pos;
-	pChar->Core()->m_Vel = vec2(0.f, 0.f);
-	pChar->m_StartTime = state.StartTime;
-	pChar->m_DDRaceState = state.DDState;
-	pChar->m_ChrTuning = state.Tuning;
-	pChar->m_EndlessHook = state.EndlessHook;
-	pChar->m_DeepFreeze = state.DeepFreeze;
-	pChar->m_Hit = state.Hit;
-	pChar->m_RescueOverride = state.RescueOverride;
-	pChar->m_Super = false;
-	pChar->m_FastReload = false;
-	pChar->m_RescuePos = vec2(0.f, 0.f);
-	pChar->m_LastRescueSave = 0;
-	pChar->ResetInput();
-	pChar->SetWeaponGot(WEAPON_NINJA, false);
-	pChar->SetWeapon(WEAPON_GUN);
-	
-	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
-	{
-		pChar->SetWeaponGot(i, false);
-		pChar->SetWeaponAmmo(i, 0);
-		if(state.WFlags & (1U << i))
-			pChar->GiveWeapon(i, -1);
-	}
+	ApplyPlayerState(state, pChar);
 	pSelf->m_SavedPlayers.erase(iterator);
 }
 
@@ -1278,9 +1254,9 @@ void CGameContext::ConCopy(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	const int ClientID = pResult->m_ClientID;
 
-    const int ToCopy = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
+	const int ToCopy = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
 
-    if(!CheckClientID(ClientID))
-        return;
-    pSelf->m_aInputCopy[ClientID] = (CheckClientID(ToCopy) && ClientID != ToCopy) ? ToCopy : -1;
+	if(!CheckClientID(ClientID))
+		return;
+	pSelf->m_aInputCopy[ClientID] = (CheckClientID(ToCopy) && ClientID != ToCopy) ? ToCopy : -1;
 }

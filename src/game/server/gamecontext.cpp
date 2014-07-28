@@ -780,21 +780,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 		CCharacter * pChar = GetPlayerChar(ClientID);
 		if(pChar && (!pChar->Team() || (pChar->Team() >= 10 && pChar->Team() <= 15)))
 		{
-			CPlayerRescueState state;
-			
-			state.Pos = pChar->m_RescuePos;
-			state.StartTime = pChar->m_StartTime;
-			state.DDState = pChar->m_DDRaceState;
-			state.WFlags = 0;
-			state.Tuning = pChar->m_ChrTuning;
-			for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
-				if(pChar->GetWeaponGot(i))
-					state.WFlags |= (1U << i);
-			state.EndlessHook = pChar->m_EndlessHook;
-			state.DeepFreeze = pChar->m_DeepFreeze;
-			state.Hit = pChar->m_Hit;
-			state.RescueOverride = pChar->m_RescueOverride;
-			m_SavedPlayers[Server()->ClientName(ClientID)] = state;
+		        m_SavedPlayers[Server()->ClientName(ClientID)] = GetPlayerState(pChar);
 		}
 	}
 	
@@ -2342,3 +2328,51 @@ void CGameContext::ResetTuning()
 	Tuning()->Set("shotgun_curvature", 0);
 	SendTuningParams(-1);
 }
+
+CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar)
+{
+	CPlayerRescueState state;
+			
+	state.Pos = pChar->m_DeepFreeze ? pChar->m_Pos : pChar->m_RescuePos;
+	state.StartTime = pChar->m_StartTime;
+	state.DDState = pChar->m_DDRaceState;
+	state.Tuning = pChar->m_ChrTuning;
+	state.WFlags = 0;
+	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+		if(pChar->GetWeaponGot(i))
+			state.WFlags |= (1U << i);
+	state.EndlessHook = pChar->m_EndlessHook;
+	state.DeepFreeze = pChar->m_DeepFreeze;
+	state.Hit = pChar->m_Hit;
+	state.RescueOverride = pChar->m_RescueOverride;
+	return state;
+}
+
+void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter * pChar)
+{
+	pChar->Core()->m_Pos = pChar->m_PrevPos = pChar->m_Pos = state.Pos;
+	pChar->Core()->m_Vel = vec2(0.f, 0.f);
+	pChar->m_StartTime = state.StartTime;
+	pChar->m_DDRaceState = state.DDState;
+	pChar->m_ChrTuning = state.Tuning;
+	pChar->m_EndlessHook = state.EndlessHook;
+	pChar->m_DeepFreeze = state.DeepFreeze;
+	pChar->m_Hit = state.Hit;
+	pChar->m_RescueOverride = state.RescueOverride;
+	pChar->m_Super = false;
+	pChar->m_FastReload = false;
+	pChar->m_RescuePos = vec2(0.f, 0.f);
+	pChar->m_LastRescueSave = 0;
+	pChar->ResetInput();
+	pChar->SetWeaponGot(WEAPON_NINJA, false);
+	pChar->SetWeapon(WEAPON_GUN);
+	
+	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+	{
+		pChar->SetWeaponGot(i, false);
+		pChar->SetWeaponAmmo(i, 0);
+		if(state.WFlags & (1U << i))
+			pChar->GiveWeapon(i, -1);
+	}
+}
+
