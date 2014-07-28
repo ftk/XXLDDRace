@@ -1318,7 +1318,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 						pChr->SetEmoteType(EMOTE_NORMAL);
 						break;
 				}
-				pChr->SetEmoteStop(Server()->Tick() + 2 * Server()->TickSpeed());
+				pChr->SetEmoteStop(Server()->Tick() + 4 * Server()->TickSpeed());
+				if(pMsg->m_Emoticon == EMOTICON_ZOMG) // create crying sound
+					CreateSound(pChr->m_Pos, SOUND_TEE_CRY, pChr->Teams()->TeamMask(pChr->Team(), -1, ClientID));
 			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_KILL && !m_World.m_Paused)
