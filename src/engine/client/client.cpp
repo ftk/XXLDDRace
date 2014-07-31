@@ -2496,7 +2496,8 @@ void CClient::InputListeningThread(void * pClient)
 	while(!feof(stdin) && !ferror(stdin))
 	{
 		char buffer[1024];
-		fgets(buffer, sizeof(buffer), stdin);
+		if(!fgets(buffer, sizeof(buffer), stdin))
+			break;
 		
 		scope_lock l(&QLock);
 		pSelf->m_MsgQ.push(buffer);
