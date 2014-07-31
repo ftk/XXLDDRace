@@ -112,7 +112,8 @@ void sort_quick(R range)
 template<class R>
 void sort(R range)
 {
-	std::sort(&range.front(), &range.back());
+	if(range.size() > 0)
+		std::sort(&range.front(), &range.back());
 }
 
 
