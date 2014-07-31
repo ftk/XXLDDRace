@@ -357,6 +357,7 @@ public:
 	struct CPlayerRescueState
 	{
 		vec2 Pos;
+		vec2 RescuePos;
 		int StartTime;
 		int DDState;
 		unsigned WFlags;
