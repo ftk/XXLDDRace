@@ -1046,7 +1046,7 @@ void CMenus::RenderSettings(CUIRect MainView)
 void CMenus::RenderSettingsDDRace(CUIRect MainView)
 
 {
-	CUIRect Button;
+	CUIRect Button, MapBckgCol;
 	MainView.VSplitLeft(300.0f, &MainView, 0);
 
 	MainView.HSplitTop(20.0f, &Button, &MainView);
@@ -1130,5 +1130,56 @@ void CMenus::RenderSettingsDDRace(CUIRect MainView)
 	{
 		g_Config.m_ClShowhudHealthAmmo ^= 1;
 	}
+	
+	MainView.HSplitBottom(120.0f, &MainView, &MapBckgCol);
+	RenderTools()->DrawUIRect(&MapBckgCol, vec4(1,1,1,0.25f), CUI::CORNER_ALL, 5.0f);
+	MapBckgCol.Margin(10.0f, &MapBckgCol);	
+	TextRender()->Text(0, MapBckgCol.x, MapBckgCol.y-5, 18, Localize("Map background"), -1);
+	MapBckgCol.HSplitBottom(90.0f, 0, &MapBckgCol);
+	
+	// Map background
+	{
+		CUIRect Label;
+		MapBckgCol.VSplitLeft(10.0f, 0, &MapBckgCol);
 
+		int *pColor;
+		pColor = &g_Config.m_ClMapBackground;
+
+		const char *paLabels[] = {
+			Localize("Red"),
+			Localize("Green"),
+			Localize("Blue")};
+		static int s_aColorSlider[3] = {0};
+
+		MapBckgCol.VSplitLeft(10.0f, 0, &MapBckgCol);
+		MapBckgCol.HSplitBottom(82.5f, 0, &MapBckgCol);
+
+		int PrevColor = *pColor;
+		int Color = 0;
+		static float s_FadeScroll[6][3] = {{0}};
+		for(int s = 0; s < 3; s++)
+		{
+			MapBckgCol.HSplitTop(20.0f, &Label, &MapBckgCol);
+			Label.VSplitLeft(100.0f, &Label, &Button);
+			Button.HMargin(2.0f, &Button);
+
+			float k = ((PrevColor>>((2-s)*8))&0xff)  / 255.0f;
+			k = DoScrollbarH(&s_aColorSlider[s], &Button, k);
+			Color <<= 8;
+			Color += clamp((int)(k*255), 0, 255);
+			UI()->DoLabelScaled(&Label, paLabels[s], 14.0f, -1);
+		}
+		
+		*pColor = Color;
+		
+		MapBckgCol.HSplitBottom(0.0f, &Label, &MapBckgCol);
+		Label.VSplitLeft(0.0f, &Label, &Button);
+		Button.HMargin(2.0f, &Button);
+				
+		static int s_ResetButton = 0;
+		if(DoButton_Menu(&s_ResetButton, Localize("Reset color"), 0, &Button))
+		{
+			g_Config.m_ClMapBackground = 7777777;
+		}		
+	}
 }
