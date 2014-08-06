@@ -2354,7 +2354,7 @@ CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar
 void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter * pChar)
 {
 	pChar->Core()->m_Pos = pChar->m_PrevPos = pChar->m_Pos = state.Pos;
-	pChar->Core()->m_RescuePos = state.RescuePos;
+	pChar->m_RescuePos = state.RescuePos;
 	pChar->Core()->m_Vel = vec2(0.f, 0.f);
 	pChar->m_StartTime = state.StartTime;
 	pChar->m_DDRaceState = state.DDState;
