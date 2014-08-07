@@ -316,7 +316,9 @@ private:
 	
 	static void ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData);
 	static void ConCopy(IConsole::IResult *pResult, void *pUserData);
+	static void ConSwap(IConsole::IResult *pResult, void *pUserData);
 	int m_aInputCopy[MAX_CLIENTS];
+	int m_aSwapRequest[MAX_CLIENTS];
 
 	enum
 	{

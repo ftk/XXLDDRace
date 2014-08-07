@@ -1260,3 +1260,66 @@ void CGameContext::ConCopy(IConsole::IResult *pResult, void *pUserData)
 		return;
 	pSelf->m_aInputCopy[ClientID] = (CheckClientID(ToCopy) && ClientID != ToCopy) ? ToCopy : -1;
 }
+
+void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *) pUserData;
+	const int ClientID = pResult->m_ClientID;
+
+	int ToSwap = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
+	if(!(CheckClientID(ToSwap) && ClientID != ToSwap))
+		ToSwap = -1;
+
+	if(!CheckClientID(ClientID))
+		return;
+	
+	pSelf->m_aSwapRequest[ClientID] = ToSwap;
+	if(ToSwap == -1)
+		return;
+	
+	if(pSelf->ProcessSpamProtection(ClientID)) // dont flood
+		return;
+	
+	// check if ToSwap agrees
+	char aBuf[128];
+	if(pSelf->m_aSwapRequest[ToSwap] != ClientID)
+	{
+		// send  notification to ToSwap
+		str_format(aBuf, sizeof(aBuf), "%s wants to swap places with you. Type \'/swap %d\' to accept.",
+			   pSelf->Server()->ClientName(ClientID), ClientID);
+		pSelf->SendChatTarget(ToSwap, aBuf);
+		
+		str_format(aBuf, sizeof(aBuf), "Requst sent to %s.",
+			   pSelf->Server()->ClientName(ToSwap));
+		pSelf->SendChatTarget(ClientID, aBuf);
+	}
+	else
+	{
+		// ToSwap agreed
+		CCharacter * pChar1 = pSelf->GetPlayerChar(ClientID);
+		CCharacter * pChar2 = pSelf->GetPlayerChar(ToSwap);
+		if(!pChar1 || !pChar2)
+		{
+			// one is not alive
+			const char * pStr = "Can\'t swap!";
+			pSelf->SendChatTarget(ToSwap, pStr);
+			pSelf->SendChatTarget(ClientID, pStr);
+			return;
+		}
+
+		CPlayerRescueState state1 = GetPlayerState(pChar1),
+			state2 = GetPlayerState(pChar2);
+		
+		// swap
+		ApplyPlayerState(state2, pChar1);
+		ApplyPlayerState(state1, pChar2);
+		
+		str_format(aBuf, sizeof(aBuf), "%s swapped with %s.",
+			   pSelf->Server()->ClientName(ToSwap),
+			   pSelf->Server()->ClientName(ClientID));
+		pSelf->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+		// reset swap requests
+		pSelf->m_aSwapRequest[ToSwap] = -1;
+		pSelf->m_aSwapRequest[ClientID] = -1;
+	}
+}

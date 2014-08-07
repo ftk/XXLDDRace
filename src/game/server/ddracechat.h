@@ -39,6 +39,7 @@ CHAT_COMMAND("pm", "ir", CFGFLAG_CHAT|CFGFLAG_SERVER, ConPrivMsg, this, "Send pr
 CHAT_COMMAND("dr", "", CFGFLAG_CHAT|CFGFLAG_SERVER, ConDisconnectRescue, this, "Rescue to location before disconnect")
 
 CHAT_COMMAND("copy", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConCopy, this, "Copy player's input (id)")
+CHAT_COMMAND("swap", "?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConSwap, this, "Request swapping with player (id)")
 
 #if defined(CONF_SQL)
 CHAT_COMMAND("times", "?s?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConTimes, this, "/times ?s?i shows last 5 times of the server or of a player beginning with name s starting with time i (i = 1 by default)")

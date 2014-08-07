@@ -65,7 +65,10 @@ void CGameContext::Construct(int Resetting)
 	m_ChatResponseTargetID = -1;
 	
 	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
 		m_aInputCopy[i] = -1;
+		m_aSwapRequest[i] = -1;
+	}
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -683,16 +686,6 @@ void CGameContext::OnClientDirectInput(int ClientID, void *pInput)
 		if(m_aInputCopy[ClientID] != -1)
 		{
 			void * InputToCopy = ((CServer *) Server())->m_aClients[m_aInputCopy[ClientID]].m_LatestInput.m_aData;
-			/*
-			if(m_aInputCopy[m_aInputCopy[ClientID]] == ClientID) // swap
-			{
-				int Tmp[MAX_INPUT_SIZE];
-				mem_copy(Tmp, pInput, MAX_INPUT_SIZE*sizeof(int));
-				mem_copy(pInput, InputToCopy, MAX_INPUT_SIZE*sizeof(int));
-				mem_copy(InputToCopy, Tmp, MAX_INPUT_SIZE*sizeof(int));
-			}
-			else // copy
-			*/
 			mem_copy(pInput, InputToCopy, MAX_INPUT_SIZE*sizeof(int));
 		}
 		m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
@@ -799,9 +792,14 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	}
 	
 	m_aInputCopy[ClientID] = -1;
+	m_aSwapRequest[ClientID] = -1;
 	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
 		if(m_aInputCopy[i] == ClientID)
 			m_aInputCopy[i] = -1;
+		if(m_aSwapRequest[i] == ClientID)
+			m_aSwapRequest[i] = -1;
+	}
 }
 
 void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
