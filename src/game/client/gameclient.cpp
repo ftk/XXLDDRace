@@ -1030,7 +1030,7 @@ void CGameClient::OnPredict()
 
 			mem_zero(&World.m_apCharacters[c]->m_Input, sizeof(World.m_apCharacters[c]->m_Input));
 
-			const bool IsFreezed = m_IsDDRace && IsCharacterFreezed(m_Snap.m_aCharacters[c].m_Cur);
+			const bool IsFreezed = m_IsDDRace && g_Config.m_ClPredict == 1 && IsCharacterFreezed(m_Snap.m_aCharacters[c].m_Cur);
 			if(m_Snap.m_LocalClientID == c)
 			{
 				// apply player input
