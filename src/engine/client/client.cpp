@@ -1426,7 +1426,7 @@ void CClient::PumpNetwork()
 		if(State() != IClient::STATE_OFFLINE && State() != IClient::STATE_QUITING && m_NetClient.State() == NETSTATE_OFFLINE)
 		{
 			SetState(IClient::STATE_OFFLINE);
-			Disconnect();
+			DisconnectWithReason(m_NetClient.ErrorString()[0] ? m_NetClient.ErrorString() : "offline");
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "offline error='%s'", m_NetClient.ErrorString());
 			m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "client", aBuf);
@@ -2049,7 +2049,7 @@ void CClient::Con_Connect(IConsole::IResult *pResult, void *pUserData)
 void CClient::Con_Disconnect(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
-    pSelf->Disconnect();
+	pSelf->Disconnect();
 }
 
 void CClient::Con_Quit(IConsole::IResult *pResult, void *pUserData)
