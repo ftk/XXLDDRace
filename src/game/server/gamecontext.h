@@ -358,14 +358,19 @@ public:
 	{
 		vec2 Pos;
 		vec2 RescuePos;
+		int RescueFlags;
 		int StartTime;
-		int DDState;
+		int DDRaceState;
 		unsigned WFlags;
-		CTuningParams Tuning;
+		CTuningParams ChrTuning;
 		bool EndlessHook;
 		bool DeepFreeze;
 		int Hit;
 		int RescueOverride;
+		int CpTick;
+		int CpActive;
+		int CpLastBroadcast;
+		float CpCurrent[25];
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
 

@@ -2334,38 +2334,55 @@ void CGameContext::ResetTuning()
 CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar)
 {
 	CPlayerRescueState state;
-			
-	state.Pos = pChar->m_Pos;
-	state.RescuePos = pChar->m_RescuePos;
-	state.StartTime = pChar->m_StartTime;
-	state.DDState = pChar->m_DDRaceState;
-	state.Tuning = pChar->m_ChrTuning;
+#define ST_PARAM(var) state. var = pChar->m_ ## var 
+	ST_PARAM(Pos);
+	ST_PARAM(RescuePos);
+	ST_PARAM(RescueFlags);
+	ST_PARAM(StartTime);
+	ST_PARAM(DDRaceState);
+	ST_PARAM(ChrTuning);
+	ST_PARAM(EndlessHook);
+	ST_PARAM(DeepFreeze);
+	ST_PARAM(Hit);
+	ST_PARAM(RescueOverride);
+	ST_PARAM(CpTick);
+	ST_PARAM(CpActive);
+	ST_PARAM(CpLastBroadcast);
+#undef ST_PARAM
+
+	mem_copy(state.CpCurrent, pChar->m_CpCurrent, sizeof(state.CpCurrent));
+
 	state.WFlags = 0;
 	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
 		if(pChar->GetWeaponGot(i))
 			state.WFlags |= (1U << i);
-	state.EndlessHook = pChar->m_EndlessHook;
-	state.DeepFreeze = pChar->m_DeepFreeze;
-	state.Hit = pChar->m_Hit;
-	state.RescueOverride = pChar->m_RescueOverride;
 	return state;
 }
 
 void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter * pChar)
 {
 	pChar->Core()->m_Pos = pChar->m_PrevPos = pChar->m_Pos = state.Pos;
-	pChar->m_RescuePos = state.RescuePos;
 	pChar->Core()->m_Vel = vec2(0.f, 0.f);
-	pChar->m_StartTime = state.StartTime;
-	pChar->m_DDRaceState = state.DDState;
-	pChar->m_ChrTuning = state.Tuning;
-	pChar->m_EndlessHook = state.EndlessHook;
-	pChar->m_DeepFreeze = state.DeepFreeze;
-	pChar->m_Hit = state.Hit;
-	pChar->m_RescueOverride = state.RescueOverride;
+
+#define ST_PARAM(var) pChar->m_ ## var = state. var
+	ST_PARAM(RescuePos);
+	ST_PARAM(RescueFlags);
+	ST_PARAM(StartTime);
+	ST_PARAM(DDRaceState);
+	ST_PARAM(ChrTuning);
+	ST_PARAM(EndlessHook);
+	ST_PARAM(DeepFreeze);
+	ST_PARAM(Hit);
+	ST_PARAM(RescueOverride);
+	ST_PARAM(CpTick);
+	ST_PARAM(CpActive);
+	ST_PARAM(CpLastBroadcast);
+#undef ST_PARAM
+
+	mem_copy(pChar->m_CpCurrent, state.CpCurrent, sizeof(state.CpCurrent));
+
 	pChar->m_Super = false;
 	pChar->m_FastReload = false;
-	pChar->m_RescuePos = vec2(0.f, 0.f);
 	pChar->m_LastRescueSave = 0;
 	pChar->ResetInput();
 	pChar->SetWeaponGot(WEAPON_NINJA, false);
