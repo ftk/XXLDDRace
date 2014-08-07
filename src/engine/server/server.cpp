@@ -2065,7 +2065,7 @@ int CServer::NameToID(void *pUser, const char * pName)
 		// try number
 		char * pPos; // position of the next char after number
 		long int id = strtol(pName, &pPos, 10);
-		if(pPos[0] == '\0' && id >= 0 && id < MAX_CLIENTS && pServer->m_aClients[i].m_State != CClient::STATE_EMPTY)
+		if(pPos[0] == '\0' && id >= 0 && id < MAX_CLIENTS && pServer->m_aClients[id].m_State != CClient::STATE_EMPTY)
 			return (int)id;
 	}
 	
