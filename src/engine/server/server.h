@@ -264,6 +264,8 @@ public:
 	static void ConAddBanmaster(IConsole::IResult *pResult, void *pUser);
 	static void ConBanmasters(IConsole::IResult *pResult, void *pUser);
 	static void ConClearBanmasters(IConsole::IResult *pResult, void *pUser);
+
+	static int NameToID(void *pUser, const char * pName);
 };
 
 #endif

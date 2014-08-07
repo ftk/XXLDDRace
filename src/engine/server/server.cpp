@@ -28,7 +28,7 @@
 #include <mastersrv/mastersrv.h>
 
 // DDRace
-#include <string.h>
+#include <cstdlib> // strtol
 #include <vector>
 #include <engine/shared/linereader.h>
 
@@ -1493,6 +1493,7 @@ int CServer::Run()
 	m_pConsole->StoreCommands(false);
 
 	m_pConsole->InitTickTimers(&m_CurrentGameTick);
+	m_pConsole->InitNameToIDCallback(NameToID, this);
 
 	// start game
 	{
@@ -2055,3 +2056,32 @@ void CServer::ConClearBanmasters(IConsole::IResult *pResult, void *pUser)
 	pServer->m_NetServer.BanmastersClear();
 	pServer->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server/banmaster", "cleared banmaster list");
 }
+
+int CServer::NameToID(void *pUser, const char * pName)
+{
+	CServer *pServer = (CServer *)pUser;
+
+	{
+		// try number
+		char * pPos; // position of the next char after number
+		long int id = strtol(pName, &pPos, 10);
+		if(pPos[0] == '\0' && id >= 0 && id < MAX_CLIENTS && pServer->m_aClients[i].m_State != CClient::STATE_EMPTY)
+			return (int)id;
+	}
+	
+	int BestID = IConsole::IResult::VICTIM_NONE;
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(pServer->m_aClients[i].m_State != CClient::STATE_EMPTY)
+		{
+		        const char * pNamePos = str_find_nocase(pServer->ClientName(i), pName);
+			if(!pNamePos)
+				continue;
+			BestID = i;
+			if(pNamePos == pServer->ClientName(i)) // pName is prefix of ClientName(i)
+				return BestID;
+		}
+	}
+	return BestID;
+}
+

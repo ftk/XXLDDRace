@@ -171,7 +171,7 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 				char* pVictim = 0;
 
 				if (Command != 'v')
-				pResult->AddArgument(pStr);
+					pResult->AddArgument(pStr);
 				else
 					pVictim = pStr;
 
@@ -193,7 +193,7 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 				}
 
 				if (pVictim)
-					pResult->SetVictim(pVictim);
+					pResult->SetVictim(Victim(pVictim));
 			}
 		}
 	}
@@ -744,8 +744,10 @@ CConsole::CConsole(int FlagMask)
 	m_pStorage = 0;
 
 	m_pCurTick = NULL;
+
+	m_pNameToIDfn = NULL;
 	
-	#if defined(_MSC_VER) && _MSC_VER < 1700 // workaround for msvc < 2012
+	#if !defined(_MSC_VER) || _MSC_VER >= 1700 // workaround for msvc < 2012
 	commands.max_load_factor(0.75f);
 	commands.reserve(512);
 	#endif
@@ -1140,14 +1142,16 @@ void CConsole::CResult::SetVictim(int Victim)
 	m_Victim = clamp<int>(Victim, VICTIM_NONE, MAX_CLIENTS - 1);
 }
 
-void CConsole::CResult::SetVictim(const char *pVictim)
+int CConsole::Victim(const char *pVictim)
 {
-	if(!str_comp(pVictim, "me"))
-		m_Victim = VICTIM_ME;
-	else if(!str_comp(pVictim, "all"))
-		m_Victim = VICTIM_ALL;
+	if(!str_comp_nocase(pVictim, "me"))
+		return CResult::VICTIM_ME;
+	else if(!str_comp_nocase(pVictim, "all"))
+		return CResult::VICTIM_ALL;
+	else if(!m_pNameToIDfn)
+		return clamp<int>(str_toint(pVictim), 0, MAX_CLIENTS - 1);
 	else
-		m_Victim = clamp<int>(str_toint(pVictim), 0, MAX_CLIENTS - 1);
+		return m_pNameToIDfn(m_pNameToIDfnArg, pVictim);
 }
 
 void CConsole::ConSubAdminCommandStatus(IResult *pResult, void *pUser)

@@ -47,6 +47,12 @@ public:
 		int m_ClientID;
 
 		// DDRace
+		enum
+		{
+			VICTIM_NONE=-3,
+			VICTIM_ME=-2,
+			VICTIM_ALL=-1,
+		};
 
 		virtual int GetVictim() = 0;
 	};
@@ -103,6 +109,10 @@ public:
 
 	virtual void InitTickTimers(int * CurTick) = 0;
 	virtual void ProcessTimers() = 0;
+
+	typedef int (*name_to_id_fn_t)(void *, const char *);
+
+	virtual void InitNameToIDCallback(name_to_id_fn_t pCallback, void * pUserParam) = 0;
 };
 
 extern IConsole *CreateConsole(int FlagMask);

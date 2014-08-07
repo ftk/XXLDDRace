@@ -130,18 +130,10 @@ class CConsole : public IConsole
 
 		// DDRace
 
-		enum
-		{
-			VICTIM_NONE=-3,
-			VICTIM_ME=-2,
-			VICTIM_ALL=-1,
-		};
-
 		int m_Victim;
 		void ResetVictim();
 		bool HasVictim();
 		void SetVictim(int Victim);
-		void SetVictim(const char *pVictim);
 		virtual int GetVictim();
 	};
 
@@ -201,6 +193,13 @@ public:
 
 	void ProcessTimers();
 	void InitTickTimers(int * CurTick) { m_pCurTick = CurTick; }
+
+private:
+	name_to_id_fn_t m_pNameToIDfn;
+	void * m_pNameToIDfnArg;
+public:
+	void InitNameToIDCallback(name_to_id_fn_t pCallback, void * pUserParam) { m_pNameToIDfn = pCallback; m_pNameToIDfnArg = pUserParam; }
+	int Victim(const char *pVictim);
 
 
 public:
