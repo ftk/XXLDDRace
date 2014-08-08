@@ -29,6 +29,7 @@
 
 // DDRace
 #include <cstdlib> // strtol
+#include <cstring>
 #include <vector>
 #include <engine/shared/linereader.h>
 
