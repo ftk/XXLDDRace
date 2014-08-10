@@ -2332,8 +2332,12 @@ void CGameContext::ResetTuning()
 CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar)
 {
 	CPlayerRescueState state;
+
+	state.Vel = pChar->Core()->m_Vel;
+	
 #define ST_PARAM(var) state. var = pChar->m_ ## var 
 	ST_PARAM(Pos);
+	ST_PARAM(PrevPos);
 	ST_PARAM(RescuePos);
 	ST_PARAM(RescueFlags);
 	ST_PARAM(StartTime);
@@ -2346,6 +2350,7 @@ CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar
 	ST_PARAM(CpTick);
 	ST_PARAM(CpActive);
 	ST_PARAM(CpLastBroadcast);
+	ST_PARAM(FreezeTime);
 #undef ST_PARAM
 
 	mem_copy(state.CpCurrent, pChar->m_CpCurrent, sizeof(state.CpCurrent));
@@ -2359,10 +2364,11 @@ CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar
 
 void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter * pChar)
 {
-	pChar->Core()->m_Pos = pChar->m_PrevPos = pChar->m_Pos = state.Pos;
-	pChar->Core()->m_Vel = vec2(0.f, 0.f);
+	pChar->Core()->m_Pos = pChar->m_Pos = state.Pos;
+	pChar->Core()->m_Vel = state.Vel;
 
 #define ST_PARAM(var) pChar->m_ ## var = state. var
+	ST_PARAM(PrevPos);
 	ST_PARAM(RescuePos);
 	ST_PARAM(RescueFlags);
 	ST_PARAM(StartTime);
@@ -2375,6 +2381,7 @@ void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter 
 	ST_PARAM(CpTick);
 	ST_PARAM(CpActive);
 	ST_PARAM(CpLastBroadcast);
+	ST_PARAM(FreezeTime);
 #undef ST_PARAM
 
 	mem_copy(pChar->m_CpCurrent, state.CpCurrent, sizeof(state.CpCurrent));

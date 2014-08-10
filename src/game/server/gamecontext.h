@@ -360,6 +360,8 @@ public:
 	{
 		vec2 Pos;
 		vec2 RescuePos;
+		vec2 PrevPos;
+		vec2 Vel;
 		int RescueFlags;
 		int StartTime;
 		int DDRaceState;
@@ -373,6 +375,7 @@ public:
 		int CpActive;
 		int CpLastBroadcast;
 		float CpCurrent[25];
+		int FreezeTime;
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
 
