@@ -1266,6 +1266,11 @@ void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	const int ClientID = pResult->m_ClientID;
 
+	if(!g_Config.m_SvSwap)
+	{
+		pSelf->SendChatTarget(ClientID, "Swap is not activated");
+	}
+	
 	int ToSwap = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
 	if(!(CheckClientID(ToSwap) && ClientID != ToSwap))
 		ToSwap = -1;
