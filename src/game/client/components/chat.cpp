@@ -472,11 +472,15 @@ void CChat::OnRender()
 	const int OffsetType = m_pClient->m_pScoreboard->Active() ? 1 : 0;
 
 	// draw chatbox
-	if(g_Config.m_UiBgChat && m_ChatboxHeight && m_ChatboxWidth > Begin)
+	if(g_Config.m_UiChatboxAlpha && m_ChatboxHeight && m_ChatboxWidth > Begin)
 	{
 		Graphics()->TextureSet(-1);
 		Graphics()->QuadsBegin();
-		Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.3f);
+		const int col = g_Config.m_UiChatboxColor;
+		Graphics()->SetColor((col >> 16) / 255.f, // red
+				     ((col >> 8) & 0xff) / 255.f, // green
+				     (col & 0xff) / 255.f, // blue
+				     g_Config.m_UiChatboxAlpha / 100.f);
 		RenderTools()->DrawRoundRect(Begin, y - m_ChatboxHeight, m_ChatboxWidth, m_ChatboxHeight + 3.f, 3.0f);
 		Graphics()->QuadsEnd();
 	}

@@ -1,0 +1,58 @@
+ARCH ?= 64
+CPPFLAGS := -m$(ARCH) -flto -O3 -pipe -fno-exceptions -fvisibility=internal -march=native \
+-Wall -DCONF_RELEASE -DNO_VIZ -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" -I "other/sdl/include" -I "other/freetype/include"
+CXXFLAGS := -std=c++11 -fno-rtti
+CFLAGS :=
+LDFLAGS := -m$(ARCH) -flto -O3 -s -static-libgcc -static-libstdc++ -march=native
+
+ifeq ($(ARCH),64)
+CPPFLAGS += -mavx -mfpmath=both
+endif
+
+CC := gcc
+CXX := g++
+LD := $(CXX)
+PYTHON ?= python
+WINDRES ?= windres
+
+all: XXLDDRace.exe XXLDDRace-Server.exe versionsrv.exe mastersrv.exe banmaster.exe
+
+include common.mk
+
+generated := $(generated_h) $(generated_cpp) other/icons/teeworlds_srv_gcc.coff other/icons/teeworlds_gcc.coff
+
+
+.PHONY: all clean distclean
+
+
+
+clean:
+	-rm $(sort $(all_objs) XXLDDRace.exe XXLDDRace-Server.exe)
+distclean: clean
+	-rm $(generated)
+	-rm -rf objs/
+
+
+
+
+# rules for target files
+
+XXLDDRace.exe: $(client_objs) other/icons/teeworlds_gcc.coff
+	$(LD) $(LDFLAGS) -o '$@' $^ -Lother/sdl/lib$(ARCH) -Lother/freetype/lib$(ARCH) -lws2_32 -lgdi32 -lopengl32 -lglu32 -lfreetype -lSDL -lSDLmain
+
+XXLDDRace-Server.exe: $(server_objs) other/icons/teeworlds_srv_gcc.coff
+	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+
+#versionsrv.exe: $(versionsrv_objs)
+#	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+#mastersrv.exe: $(mastersrv_objs)
+#	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+#banmaster.exe: $(banmaster_objs)
+#	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+.SECONDEXPANSION:
+versionsrv.exe mastersrv.exe banmaster.exe: $$($$(patsubst %.exe,%_objs,$$@))
+	$(LD) $(LDFLAGS) -o '$@' $^ -lws2_32
+
+%.coff: %.rc
+	$(WINDRES) -i $< -o $@
+

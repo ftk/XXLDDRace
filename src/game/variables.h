@@ -58,7 +58,8 @@ MACRO_CONFIG_INT(UiColorAlpha, ui_color_alpha, 228, 0, 255, CFGFLAG_CLIENT|CFGFL
 MACRO_CONFIG_INT(GfxNoclip, gfx_noclip, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Disable clipping")
 
 MACRO_CONFIG_INT(UiMonospaceChat, ui_monospace_chat, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Monospace font in chat")
-MACRO_CONFIG_INT(UiBgChat, ui_bg_chat, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Dark background for the chat box")
+MACRO_CONFIG_INT(UiChatboxAlpha, ui_chatbox_alpha, 30, 0, 100, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Transparency for chat background (percents)")
+MACRO_CONFIG_INT(UiChatboxColor, ui_chatbox_color, 0, 0x000000, 0xFFFFFF, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Color for chat background (RGB)")
 
 // server
 MACRO_CONFIG_INT(SvWarmup, sv_warmup, 0, 0, 0, CFGFLAG_SERVER, "Number of seconds to do warmup before round starts")
