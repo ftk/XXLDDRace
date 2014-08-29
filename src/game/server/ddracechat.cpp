@@ -1196,15 +1196,16 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
     
-	int to = pResult->GetInteger(0);
+	int to = pResult->GetVictim();
     
 	if(!CheckClientID(to))
 		return;
 	if(CheckClientID(pResult->m_ClientID) && pSelf->ProcessSpamProtection(pResult->m_ClientID))
 		return;
     
-	char message[512] = "<PM>: ";
-	str_append(message, pResult->GetString(1), sizeof(message));
+	char message[512];
+	str_format(message, sizeof(message), "PM -> %s: ", pSelf->Server()->ClientName(to));
+	str_append(message, pResult->GetString(0), sizeof(message));
     
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Team = 1;
@@ -1218,7 +1219,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 		str_format(message, sizeof(message), "\"%s\" -> \"%s\" : %s", 
 			   pSelf->Server()->ClientName(pResult->m_ClientID),
 			   pSelf->Server()->ClientName(to),
-			   pResult->GetString(1));
+			   pResult->GetString(0));
 
 	}
 	else
@@ -1226,7 +1227,7 @@ void CGameContext::ConPrivMsg(IConsole::IResult *pResult, void *pUserData)
 		str_format(message, sizeof(message), "%d -> \"%s\" : %s", 
 			   pResult->m_ClientID,
 			   pSelf->Server()->ClientName(to),
-			   pResult->GetString(1));
+			   pResult->GetString(0));
 	}
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "pmchat", message);
 }
@@ -1254,7 +1255,7 @@ void CGameContext::ConCopy(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	const int ClientID = pResult->m_ClientID;
 
-	const int ToCopy = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
+	const int ToCopy = pResult->NumArguments() > 0 ? pResult->GetVictim() : -1;
 
 	if(!CheckClientID(ClientID))
 		return;
@@ -1272,8 +1273,8 @@ void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
 		return;
 	}
 	
-	int ToSwap = pResult->NumArguments() > 0 ? pResult->GetInteger(0) : -1;
-	if(!(CheckClientID(ToSwap) && ClientID != ToSwap))
+	int ToSwap = pResult->NumArguments() > 0 ? pResult->GetVictim() : -1;
+	if(!CheckClientID(ToSwap) || ClientID == ToSwap)
 		ToSwap = -1;
 
 	if(!CheckClientID(ClientID))
