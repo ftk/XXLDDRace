@@ -1304,9 +1304,9 @@ void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
 		// ToSwap agreed
 		CCharacter * pChar1 = pSelf->GetPlayerChar(ClientID);
 		CCharacter * pChar2 = pSelf->GetPlayerChar(ToSwap);
-		if(!pChar1 || !pChar2)
+		if(!pChar1 || !pChar2 || pChar1->Team() != pChar2->Team())
 		{
-			// one is not alive
+			// one is not alive or not in the same team
 			const char * pStr = "Can\'t swap!";
 			pSelf->SendChatTarget(ToSwap, pStr);
 			pSelf->SendChatTarget(ClientID, pStr);
