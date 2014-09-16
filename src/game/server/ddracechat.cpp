@@ -1255,7 +1255,7 @@ void CGameContext::ConCopy(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	const int ClientID = pResult->m_ClientID;
 
-	const int ToCopy = pResult->NumArguments() > 0 ? pResult->GetVictim() : -1;
+	const int ToCopy = pResult->GetVictim();
 
 	if(!CheckClientID(ClientID))
 		return;
@@ -1273,7 +1273,7 @@ void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
 		return;
 	}
 	
-	int ToSwap = pResult->NumArguments() > 0 ? pResult->GetVictim() : -1;
+	int ToSwap = pResult->GetVictim();
 	if(!CheckClientID(ToSwap) || ClientID == ToSwap)
 		ToSwap = -1;
 
