@@ -2351,12 +2351,12 @@ CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar
 	ST_PARAM(FreezeTime);
 #undef ST_PARAM
 
-	state.Core = *pChar->Core();
+	pChar->Core()->Write(&state.Core);
 
 	mem_copy(state.CpCurrent, pChar->m_CpCurrent, sizeof(state.CpCurrent));
 
 	state.WFlags = 0;
-	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+	for(int i = WEAPON_HAMMER; i <= WEAPON_RIFLE; i++)
 		if(pChar->GetWeaponGot(i))
 			state.WFlags |= (1U << i);
 	return state;
@@ -2382,7 +2382,7 @@ void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter 
 	ST_PARAM(FreezeTime);
 #undef ST_PARAM
 
-	*pChar->Core() = state.Core;
+	pChar->Core()->Read(&state.Core);
 
 	mem_copy(pChar->m_CpCurrent, state.CpCurrent, sizeof(state.CpCurrent));
 
@@ -2393,7 +2393,7 @@ void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter 
 	pChar->SetWeaponGot(WEAPON_NINJA, false);
 	pChar->SetWeapon(WEAPON_GUN);
 	
-	for(int i = WEAPON_SHOTGUN; i <= WEAPON_RIFLE; i++)
+	for(int i = WEAPON_HAMMER; i <= WEAPON_RIFLE; i++)
 	{
 		pChar->SetWeaponGot(i, false);
 		pChar->SetWeaponAmmo(i, 0);

@@ -375,7 +375,7 @@ public:
 		int CpLastBroadcast;
 		float CpCurrent[25];
 		int FreezeTime;
-		CCharacterCore Core;
+		CNetObj_CharacterCore Core;
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
 
