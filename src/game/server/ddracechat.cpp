@@ -556,8 +556,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 					{
 						pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
 					}
-					else if (teams.SetCharacterTeam(
-							 pPlayer->GetCID(), team))
+					else if (teams.SetCharacterTeam(pPlayer->GetCID(), team))
 					{
 						char aBuf[512];
 						str_format(aBuf, sizeof(aBuf), "%s joined team %d",
@@ -568,19 +567,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 					}
 					else
 					{
-						/*
-						  int t = teams.GetTeamState(teams.m_Core.Team(pPlayer->GetCID()));
-						  // if(team < 0 || team >= MAX_CLIENTS || teams.GetTeamState(team) > CGameTeams::TEAMSTATE_OPEN || 
-						  //    (t && t != CGameTeams::TEAMSTATE_EMPTY) ||
-						  //    pPlayer->GetCharacter()->m_DDRaceState != DDRACE_STARTED)
-						  if(team >= 0 && team < MAX_CLIENTS && (!t || (!teams.Count(t) && !teams.Count(team) )))
-						  {
-						  pPlayer->GetCharacter()->Teams()->m_Core.Team(pPlayer->GetCID(), team);
-						  }
-						  else*/
-						{
-							pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
-						}
+						pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", "You cannot join this team");
 		  			}
 				}
 				else if(team < MAX_CLIENTS && (teams.m_Core.Team(pPlayer->GetCID()) >= 10 || teams.m_Core.Team(pPlayer->GetCID()) == 0))

@@ -139,6 +139,9 @@ bool CGameTeams::SetCharacterTeam(int ClientID, int Team)
 	//You can join to TEAM_SUPER at any time, but any other group you cannot if it started
 	if (Team != TEAM_SUPER && m_TeamState[Team] > TEAMSTATE_OPEN)
 		return false;
+	// Can't switch from a non-open team
+	if (m_Core.Team(ClientID) != TEAM_FLOCK && m_TeamState[m_Core.Team(ClientID)] > TEAMSTATE_OPEN)
+		return false;
 	//No need to switch team if you there
 	if (m_Core.Team(ClientID) == Team)
 		return false;
