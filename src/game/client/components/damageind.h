@@ -18,7 +18,7 @@ class CDamageInd : public CComponent
 
 	enum
 	{
-		MAX_ITEMS=64,
+		MAX_ITEMS=512,
 	};
 
 	CItem m_aItems[MAX_ITEMS];
