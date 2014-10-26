@@ -2348,6 +2348,7 @@ CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar
 	ST_PARAM(CpTick);
 	ST_PARAM(CpActive);
 	ST_PARAM(CpLastBroadcast);
+	ST_PARAM(TeleCheckpoint);
 	ST_PARAM(FreezeTime);
 #undef ST_PARAM
 
@@ -2379,6 +2380,7 @@ void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter 
 	ST_PARAM(CpTick);
 	ST_PARAM(CpActive);
 	ST_PARAM(CpLastBroadcast);
+	ST_PARAM(TeleCheckpoint);
 	ST_PARAM(FreezeTime);
 #undef ST_PARAM
 

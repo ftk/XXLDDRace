@@ -373,6 +373,7 @@ public:
 		int CpTick;
 		int CpActive;
 		int CpLastBroadcast;
+		int TeleCheckpoint;
 		float CpCurrent[25];
 		int FreezeTime;
 		CNetObj_CharacterCore Core;
