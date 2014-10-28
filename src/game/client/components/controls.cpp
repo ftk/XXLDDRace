@@ -241,6 +241,7 @@ void CControls::OnConsoleInit()
 	Console()->Register("+hook", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputData.m_Hook, "Hook");
 	Console()->Register("+fire", "", CFGFLAG_CLIENT, ConKeyInputCounter, &m_InputData.m_Fire, "Fire");
 	Console()->Register("+showhookcoll", "", CFGFLAG_CLIENT, ConKeyInputState, &m_ShowHookColl, "Show Hook Collision");
+	Console()->Register("+ride", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputRide, "Ride");
 
 	Console()->Register("mouse", "ff", CFGFLAG_CLIENT, ConMousePos, this, "Set mouse position");
 	Console()->Register("mouse_angle", "f", CFGFLAG_CLIENT, ConMouseAngle, this, "Set mouse angle in degree");
@@ -355,6 +356,54 @@ int CControls::SnapInput(int *pData)
 			m_InputData.m_Direction = 1;
 		else if(m_InputDirectionLeft && m_InputDirectionRight)
 			m_InputData.m_Direction = m_LastData.m_Direction ? -m_LastData.m_Direction : 1;
+		else if(m_InputRide)	//ridebot
+		{						//TODO: make it fine ;)
+			int x_self,x_target;
+			int id = -1;
+			int mindist = 1000000;
+			int cur_x = int(m_pClient->m_pControls->m_TargetPos.x);
+			int cur_y = int(m_pClient->m_pControls->m_TargetPos.y);
+			int localid = m_pClient->m_Snap.m_LocalClientID;
+			float r0 = rand()%2000000, r1 = r0/1000000;
+			float delta;
+			
+			if (g_Config.m_ClRideSet == 1)
+				x_self = m_pClient->m_Snap.m_aCharacters[localid].m_Cur.m_X;
+			else if (g_Config.m_ClRideSet == 2)
+				x_self = m_pClient->m_PredictedChar.m_Pos.x;
+			else
+				x_self = m_pClient->m_LocalCharacterPos.x;
+			
+			if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
+				localid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+			
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if(!m_pClient->m_Snap.m_aCharacters[i].m_Active || i == localid)
+					continue;
+				int x = m_pClient->m_Snap.m_aCharacters[i].m_Cur.m_X;
+				int y = m_pClient->m_Snap.m_aCharacters[i].m_Cur.m_Y;
+				int dist = (x-cur_x)*(x-cur_x) + (y-cur_y)*(y-cur_y);
+				if(dist < mindist)
+				{
+					mindist = dist;
+					id = i;
+				}
+			}
+			
+			if(m_pClient->m_Snap.m_aCharacters[id].m_Cur.m_X == 0)
+				x_target = x_self;
+			else
+				x_target = m_pClient->m_Snap.m_aCharacters[id].m_Cur.m_X;
+				
+			delta = abs(x_self-x_target);
+			
+			if((r1<delta/g_Config.m_ClRideThreshold1) && (delta>g_Config.m_ClRideThreshold2))
+			{
+				if(x_self<x_target) m_InputData.m_Direction = 1; //s leva v prava
+				if(x_self>x_target) m_InputData.m_Direction = -1; //s prava v leva
+			}
+		}
 
 		// stress testing
 		if(g_Config.m_DbgStress)
