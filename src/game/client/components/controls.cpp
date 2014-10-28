@@ -358,7 +358,7 @@ int CControls::SnapInput(int *pData)
 			m_InputData.m_Direction = m_LastData.m_Direction ? -m_LastData.m_Direction : 1;
 		else if(m_InputRide)	//ridebot
 		{						//TODO: make it fine ;)
-			int x_self,x_target;
+			float x_self,x_target;
 			int id = -1;
 			int mindist = 1000000;
 			int cur_x = int(m_pClient->m_pControls->m_TargetPos.x);
@@ -394,7 +394,7 @@ int CControls::SnapInput(int *pData)
 			if(m_pClient->m_Snap.m_aCharacters[id].m_Cur.m_X == 0)
 				x_target = x_self;
 			else
-				x_target = m_pClient->m_Snap.m_aCharacters[id].m_Cur.m_X;
+				x_target = m_pClient->m_aClients[id].m_Predicted.m_Pos.x;
 				
 			delta = abs(x_self-x_target);
 			
