@@ -71,7 +71,8 @@ void CDamageInd::OnRender()
 			DestroyI(&m_aItems[i]);
 		else
 		{
-			vec2 Pos = mix(m_aItems[i].m_Pos+m_aItems[i].m_Dir*75.0f, m_aItems[i].m_Pos, clamp((Life-0.60f)/0.15f, 0.0f, 1.0f));
+			vec2 Pos = mix(m_aItems[i].m_Pos+m_aItems[i].m_Dir*75.0f, m_aItems[i].m_Pos,
+				       clamp(Life/((float)g_Config.m_ClDamageIndSpeed/1000), 0.0f, 1.0f));
 			Graphics()->SetColor(1.0f,1.0f,1.0f, Life/0.1f);
 			Graphics()->QuadsSetRotation(m_aItems[i].m_StartAngle + Life * 2.0f);
 			RenderTools()->SelectSprite(SPRITE_STAR1);
