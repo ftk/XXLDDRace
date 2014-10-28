@@ -213,6 +213,10 @@ MACRO_CONFIG_INT(SvNamelessScore, sv_nameless_score, 0, 0, 1, CFGFLAG_SERVER, "W
 MACRO_CONFIG_INT(SvTimeInBroadcastInterval, sv_time_in_broadcast_interval, 1, 0, 60, CFGFLAG_SERVER, "How often to update the broadcast time")
 MACRO_CONFIG_INT(SvDefaultTimerType, sv_default_timer_type, 0, 0, 1, CFGFLAG_SERVER, "Default way of displaying time either game/round timer or broadcast. 0 = game/round timer, 1 = broadcast")
 
+MACRO_CONFIG_INT(ClRideThreshold1, cl_ride_threshold1, 75, 1, 500000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "RIDEBOT> Slowing down distance")
+MACRO_CONFIG_INT(ClRideThreshold2, cl_ride_threshold2, 5, 0, 5000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "RIDEBOT> Dead zone")
+MACRO_CONFIG_INT(ClRideSet, cl_ride_set, 2, 0, 2, CFGFLAG_SAVE|CFGFLAG_CLIENT, "RIDEBOT> Self coordinates 0:Local | 1:Server | 2:Predicted")
+
 MACRO_CONFIG_STR(ClQuitMessageText, cl_quit_message, 256, "", CFGFLAG_SAVE|CFGFLAG_CLIENT, "Set custom disconnecting reason")
 MACRO_CONFIG_INT(ClNoRenderTime, cl_norender_time, 0, 0, 999, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Don't render for x ms after swapping buffers")
 MACRO_CONFIG_INT(ClDamageIndTime, cl_damageind_time, 500, 0, 99999, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Damage indicator time in ms")
