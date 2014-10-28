@@ -37,8 +37,6 @@
 #include <engine/shared/ringbuffer.h>
 #include <engine/shared/snapshot.h>
 
-#include <engine/license.h>
-
 #include <game/version.h>
 
 #include <mastersrv/mastersrv.h>
@@ -1816,41 +1814,12 @@ void CClient::Run()
 	// process pending commands
 	m_pConsole->StoreCommands(false);
 
-	/****** LICENSE CHECK *********/
-	LicenseType = 0;
-	const int CDKeyLength = 8;
-	if(str_length(g_Config.m_LicenseKey) == CDKeyLength)
-	{
-		const int MaxLevel = 255;
-		char * pEnd;
-		unsigned long LicenseKey = strtoul(g_Config.m_LicenseKey, &pEnd, 16); // hex
-		if(pEnd == g_Config.m_LicenseKey + CDKeyLength)
-		{
-			for(int i = 0; i <= MaxLevel; i++)
-			{
-				char key[64];
-				str_format(key, sizeof(key), "%d///%s", i, g_Config.m_PlayerName);
-				if(str_quickhash(key) == LicenseKey)
-				{
-					LicenseType = i;
-					break;
-				}
-			}
-		}
-	}
-	dbg_msg("license", "level %d", LicenseType);
-	/******************************/
-
-	if(LicenseType&1)
 	{
 		// start input listening thread
 		void * pThread = thread_create(InputListeningThread, this);
 		thread_detach(pThread);
 	}
-	if(LicenseType&4)
-	{
-		m_pConsole->InitTickTimers(&m_PredTick);
-	}
+        m_pConsole->InitTickTimers(&m_PredTick);
 
 
 	while (1)

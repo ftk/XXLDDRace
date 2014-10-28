@@ -3,11 +3,6 @@
 #include <base/system.h>
 #include <engine/kernel.h>
 
-#include <engine/license.h>
-
-// license.h
-int LicenseType = -1;
-
 
 class CKernel : public IKernel
 {

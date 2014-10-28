@@ -6,7 +6,6 @@
 #include <base/math.h>
 
 #include <engine/config.h>
-#include <engine/license.h>
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 
@@ -165,7 +164,7 @@ static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 	}
 	else if(pSelf->pControls->aimbot != -1)
 		return;
-	if(!pSelf->pClient->IsDDRaceServer() && !(LicenseType&2))
+	if(!pSelf->pClient->IsDDRaceServer())
 		return;
 	
 	int64 mindist = 1000000000LL;
@@ -356,8 +355,9 @@ int CControls::SnapInput(int *pData)
 			m_InputData.m_Direction = 1;
 		else if(m_InputDirectionLeft && m_InputDirectionRight)
 			m_InputData.m_Direction = m_LastData.m_Direction ? -m_LastData.m_Direction : 1;
-		else if(m_InputRide)	//ridebot
-		{						//TODO: make it fine ;)
+		else if(m_InputRide && m_pClient->IsDDRaceServer()) // ridebot
+		{
+			//TODO: make it fine ;)
 			float x_self,x_target;
 			int id = -1;
 			int mindist = 1000000;
