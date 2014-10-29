@@ -19,7 +19,7 @@
 #include "controls.h"
 
 CControls::CControls() : auto_hit(false), hit_interval(0), 
-	auto_hook(false), auto_hook_type(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.012f /* 1 / HookFireSpeed */), aimbot_smooth(0)
+	auto_hook(false), auto_hook_type(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.012f /* 1 / HookFireSpeed */), aimbot_smooth(0), auto_jump(false), jump_interval(0)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -130,6 +130,18 @@ static void ConAutoHit(IConsole::IResult *pResult, void *pUserData)
 			pSelf->m_InputData.m_Fire = (pSelf->m_InputData.m_Fire + 1) & INPUT_STATE_MASK;
 	}
 	pSelf->hit_interval = int64(pResult->GetInteger(1)) * time_freq() / 1000LL;
+}
+
+static void ConAutoJump(IConsole::IResult *pResult, void *pUserData)
+{
+	CControls *pSelf = (CControls *)pUserData;
+	pSelf->auto_jump = !!pResult->GetInteger(0);
+	if(!pSelf->auto_jump)
+	{
+		if(pSelf->m_InputData.m_Jump & 1)
+			pSelf->m_InputData.m_Jump = (pSelf->m_InputData.m_Jump + 1) & INPUT_STATE_MASK;
+	}
+	pSelf->jump_interval = int64(pResult->GetInteger(1)) * time_freq() / 1000LL;
 }
 
 static void ConAutoHook(IConsole::IResult *pResult, void *pUserData)
@@ -248,6 +260,8 @@ void CControls::OnConsoleInit()
 	
 	Console()->Register("autohit", "ii", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
 	Console()->Register("+autohit", "i", CFGFLAG_CLIENT, ConAutoHit, this, "Spam-click fire");
+	Console()->Register("autojump", "ii", CFGFLAG_CLIENT, ConAutoJump, this, "Auto jumping");
+	Console()->Register("+autojump", "i", CFGFLAG_CLIENT, ConAutoJump, this, "Auto jumping");
 	Console()->Register("autohook", "i?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
@@ -286,6 +300,7 @@ int CControls::SnapInput(int *pData)
 	bool Send = false;
 
 	static int64 last_hit_time = 0;
+	static int64 last_jump_time = 0;
 	//static int64 last_hook_time = 0;
 
 	int64 time = time_get();
@@ -316,6 +331,13 @@ int CControls::SnapInput(int *pData)
 		last_hit_time = time;
 		Send = true;
 	}
+	if(auto_jump && last_jump_time + jump_interval < time)
+	{
+		m_InputData.m_Jump = (m_InputData.m_Jump + 1) & INPUT_STATE_MASK;
+		last_jump_time = time;
+		Send = true;
+	}
+	
 	if(auto_hook) // rehook
 	{
 		AutoHook();

@@ -37,6 +37,8 @@ public:
 	bool auto_hit;
 	int64 hit_interval;
 	bool auto_hook;
+	bool auto_jump;
+	int64 jump_interval;
 	int auto_hook_type;
 	
 	int aimbot;
