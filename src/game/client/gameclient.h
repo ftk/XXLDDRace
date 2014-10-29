@@ -92,6 +92,8 @@ public:
 	bool m_NewTick;
 	bool m_NewPredictedTick;
 	int m_FlagDropTick[2];
+	
+	bool m_StateSolo;
 
 	// TODO: move this
 	CTuningParams m_Tuning;

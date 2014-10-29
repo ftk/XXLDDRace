@@ -490,6 +490,7 @@ void CHud::OnRender()
 		RenderTeambalanceWarning();
 		RenderVoting();
 		RenderRecord();
+		RenderStates();
 	}
 	RenderCursor();
 }
@@ -523,6 +524,7 @@ void CHud::OnMessage(int MsgType, void *pRawMsg)
 		{
 			m_CheckpointTick = 0;
 			m_DDRaceTime = 0;
+			m_pClient->m_StateSolo = false;
 		}
 	}
 	else if(MsgType == NETMSGTYPE_SV_RECORD)
@@ -612,4 +614,34 @@ void CHud::RenderRecord()
 		str_format(aBuf, sizeof(aBuf), "%02d:%05.2f", (int)m_PlayerRecord/60, m_PlayerRecord-((int)m_PlayerRecord/60*60));
 		TextRender()->Text(0, 53, 47, 6, aBuf, -1);
 	}
+}
+
+void CHud::RenderStates()
+{
+	if((m_pClient->m_StateSolo == true) && (g_Config.m_ClHUDSolo != 0))
+	{
+		bool Flash = time_get()/(time_freq()/2)%2 == 0;
+		char Buf[512];
+		str_format(Buf, sizeof(Buf), "SOLO");
+		if(Flash)
+			TextRender()->TextColor(0.5f,1,1,1);
+		else
+			TextRender()->TextColor(0.2f,0.7f,0.7f,1.0f);
+		TextRender()->Text(0x0, 5, 90, 6, Buf, -1);
+		TextRender()->TextColor(1,1,1,1);
+		
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_EMOTICONS].m_Id);
+		Graphics()->QuadsBegin();
+		RenderTools()->SelectSprite(SPRITE_GHOST);
+		IGraphics::CQuadItem QuadItem(24, 82, 24,24);
+		if(Flash)
+			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.5f);
+		else
+			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.2f);
+		Graphics()->QuadsDraw(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+		
+	}
+	else
+		return;
 }
