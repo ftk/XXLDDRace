@@ -280,21 +280,25 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 		if(pMsg->m_ClientID < 0)
 			if(str_find(pMsg->m_pMessage, "You are now in solo") || str_find(pMsg->m_pMessage, "Solo part.") || str_find(pMsg->m_pMessage, "in a solo"))
 			{
-				int64 Now = time_get();
-				m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CTF_GRAB_PL, 0);
-				m_aLastSoundPlayed[SOUND_CTF_GRAB_PL] = Now;
 				m_pClient->m_StateSolo = true;
 				if(g_Config.m_ClHUDSolo == 2)
+				{
+					int64 Now = time_get();
+					m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CTF_GRAB_PL, 0);
+					m_aLastSoundPlayed[SOUND_CTF_GRAB_PL] = Now;
 					return;
+				}
 			}
 			else if(str_find(pMsg->m_pMessage, "You are now out of solo") || str_find(pMsg->m_pMessage, "Out solo part.") || str_find(pMsg->m_pMessage, "out of the solo"))
 			{
-				int64 Now = time_get();
-				m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CTF_RETURN, 0);
-				m_aLastSoundPlayed[SOUND_CTF_RETURN] = Now;
 				m_pClient->m_StateSolo = false;
 				if(g_Config.m_ClHUDSolo == 2)
+				{
+					int64 Now = time_get();
+					m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CTF_RETURN, 0);
+					m_aLastSoundPlayed[SOUND_CTF_RETURN] = Now;
 					return;
+				}
 			}
 		AddLine(pMsg->m_ClientID, pMsg->m_Team, pMsg->m_pMessage);
 	}
