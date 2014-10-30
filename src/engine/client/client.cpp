@@ -2304,20 +2304,29 @@ int main(int argc, const char **argv) // ignore_convention
 {
 #endif
 #if defined(CONF_FAMILY_WINDOWS)
-	bool debug = false;
-	
-	
-	for(int i = 1; i < argc; i++) // ignore_convention
 	{
-		if(str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0) // ignore_convention
+		int option = 0;
+	
+	
+		for(int i = 1; i < argc; i++) // ignore_convention
 		{
-			debug = true;
-			break;
+			if(str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0) // ignore_convention
+			{
+				option = 1;
+				break;
+			}
+			else if(str_comp("-S", argv[i]) == 0 || str_comp("--show", argv[i]) == 0) // ignore_convention
+			{
+				option = 2; // show console window
+				break;
+			}
+
 		}
+		if(option == 1)
+			ShowWindow(GetConsoleWindow(), SW_HIDE); // hide console window
+		else if(option == 0)
+			FreeConsole(); // no console
 	}
-	if(!debug)
-		ShowWindow(GetConsoleWindow(), SW_HIDE);
-		//FreeConsole();
 #endif
 
 	CClient *pClient = CreateClient();
