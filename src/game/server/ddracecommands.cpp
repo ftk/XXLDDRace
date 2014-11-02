@@ -796,15 +796,14 @@ void CGameContext::ConBlood(IConsole::IResult *pResult, void *pUserData)
 	if (!pChr->m_Bloody)
 	{
 		pChr->m_Bloody = true;
-
-		str_format(aBuf, sizeof(aBuf), "You got bloody by %s.", pSelf->Server()->ClientName(pResult->m_ClientID));
-		pSelf->SendChatTarget(Victim, aBuf);
+		//str_format(aBuf, sizeof(aBuf), "You got bloody by %s.", pSelf->Server()->ClientName(pResult->m_ClientID));
+		//pSelf->SendChatTarget(Victim, aBuf);
 	}
 	else
 	{
 		pChr->m_Bloody = false;
-		str_format(aBuf, sizeof(aBuf), "%s removed your blood.", pSelf->Server()->ClientName(pResult->m_ClientID));
-		pSelf->SendChatTarget(Victim, aBuf);
+		//str_format(aBuf, sizeof(aBuf), "%s removed your blood.", pSelf->Server()->ClientName(pResult->m_ClientID));
+		//pSelf->SendChatTarget(Victim, aBuf);
 	}
 }
 
