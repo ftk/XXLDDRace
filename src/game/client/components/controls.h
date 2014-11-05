@@ -45,5 +45,6 @@ public:
 	float aimbot_predict;
 	float aimbot_predict_dist;
 	int aimbot_smooth; // aim on render
+	int GetNearestID();
 };
 #endif

@@ -179,39 +179,7 @@ static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 	if(!pSelf->pClient->IsDDRaceServer())
 		return;
 	
-	int64 mindist = 1000000000LL;
-	int id = -1;
-	
-	/*
-	int xl = pSelf->pClient->m_Snap.m_aCharacters[pSelf->pClient->m_Snap.m_LocalClientID].m_Cur.m_X;
-	int yl = pSelf->pClient->m_Snap.m_aCharacters[pSelf->pClient->m_Snap.m_LocalClientID].m_Cur.m_Y;
-	
-	xl += int(pSelf->pControls->m_MousePos.x);
-	yl += int(pSelf->pControls->m_MousePos.y);
-	*/
-	int xl = int(pSelf->pControls->m_TargetPos.x);
-	int yl = int(pSelf->pControls->m_TargetPos.y);
-	
-	int localid = pSelf->pClient->m_Snap.m_LocalClientID;
-	
-	if(pSelf->pClient->m_Snap.m_SpecInfo.m_Active && pSelf->pClient->m_Snap.m_SpecInfo.m_UsePosition)
-		localid = pSelf->pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-	
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(!pSelf->pClient->m_Snap.m_aCharacters[i].m_Active || i == localid)
-			continue;
-		int x = pSelf->pClient->m_Snap.m_aCharacters[i].m_Cur.m_X;
-		int y = pSelf->pClient->m_Snap.m_aCharacters[i].m_Cur.m_Y;
-		int64 dist = (x-xl)*(x-xl) + (y-yl)*(y-yl);
-		if(dist < mindist)
-		{
-			mindist = dist;
-			id = i;
-		}
-	}
-	
-	pSelf->pControls->aimbot = id;
+	pSelf->pControls->aimbot = pSelf->pControls->GetNearestID();
 	pSelf->pControls->Aim();
 }
 static void ConAimbotPredict(IConsole::IResult *pResult, void *pUserData)
@@ -381,10 +349,6 @@ int CControls::SnapInput(int *pData)
 		{
 			//TODO: make it fine ;)
 			float x_self,x_target;
-			int id = -1;
-			int mindist = 1000000;
-			int cur_x = int(m_pClient->m_pControls->m_TargetPos.x);
-			int cur_y = int(m_pClient->m_pControls->m_TargetPos.y);
 			int localid = m_pClient->m_Snap.m_LocalClientID;
 			float r0 = rand()%2000000, r1 = r0/1000000;
 			float delta;
@@ -395,23 +359,8 @@ int CControls::SnapInput(int *pData)
 				x_self = m_pClient->m_PredictedChar.m_Pos.x;
 			else
 				x_self = m_pClient->m_LocalCharacterPos.x;
-			
-			if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-				localid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-			
-			for(int i = 0; i < MAX_CLIENTS; i++)
-			{
-				if(!m_pClient->m_Snap.m_aCharacters[i].m_Active || i == localid)
-					continue;
-				int x = m_pClient->m_Snap.m_aCharacters[i].m_Cur.m_X;
-				int y = m_pClient->m_Snap.m_aCharacters[i].m_Cur.m_Y;
-				int dist = (x-cur_x)*(x-cur_x) + (y-cur_y)*(y-cur_y);
-				if(dist < mindist)
-				{
-					mindist = dist;
-					id = i;
-				}
-			}
+
+			int id = GetNearestID();
 			
 			if(m_pClient->m_Snap.m_aCharacters[id].m_Cur.m_X == 0)
 				x_target = x_self;
@@ -422,8 +371,8 @@ int CControls::SnapInput(int *pData)
 			
 			if((r1<delta/g_Config.m_ClRideThreshold1) && (delta>g_Config.m_ClRideThreshold2))
 			{
-				if(x_self<x_target) m_InputData.m_Direction = 1; //s leva v prava
-				if(x_self>x_target) m_InputData.m_Direction = -1; //s prava v leva
+				if(x_self<x_target) m_InputData.m_Direction = 1;
+				if(x_self>x_target) m_InputData.m_Direction = -1;
 			}
 		}
 
@@ -625,4 +574,27 @@ void CControls::AutoHook()
 				m_InputData.m_Hook = 0;
 		}
 	}
+}
+
+int CControls::GetNearestID()
+{
+	int id = -1;
+	int64 mindist = 1000000000LL;
+	int x1 = int(m_pClient->m_pControls->m_TargetPos.x);
+	int y1 = int(m_pClient->m_pControls->m_TargetPos.y);
+	int localid = m_pClient->m_Snap.m_LocalClientID;
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(!m_pClient->m_Snap.m_aCharacters[i].m_Active || i == localid)
+			continue;
+		int x = m_pClient->m_Snap.m_aCharacters[i].m_Cur.m_X;
+		int y = m_pClient->m_Snap.m_aCharacters[i].m_Cur.m_Y;
+		int64 dist = (x-x1)*(x-x1) + (y-y1)*(y-y1);
+		if(dist < mindist)
+		{
+			mindist = dist;
+			id = i;
+		}
+	}
+	return id;
 }
