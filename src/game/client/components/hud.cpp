@@ -414,11 +414,12 @@ void CHud::RenderCursor()
 		RenderTools()->SelectSprite(SPRITE_DOTDOT);
 	float i = 0.02f;
 	vec2 startvel(cos(angle), sin(angle));
+	vec2 ProjStartPos = m_pClient->m_LocalCharacterPos+startvel*28*0.75f;
 	if (g_Config.m_ClAimline>0)
 		while (i<lifetime)
 		{		
 			i += 1.f/g_Config.m_ClAimline;
-			vec2 pos = CalcPos(m_pClient->m_LocalCharacterPos, startvel, curvature, speed, i);		
+			vec2 pos = CalcPos(ProjStartPos, startvel, curvature, speed, i);		
 			if (Collision()->GetCollisionAt(pos.x,pos.y)) break;
 				RenderTools()->DrawSprite(pos.x,pos.y, 5);
 		}

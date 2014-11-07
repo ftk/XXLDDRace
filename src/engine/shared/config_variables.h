@@ -217,7 +217,7 @@ MACRO_CONFIG_INT(ClRideThreshold1, cl_ride_threshold1, 75, 1, 500000, CFGFLAG_SA
 MACRO_CONFIG_INT(ClRideThreshold2, cl_ride_threshold2, 5, 0, 5000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "RIDEBOT> Dead zone")
 MACRO_CONFIG_INT(ClRideSet, cl_ride_set, 2, 0, 2, CFGFLAG_SAVE|CFGFLAG_CLIENT, "RIDEBOT> Self coordinates 0:Local | 1:Server | 2:Predicted")
 
-MACRO_CONFIG_INT(ClAimline, cl_aimline, 0, 0, 250, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Aim line point frequency")
+MACRO_CONFIG_INT(ClAimline, cl_aimline, 0, 0, 0x7FFFFFF, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Aim line point frequency")
 MACRO_CONFIG_INT(ClHUDSolo, cl_hud_solo, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Solo indicator> 0:Chat 1:Icon+Chat 2:Icon")
 
 MACRO_CONFIG_STR(ClQuitMessageText, cl_quit_message, 256, "", CFGFLAG_SAVE|CFGFLAG_CLIENT, "Set custom disconnecting reason")
