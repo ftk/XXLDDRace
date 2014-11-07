@@ -376,6 +376,53 @@ void CHud::RenderCursor()
 	Graphics()->QuadsBegin();
 
 	// render cursor
+	
+	int weap = m_pClient->m_Snap.m_pLocalCharacter->m_Weapon%NUM_WEAPONS;
+	float angle = GetAngle(m_pClient->m_pControls->m_MousePos);
+	float lifetime = 0;
+	float curvature = 0;
+	float speed = 0;
+	//int reflect = 0;
+	//int reflect_max = 0;
+
+	if (weap==WEAPON_GUN)
+	{
+		lifetime = m_pClient->m_Tuning.m_GunLifetime;
+		curvature = m_pClient->m_Tuning.m_GunCurvature;
+		speed = m_pClient->m_Tuning.m_GunSpeed;
+		//m_pClient->m_Tuning.Get(i, &Current);
+	}
+	else if (weap==WEAPON_GRENADE)
+	{
+		lifetime = m_pClient->m_Tuning.m_GrenadeLifetime;
+		curvature = m_pClient->m_Tuning.m_GrenadeCurvature;
+		speed = m_pClient->m_Tuning.m_GrenadeSpeed;
+	}
+	else if (weap==WEAPON_SHOTGUN)
+	{
+		lifetime = m_pClient->m_Tuning.m_ShotgunLifetime;
+		curvature = m_pClient->m_Tuning.m_ShotgunCurvature;
+		speed = m_pClient->m_Tuning.m_ShotgunSpeed;
+	}
+	else if (weap==WEAPON_RIFLE)
+	{
+		lifetime = 2.0f;
+		curvature = 0.0f;
+		speed = 5000.0f;
+		//reflect_max = 1;		
+	}
+		RenderTools()->SelectSprite(SPRITE_DOTDOT);
+	float i = 0.02f;
+	vec2 startvel(cos(angle), sin(angle));
+	if (g_Config.m_ClAimline>0)
+		while (i<lifetime)
+		{		
+			i += 1.f/g_Config.m_ClAimline;
+			vec2 pos = CalcPos(m_pClient->m_LocalCharacterPos, startvel, curvature, speed, i);		
+			if (Collision()->GetCollisionAt(pos.x,pos.y)) break;
+				RenderTools()->DrawSprite(pos.x,pos.y, 5);
+		}
+	
 	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[m_pClient->m_Snap.m_pLocalCharacter->m_Weapon%NUM_WEAPONS].m_pSpriteCursor);
 	float CursorSize = 64;
 	RenderTools()->DrawSprite(m_pClient->m_pControls->m_TargetPos.x, m_pClient->m_pControls->m_TargetPos.y, CursorSize);
