@@ -428,7 +428,7 @@ void CClient::SendInput()
 	// pack input
 	CMsgPacker Msg(NETMSG_INPUT);
 	Msg.AddInt(m_AckGameTick);
-	Msg.AddInt(m_PredTick);
+	Msg.AddInt(m_PredTick + g_Config.m_ClTimeMachine);
 	Msg.AddInt(Size);
 
 	m_aInputs[m_CurrentInput].m_Tick = m_PredTick;
@@ -1198,8 +1198,8 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_INPUTTIMING)
 		{
-			int InputPredTick = Unpacker.GetInt();
-			int TimeLeft = Unpacker.GetInt();
+			int InputPredTick = Unpacker.GetInt() - g_Config.m_ClTimeMachine;
+			int TimeLeft = Unpacker.GetInt() - g_Config.m_ClTimeMachine * (1000 / 50);
 
 			// adjust our prediction time
 			int64 Target = 0;
