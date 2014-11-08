@@ -636,27 +636,26 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 	// it is not allowed to aim in the center
 	if(m_Input.m_TargetX == 0 && m_Input.m_TargetY == 0)
 		m_Input.m_TargetY = -1;
-
-	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
-        mem_copy(&m_LatestInput, pNewInput, sizeof(m_LatestInput));
-
-	// it is not allowed to aim in the center
-        if(m_LatestInput.m_TargetX == 0 && m_LatestInput.m_TargetY == 0)
-                m_LatestInput.m_TargetY = -1;
-	if(m_NumInputs > 2 && m_pPlayer->GetTeam() != TEAM_SPECTATORS)
-        {
-                HandleWeaponSwitch();
-                FireWeapon();
-        }
-        if(pNewInput->m_Jump&1 && m_Super && m_Fly) //XXLmod
-                HandleFly();
-
-        mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
-
 }
 
 void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 {
+	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
+	mem_copy(&m_LatestInput, pNewInput, sizeof(m_LatestInput));
+
+	// it is not allowed to aim in the center
+	if(m_LatestInput.m_TargetX == 0 && m_LatestInput.m_TargetY == 0)
+		m_LatestInput.m_TargetY = -1;
+
+	if(m_NumInputs > 2 && m_pPlayer->GetTeam() != TEAM_SPECTATORS)
+	{
+		HandleWeaponSwitch();
+		FireWeapon();
+	}
+	if(pNewInput->m_Jump&1 && m_Super && m_Fly) //XXLmod
+		HandleFly();
+
+	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
 }
 
 void CCharacter::ResetInput()
