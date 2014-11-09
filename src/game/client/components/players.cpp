@@ -348,8 +348,13 @@ void CPlayers::RenderPlayer(
 		/* AIMLINES START */
 		if (g_Config.m_ClAimline>0)
 		{
-			float Angle = round(GetAngle(Direction) * 256) / 256.f; // compress and decompress
-			vec2 Dir(cosf(Angle), sinf(Angle));
+			vec2 Dir = Direction;
+			if(pInfo.m_Local)
+			{
+				Dir.x = round(m_pClient->m_pControls->m_MousePos.x);
+				Dir.y = round(m_pClient->m_pControls->m_MousePos.y);
+				Dir = normalize(Dir);
+			}
 			vec2 ProjStartPos = Position+Dir*21;
 
 			if(Player.m_Weapon == WEAPON_RIFLE || (m_pClient->IsDDRaceServer() && Player.m_Weapon == WEAPON_SHOTGUN))
