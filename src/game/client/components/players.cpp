@@ -344,73 +344,75 @@ void CPlayers::RenderPlayer(
 			Graphics()->LinesDraw(&LineItem, 1);
 			Graphics()->LinesEnd();
 		}
-		
+
 		/* AIMLINES START */
 		if (g_Config.m_ClAimline>0)
 		{
-			float lifetime = 0;
-			float curvature = 0;
-			float speed = 0;
-			float i = 0;
-			vec2 vel = Direction;
-			vec2 ProjStartPos = Position+vel*21;
+			float Angle = round(GetAngle(Direction) * 256) / 256.f; // compress and decompress
+			vec2 Dir(cosf(Angle), sinf(Angle));
+			vec2 ProjStartPos = Position+Dir*21;
 
 			if(Player.m_Weapon == WEAPON_RIFLE || (m_pClient->IsDDRaceServer() && Player.m_Weapon == WEAPON_SHOTGUN))
 			{
-				float m_Bounces = 0;
-					
+				int Bounces = 0;
+
 				Graphics()->TextureSet(-1);
 				Graphics()->LinesBegin();
 				Graphics()->SetColor(1, 1, 0, 0.5f);
-					
-				int m_Energy = m_pClient->m_Tuning.m_LaserReach;
-				
-				vec2 m_From = ProjStartPos;
-				vec2 To = ProjStartPos + vel * m_Energy;
-				vec2 Coltile, TempPos, TempDir;
-					
-				int Res = Collision()->IntersectLine(m_From, To, &Coltile, &To,false);
-					
-				IGraphics::CLineItem LineItem(m_From.x, m_From.y, To.x, To.y);
-				Graphics()->LinesDraw(&LineItem, 1);
-					
-				m_Energy -= distance(m_From, To) + m_pClient->m_Tuning.m_LaserBounceCost;
-					
-				ProjStartPos = To;
-					
-				while(m_Energy>0)
-				{
-					m_From = Coltile;
-					TempDir = vel * 4.0f;
-					Res = Collision()->IntersectLine(ProjStartPos, To, &Coltile, &To,false);
-						
-					int f;
-					if(Res == -1)
-					{
-						f = Collision()->GetTile(round(Coltile.x), round(Coltile.y));
-						Collision()->SetCollisionAt(round(Coltile.x), round(Coltile.y), CCollision::COLFLAG_SOLID);
-					}
-					Collision()->MovePoint(&ProjStartPos, &TempDir, 1.0f, 0);
-					if(Res == -1)
-					{
-						Collision()->SetCollisionAt(round(Coltile.x), round(Coltile.y), f);
-					}
-					vel = normalize(TempDir);
-					To = ProjStartPos + vel * m_Energy;
 
-					Graphics()->SetColor(0, 1, 1, 0.5f);
-					IGraphics::CLineItem LineItem(m_From.x, m_From.y, Coltile.x, Coltile.y);
+				int Energy = m_pClient->m_Tuning.m_LaserReach;
+
+				vec2 From = ProjStartPos;
+				vec2 To = From + Dir * Energy;
+				vec2 Coltile, TempPos, TempDir;
+
+				while(Energy > 0)
+				{
+					int Res = Collision()->IntersectLine(From, To, &Coltile, &To,false);
+
+					if(Res)
+					{
+						TempDir = Dir * 4.0f;
+						int f;
+						if(Res == -1)
+						{
+							f = Collision()->GetTile(round(Coltile.x), round(Coltile.y));
+							Collision()->SetCollisionAt(round(Coltile.x), round(Coltile.y), CCollision::COLFLAG_SOLID);
+						}
+						TempPos = To;
+						Collision()->MovePoint(&TempPos, &TempDir, 1.0f, 0);
+						if(Res == -1)
+						{
+							Collision()->SetCollisionAt(round(Coltile.x), round(Coltile.y), f);
+						}
+						To = TempPos;
+						Dir = normalize(TempDir);
+
+						Energy -= distance(From, To) + m_pClient->m_Tuning.m_LaserBounceCost;
+						Bounces++;
+
+						To = To + Dir * Energy;
+					}
+
+					IGraphics::CLineItem LineItem(From.x, From.y, Coltile.x, Coltile.y);
 					Graphics()->LinesDraw(&LineItem, 1);
-						
-					m_Energy -= distance(m_From, Coltile) + m_pClient->m_Tuning.m_LaserBounceCost;
-					m_Bounces++;
-					if(m_Bounces > m_pClient->m_Tuning.m_LaserBounceNum)
-						break;	
+					Graphics()->SetColor(0, 1, 1, 0.5f);
+
+					if(!Res)
+						break;
+
+					From = TempPos;
+
+					if(Bounces > m_pClient->m_Tuning.m_LaserBounceNum)
+						break;
 				}
 				Graphics()->LinesEnd();
 			}
 			else
 			{
+				float lifetime = 0;
+				float curvature = 0;
+				float speed = 0;
 				if (Player.m_Weapon == WEAPON_GUN)
 				{
 					lifetime = m_pClient->m_Tuning.m_GunLifetime;
@@ -429,22 +431,32 @@ void CPlayers::RenderPlayer(
 					curvature = m_pClient->m_Tuning.m_ShotgunCurvature;
 					speed = m_pClient->m_Tuning.m_ShotgunSpeed;
 				}
+
+				Graphics()->TextureSet(-1);
+				Graphics()->LinesBegin();
+				Graphics()->SetColor(1, 1, 1, 0.5f);
+
+				float i = 0;
+				vec2 prevpos = ProjStartPos;
 				while (i<lifetime)
-				{		
-				
-					vec2 pos = CalcPos(Position + Direction * 28.0f * 1.5f, Direction, curvature, speed, i);		
-					//vec2 curDir = normalize(vec2(m_pClient->m_pControls->m_MousePos.x,m_pClient->m_pControls->m_MousePos.y));
-					//vec2 pos = CalcPos(Position+curDir*21.f, curDir, curvature, speed, i);
-					if (Collision()->GetCollisionAt(pos.x,pos.y)) break;
-					RenderTools()->SelectSprite(23);
-					Graphics()->SetColor(1.0f, 0.0f, 0.0f, 1.0f);
-					RenderTools()->DrawSprite(pos.x,pos.y, 3);
+				{
+					vec2 pos = CalcPos(ProjStartPos, Direction, curvature, speed, i);
+					if (Collision()->GetCollisionAt(pos.x,pos.y) & CCollision::COLFLAG_SOLID)
+						break;
 					i += 1.f/g_Config.m_ClAimline;
+
+					if(prevpos != pos)
+					{
+						IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, pos.x, pos.y);
+						Graphics()->LinesDraw(&LineItem, 1);
+						prevpos = pos;
+					}
 				}
+				Graphics()->LinesEnd();
 			}
 		}
 		/* AIMLINES END */
-		
+
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 		Graphics()->QuadsBegin();
 		Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi*2+Angle);
