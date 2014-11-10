@@ -327,20 +327,61 @@ void CPlayers::RenderPlayer(
 	{
 		if (Player.m_PlayerFlags&PLAYERFLAG_AIM)
 		{
+			vec2 ExDirection = Direction;
+
+			if (pPlayerInfo->m_Local && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+				ExDirection = normalize(vec2(m_pClient->m_pControls->m_InputData.m_TargetX, m_pClient->m_pControls->m_InputData.m_TargetY));
+
 			Graphics()->TextureSet(-1);
-			vec2 initPos = Position + Direction * 28.0f * 1.5f;
-			vec2 finishPos = Position + Direction * (m_pClient->m_Tuning.m_HookLength);
+			vec2 initPos = Position;
+			vec2 finishPos = initPos + ExDirection * (m_pClient->m_Tuning.m_HookLength-42.0f);
+
 			Graphics()->LinesBegin();
-			Graphics()->SetColor(1.00f, 0.0f, 0.0f, 1.00f);
+			Graphics()->SetColor(1.00f, 0.0f, 0.0f, 1.0f);
 
-			int Hit = Collision()->IntersectLine(initPos, finishPos, &finishPos, 0x0, true);
-			if(Hit && !(Hit&CCollision::COLFLAG_NOHOOK))
-				Graphics()->SetColor(130.0f/255.0f, 232.0f/255.0f, 160.0f/255.0f, 1.0f);
+			vec2 OldPos = initPos + ExDirection * 42.0f;
+			vec2 NewPos = OldPos;
 
-			if(m_pClient->IntersectCharacter(initPos, finishPos, finishPos, m_pClient->m_Tuning.m_HookFireSpeed, pInfo.m_ClientID) != -1)
-				Graphics()->SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+			bool doBreak = false;
+			int Hit = 0;
 
-			IGraphics::CLineItem LineItem(Position.x, Position.y, finishPos.x, finishPos.y);
+			do {
+				OldPos = NewPos;
+				NewPos = OldPos + ExDirection * m_pClient->m_Tuning.m_HookFireSpeed;
+
+				if (distance(initPos, NewPos) > m_pClient->m_Tuning.m_HookLength)
+				{
+					NewPos = initPos + normalize(NewPos-initPos) * m_pClient->m_Tuning.m_HookLength;
+					doBreak = true;
+				}
+
+				Hit = Collision()->IntersectLine(OldPos, NewPos, &finishPos, 0x0, true);
+
+				if(!doBreak && Hit) {
+					if (!(Hit&CCollision::COLFLAG_NOHOOK))
+						Graphics()->SetColor(130.0f/255.0f, 232.0f/255.0f, 160.0f/255.0f, 1.0f);
+				}
+
+				if(m_pClient->m_Tuning.m_PlayerHooking && m_pClient->IntersectCharacter(OldPos, finishPos, finishPos, m_pClient->m_Tuning.m_HookFireSpeed, pPlayerInfo->m_ClientID) != -1)
+				{
+					Graphics()->SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+					break;
+				}
+
+				if(Hit)
+					break;
+
+				NewPos.x = round(NewPos.x);
+				NewPos.y = round(NewPos.y);
+
+				if (OldPos == NewPos)
+					break;
+
+				ExDirection.x = round(ExDirection.x*256.0f) / 256.0f;
+				ExDirection.y = round(ExDirection.y*256.0f) / 256.0f;
+			} while (!doBreak);
+
+			IGraphics::CLineItem LineItem(initPos.x, initPos.y, finishPos.x, finishPos.y);
 			Graphics()->LinesDraw(&LineItem, 1);
 			Graphics()->LinesEnd();
 		}
