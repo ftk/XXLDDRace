@@ -482,15 +482,14 @@ void CPlayers::RenderPlayer(
 				Graphics()->LinesBegin();
 				Graphics()->SetColor(1, 1, 1, 0.5f);
 
-				float i = 0;
 				vec2 prevpos = ProjStartPos;
-				while (i<lifetime)
+				vec2 BOOM_POS;
+				for(float i = 0;i<Client()->GameTickSpeed()*lifetime;i++)
 				{
-					vec2 pos = CalcPos(ProjStartPos, Dir, curvature, speed, i);
-					if (Collision()->GetCollisionAt(pos.x,pos.y) & CCollision::COLFLAG_SOLID)
+					vec2 pos = CalcPos(ProjStartPos, Dir, curvature, speed, i/Client()->GameTickSpeed());
+					if (Collision()->IntersectLine(prevpos, pos, &BOOM_POS, 0, false))
 						break;
-					i += 1.f/g_Config.m_ClAimline;
-
+					
 					if(prevpos != pos)
 					{
 						IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, pos.x, pos.y);
@@ -498,6 +497,9 @@ void CPlayers::RenderPlayer(
 						prevpos = pos;
 					}
 				}
+				Graphics()->SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+				IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, BOOM_POS.x, BOOM_POS.y);
+				Graphics()->LinesDraw(&LineItem, 1);
 				Graphics()->LinesEnd();
 			}
 		}
