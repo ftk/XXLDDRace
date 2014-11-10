@@ -66,23 +66,8 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 	if(pCurrent->m_Type == WEAPON_GRENADE)
 	{
 		m_pClient->m_pEffects->SmokeTrail(Pos, Vel*-1);
-		static float s_Time = 0.0f;
-		static float s_LastLocalTime = Client()->LocalTime();
-
-		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-		{
-			const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-			if(!pInfo->m_Paused)
-				s_Time += (Client()->LocalTime()-s_LastLocalTime)*pInfo->m_Speed;
-		}
-		else
-		{
-			if(m_pClient->m_Snap.m_pGameInfoObj && !(m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_PAUSED))
-				s_Time += Client()->LocalTime()-s_LastLocalTime;
-		}
-
-		Graphics()->QuadsSetRotation(s_Time*pi*2*2 + ItemID);
-		s_LastLocalTime = Client()->LocalTime();
+		// d/dt(a*t^2 + v*t + c) = 2*a*t + v, where a = Curvature / 10000, t = Speed * Ct
+		Graphics()->QuadsSetRotation(pi/2 - atan2(StartVel.x, StartVel.y + 2 * Curvature / 10000 * Speed * Ct));
 	}
 	else
 	{
