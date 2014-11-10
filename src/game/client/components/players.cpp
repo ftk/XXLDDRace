@@ -486,7 +486,7 @@ void CPlayers::RenderPlayer(
 				vec2 prevpos = ProjStartPos;
 				while (i<lifetime)
 				{
-					vec2 pos = CalcPos(ProjStartPos, Direction, curvature, speed, i);
+					vec2 pos = CalcPos(ProjStartPos, Dir, curvature, speed, i);
 					if (Collision()->GetCollisionAt(pos.x,pos.y) & CCollision::COLFLAG_SOLID)
 						break;
 					i += 1.f/g_Config.m_ClAimline;
