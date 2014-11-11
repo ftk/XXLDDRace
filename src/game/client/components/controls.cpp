@@ -20,7 +20,8 @@
 
 CControls::CControls() : auto_hit(false), hit_interval(0), 
 			 auto_hook(false), auto_hook_type(0),
-			 auto_jump(false), jump_interval(0)
+			 auto_jump(false), jump_interval(0),
+			 aimbot(-1)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -198,7 +199,7 @@ void CControls::OnConsoleInit()
 	Console()->Register("autohook", "i?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
-	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to the nearest player");
+	Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, this, "Aimbot lock to the nearest player");
 
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
