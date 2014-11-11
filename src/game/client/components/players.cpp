@@ -387,7 +387,7 @@ void CPlayers::RenderPlayer(
 		}
 
 		/* AIMLINES START */
-		if (g_Config.m_ClAimline>0)
+		if (g_Config.m_ClAimline && m_pClient->IsDDRaceServer())
 		{
 			vec2 Dir = Direction;
 			if(pInfo.m_Local)
@@ -398,7 +398,7 @@ void CPlayers::RenderPlayer(
 			}
 			vec2 ProjStartPos = Position+Dir*21;
 
-			if(Player.m_Weapon == WEAPON_RIFLE || (m_pClient->IsDDRaceServer() && Player.m_Weapon == WEAPON_SHOTGUN))
+			if(Player.m_Weapon == WEAPON_RIFLE || Player.m_Weapon == WEAPON_SHOTGUN)
 			{
 				int Bounces = 0;
 
@@ -454,7 +454,7 @@ void CPlayers::RenderPlayer(
 				}
 				Graphics()->LinesEnd();
 			}
-			else
+			else if (Player.m_Weapon == WEAPON_GUN || Player.m_Weapon == WEAPON_GRENADE)
 			{
 				float lifetime = 0;
 				float curvature = 0;
@@ -470,12 +470,6 @@ void CPlayers::RenderPlayer(
 					lifetime = m_pClient->m_Tuning.m_GrenadeLifetime;
 					curvature = m_pClient->m_Tuning.m_GrenadeCurvature;
 					speed = m_pClient->m_Tuning.m_GrenadeSpeed;
-				}
-				else if (Player.m_Weapon == WEAPON_SHOTGUN)
-				{
-					lifetime = m_pClient->m_Tuning.m_ShotgunLifetime;
-					curvature = m_pClient->m_Tuning.m_ShotgunCurvature;
-					speed = m_pClient->m_Tuning.m_ShotgunSpeed;
 				}
 
 				Graphics()->TextureSet(-1);
