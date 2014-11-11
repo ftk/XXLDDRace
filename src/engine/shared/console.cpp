@@ -580,12 +580,13 @@ void CConsole::ConModCommandStatus(IResult *pResult, void *pUser)
 		pConsole->Print(OUTPUT_LEVEL_STANDARD, "Console", aBuf);
 }
 
-struct CIntVariableData
+template <typename T>
+struct CNumericVariableData
 {
 	IConsole *m_pConsole;
-	int *m_pVariable;
-	int m_Min;
-	int m_Max;
+	T *m_pVariable;
+	T m_Min;
+	T m_Max;
 };
 
 struct CStrVariableData
@@ -597,7 +598,7 @@ struct CStrVariableData
 
 static void IntVariableCommand(IConsole::IResult *pResult, void *pUserData)
 {
-	CIntVariableData *pData = (CIntVariableData *)pUserData;
+	CNumericVariableData<int> *pData = (CNumericVariableData<int> *)pUserData;
 
 	if(pResult->NumArguments())
 	{
@@ -620,6 +621,33 @@ static void IntVariableCommand(IConsole::IResult *pResult, void *pUserData)
 		str_format(aBuf, sizeof(aBuf), "Value: %d", *(pData->m_pVariable));
 		pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Console", aBuf);
 	}
+}
+
+static void FloatVariableCommand(IConsole::IResult *pResult, void *pUserData)
+{
+        CNumericVariableData<float> *pData = (CNumericVariableData<float> *)pUserData;
+
+        if(pResult->NumArguments())
+        {
+                float Val = pResult->GetFloat(0);
+
+                // do clamping
+                if(pData->m_Min != pData->m_Max)
+                {
+                        if (Val < pData->m_Min)
+                                Val = pData->m_Min;
+                        if (pData->m_Max != 0 && Val > pData->m_Max)
+                                Val = pData->m_Max;
+                }
+
+                *(pData->m_pVariable) = Val;
+        }
+        else
+        {
+                char aBuf[1024];
+                str_format(aBuf, sizeof(aBuf), "Value: %f", *(pData->m_pVariable));
+                pData->m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Console", aBuf);
+        }
 }
 
 static void StrVariableCommand(IConsole::IResult *pResult, void *pUserData)
@@ -677,7 +705,7 @@ void CConsole::ConToggle(IConsole::IResult *pResult, void *pUser)
 
 		if(pfnCallback == IntVariableCommand)
 		{
-			CIntVariableData *pData = static_cast<CIntVariableData *>(pUserData);
+			CNumericVariableData<int> *pData = static_cast<CNumericVariableData<int> *>(pUserData);
 			int Val = *(pData->m_pVariable)==pResult->GetInteger(1) ? pResult->GetInteger(2) : pResult->GetInteger(1);
 			str_format(aBuf, sizeof(aBuf), "%s %i", pResult->GetString(0), Val);
 			pConsole->ExecuteLine(aBuf);
@@ -823,8 +851,14 @@ CConsole::CConsole(int FlagMask)
 	// TODO: this should disappear
 	#define MACRO_CONFIG_INT(Name,ScriptName,Def,Min,Max,Flags,Desc) \
 	{ \
-		static CIntVariableData Data = { this, &g_Config.m_##Name, Min, Max }; \
+                static CNumericVariableData<int> Data = { this, &g_Config.m_##Name, Min, Max }; \
 		Register(#ScriptName, "?i", Flags, IntVariableCommand, &Data, Desc); \
+	}
+
+#define MACRO_CONFIG_FLOAT(Name,ScriptName,Def,Min,Max,Flags,Desc)        \
+        {                                                               \
+                static CNumericVariableData<float> Data = { this, &g_Config.m_##Name, Min, Max }; \
+                Register(#ScriptName, "?i", Flags, FloatVariableCommand, &Data, Desc); \
 	}
 
 	#define MACRO_CONFIG_STR(Name,ScriptName,Len,Def,Flags,Desc) \
