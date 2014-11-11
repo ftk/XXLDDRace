@@ -58,7 +58,7 @@ $(all_objs): $(generated_h) | $$(dir $$@)
 
 # rules for obj dirs
 $(sort $(dir $(all_objs))):
-	mkdir '$@'
+	mkdir "$@"
 
 
 
