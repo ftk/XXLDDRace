@@ -396,7 +396,6 @@ void CPlayers::RenderPlayer(
 				Dir.y = round(m_pClient->m_pControls->m_MousePos.y);
 				Dir = normalize(Dir);
 			}
-			vec2 ProjStartPos = Position+Dir*21;
 
 			if(Player.m_Weapon == WEAPON_RIFLE || Player.m_Weapon == WEAPON_SHOTGUN)
 			{
@@ -408,7 +407,7 @@ void CPlayers::RenderPlayer(
 
 				int Energy = m_pClient->m_Tuning.m_LaserReach;
 
-				vec2 From = ProjStartPos;
+				vec2 From = Position+Dir;
 				vec2 To = From + Dir * Energy;
 				vec2 Coltile, TempPos, TempDir;
 
@@ -476,6 +475,7 @@ void CPlayers::RenderPlayer(
 				Graphics()->LinesBegin();
 				Graphics()->SetColor(1, 1, 1, 0.5f);
 
+				vec2 ProjStartPos = Position+Dir*21;
 				vec2 prevpos = ProjStartPos;
 				vec2 BOOM_POS;
 				for(float i = 0;i<Client()->GameTickSpeed()*lifetime;i++)
