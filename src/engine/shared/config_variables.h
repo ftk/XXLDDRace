@@ -226,6 +226,11 @@ MACRO_CONFIG_INT(ClDamageIndTime, cl_damageind_time, 500, 0, 99999, CFGFLAG_SAVE
 MACRO_CONFIG_INT(ClDamageIndSpeed, cl_damageind_speed, 500, 0, 99999, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Damage indicator speed")
 MACRO_CONFIG_INT(ClTimeMachine, cl_time_machine, 0, -1000, 1000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Delay sending input")
 
+MACRO_CONFIG_FLOAT(ClAimbotPredict0, cl_aimbot_predict0, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Prediction coefficient 0")
+MACRO_CONFIG_FLOAT(ClAimbotPredict1, cl_aimbot_predict1, 0.0125, 0, 0, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Prediction coefficient 1")
+MACRO_CONFIG_INT(ClAimbotSmooth, cl_aimbot_smooth, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Toggle smoother visual aim (0=on input send, 1=on render, 2=stealth")
+
+
 // these might need some fine tuning
 MACRO_CONFIG_INT(SvChatPenalty, sv_chat_penalty, 250, 50, 1000, CFGFLAG_SERVER, "chat score will be increased by this on every message, and decremented by 1 on every tick.")
 MACRO_CONFIG_INT(SvChatThreshold, sv_chat_threshold, 1000, 50, 10000 , CFGFLAG_SERVER, "if chats core exceeds this, the player will be muted for sv_spam_mute_duration seconds")

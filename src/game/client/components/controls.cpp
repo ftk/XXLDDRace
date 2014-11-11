@@ -19,7 +19,8 @@
 #include "controls.h"
 
 CControls::CControls() : auto_hit(false), hit_interval(0), 
-	auto_hook(false), auto_hook_type(0), aimbot(-1), aimbot_predict(0.f), aimbot_predict_dist(0.012f /* 1 / HookFireSpeed */), aimbot_smooth(0), auto_jump(false), jump_interval(0)
+			 auto_hook(false), auto_hook_type(0),
+			 auto_jump(false), jump_interval(0)
 {
 	mem_zero(&m_LastData, sizeof(m_LastData));
 }
@@ -138,8 +139,7 @@ static void ConAutoJump(IConsole::IResult *pResult, void *pUserData)
 	pSelf->auto_jump = !!pResult->GetInteger(0);
 	if(!pSelf->auto_jump)
 	{
-		if(pSelf->m_InputData.m_Jump & 1)
-			pSelf->m_InputData.m_Jump = (pSelf->m_InputData.m_Jump + 1) & INPUT_STATE_MASK;
+		pSelf->m_InputData.m_Jump = !pSelf->m_InputData.m_Jump;
 	}
 	pSelf->jump_interval = int64(pResult->GetInteger(1)) * time_freq() / 1000LL;
 }
@@ -160,59 +160,24 @@ static void ConAimbotLock(IConsole::IResult *pResult, void *pUserData)
 	pSelf->aimbot = online ? pResult->GetInteger(1) : (-1);
 }
 
-struct CAimbot
-{
-	CGameClient *pClient;
-	CControls *pControls;
-};
-
 static void ConAimbot(IConsole::IResult *pResult, void *pUserData)
 {
-	CAimbot *pSelf = (CAimbot *)pUserData;
+	CControls *pSelf = (CControls *)pUserData;
 	if(!pResult->GetInteger(0))
 	{
-		pSelf->pControls->aimbot = (-1);
+		pSelf->aimbot = (-1);
 		return;
 	}
-	else if(pSelf->pControls->aimbot != -1)
+	else if(pSelf->aimbot != -1)
 		return;
-	if(!pSelf->pClient->IsDDRaceServer())
-		return;
-	
-	pSelf->pControls->aimbot = pSelf->pControls->GetNearestID();
-	pSelf->pControls->Aim();
-}
-static void ConAimbotPredict(IConsole::IResult *pResult, void *pUserData)
-{
-	CControls *pSelf = (CControls *)pUserData;
-	pSelf->aimbot_predict = pResult->GetFloat(0);
-}
-static void ConAimbotPredictDistance(IConsole::IResult *pResult, void *pUserData)
-{
-	CControls *pSelf = (CControls *)pUserData;
-	pSelf->aimbot_predict_dist = pResult->GetFloat(0);
-}
 
-static void ConfigSaveCallback(class IConfig *pConfig, void *pUserData)
-{
-	CControls *pSelf = (CControls *)pUserData;
-	
-	char buf[128];
-	str_format(buf, sizeof(buf), "aimbot_predict %f", pSelf->aimbot_predict);
-	pConfig->WriteLine(buf);
-	str_format(buf, sizeof(buf), "aimbot_dist %f", pSelf->aimbot_predict_dist);
-	pConfig->WriteLine(buf);
-	str_format(buf, sizeof(buf), "aimbot_smooth %d", pSelf->aimbot_smooth);
-	pConfig->WriteLine(buf);
+	pSelf->aimbot = pSelf->GetNearestID();
+	pSelf->Aim();
 }
 
 
 void CControls::OnConsoleInit()
 {
-	IConfig *pConfig = Kernel()->RequestInterface<IConfig>();
-	if(pConfig)
-		pConfig->RegisterCallback(ConfigSaveCallback, this);
-	
 	// game commands
 	Console()->Register("+left", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputDirectionLeft, "Move left");
 	Console()->Register("+right", "", CFGFLAG_CLIENT, ConKeyInputState, &m_InputDirectionRight, "Move right");
@@ -233,15 +198,8 @@ void CControls::OnConsoleInit()
 	Console()->Register("autohook", "i?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+autohook", "?i", CFGFLAG_CLIENT, ConAutoHook, this, "Auto hook");
 	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to player");
-	{ static CAimbot s_Set = {m_pClient, this}; Console()->Register("+aimbotnear", "", CFGFLAG_CLIENT, ConAimbot, (void *)&s_Set, "Aimbot lock to the nearest player"); }
-	Console()->Register("aimbot_predict", "f", CFGFLAG_CLIENT, ConAimbotPredict, this, "Set aimbot prediction");
-	Console()->Register("aimbot_dist", "f", CFGFLAG_CLIENT, ConAimbotPredictDistance, this, "Set aimbot prediction distance multiplier");
-    
-	Console()->Register("aimbot_smooth", "i", CFGFLAG_CLIENT, ([](IConsole::IResult *pResult, void *pUserData)
-								   {
-									   ((CControls *)pUserData)->aimbot_smooth = pResult->GetInteger(0);
-								   }), this, "Toggle smoother visual aim (0=on input send, 1=on render, 2=stealth");
-    
+	Console()->Register("+aimbot", "i", CFGFLAG_CLIENT, ConAimbotLock, this, "Aimbot lock to the nearest player");
+
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 1}; Console()->Register("+weapon1", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to hammer"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 2}; Console()->Register("+weapon2", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to gun"); }
 	{ static CInputSet s_Set = {this, &m_InputData.m_WantedWeapon, 3}; Console()->Register("+weapon3", "", CFGFLAG_CLIENT, ConKeyInputSet, (void *)&s_Set, "Switch to shotgun"); }
@@ -301,7 +259,7 @@ int CControls::SnapInput(int *pData)
 	}
 	if(auto_jump && last_jump_time + jump_interval < time)
 	{
-		m_InputData.m_Jump = (m_InputData.m_Jump + 1) & INPUT_STATE_MASK;
+		m_InputData.m_Jump = !m_InputData.m_Jump;
 		last_jump_time = time;
 		Send = true;
 	}
@@ -310,13 +268,13 @@ int CControls::SnapInput(int *pData)
 	{
 		AutoHook();
 	}
-	if(aimbot_smooth == 0 || aimbot_smooth == 1)
+	if(g_Config.m_ClAimbotSmooth == 0 || g_Config.m_ClAimbotSmooth == 1)
 		Aim();
 	else 
 	{
-		if((aimbot_smooth&2 && m_InputData.m_Fire != m_LastData.m_Fire && m_InputData.m_Fire&1) ||
-			(aimbot_smooth&4 && ((!m_LastData.m_Hook && m_InputData.m_Hook) || auto_hook)))
-				Aim();
+		if((g_Config.m_ClAimbotSmooth&2 && m_InputData.m_Fire != m_LastData.m_Fire && m_InputData.m_Fire&1) ||
+		   (g_Config.m_ClAimbotSmooth&4 && ((!m_LastData.m_Hook && m_InputData.m_Hook) || auto_hook)))
+			Aim();
 	}
 
 
@@ -405,9 +363,9 @@ int CControls::SnapInput(int *pData)
 			else if(m_InputData.m_WantedWeapon != m_LastData.m_WantedWeapon) Send = true;
 			else if(m_InputData.m_NextWeapon != m_LastData.m_NextWeapon) Send = true;
 			else if(m_InputData.m_PrevWeapon != m_LastData.m_PrevWeapon) Send = true;
-            else if(m_InputData.m_TargetX != m_LastData.m_TargetX) Send = true;
-            else if(m_InputData.m_TargetY != m_LastData.m_TargetY) Send = true;
-        }
+			else if(m_InputData.m_TargetX != m_LastData.m_TargetX) Send = true;
+			else if(m_InputData.m_TargetY != m_LastData.m_TargetY) Send = true;
+		}
 	}
 
 	// copy and return size
@@ -423,7 +381,7 @@ int CControls::SnapInput(int *pData)
 
 void CControls::OnRender()
 {
-	if(aimbot_smooth == 1)
+	if(g_Config.m_ClAimbotSmooth == 1)
 		Aim();
 
 	// update target pos
@@ -438,7 +396,7 @@ void CControls::OnRender()
 bool CControls::OnMouseMove(float x, float y)
 {
 	if((m_pClient->m_Snap.m_pGameInfoObj && m_pClient->m_Snap.m_pGameInfoObj->m_GameStateFlags&GAMESTATEFLAG_PAUSED) ||
-		(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()) || (aimbot != -1 && aimbot_smooth < 2))
+		(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()) || (aimbot != -1 && g_Config.m_ClAimbotSmooth < 2))
 		return false;
 
 	m_MousePos += vec2(x, y); // TODO: ugly
@@ -471,6 +429,8 @@ void CControls::Aim()
 {
 	if(aimbot != -1 && m_pClient->m_Snap.m_aCharacters[aimbot].m_Active)
 	{
+		if(!m_pClient->IsDDRaceServer())
+                        return;
 		//const int localid = m_pClient->m_Snap.m_LocalClientID;
 		
 		vec2 pos_local = m_pClient->m_LocalCharacterPos;
@@ -481,17 +441,17 @@ void CControls::Aim()
 			//int specid = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
 			pos_local = m_pClient->m_Snap.m_SpecInfo.m_Position;
 		}
-		if(aimbot_predict != 0.f || aimbot_predict_dist != 0.f)
+		if(g_Config.m_ClAimbotPredict0 != 0.f || g_Config.m_ClAimbotPredict1 != 0.f)
 		{
 			//vec2 vel_local = m_pClient->m_aClients[localid].m_Predicted.m_Vel;
 			vec2 vel = m_pClient->m_aClients[aimbot].m_Predicted.m_Vel;
 			
-			pos += vel * aimbot_predict;
-			//pos_local += vel_local * aimbot_predict;
+			pos += vel * g_Config.m_ClAimbotPredict0;
+			//pos_local += vel_local * g_Config.m_ClAimbotPredict0;
 			float dist = distance(pos, pos_local);
-            
-			pos += vel * (dist * aimbot_predict_dist);
-			//pos_local += vel_local * (dist * aimbot_predict_dist);
+
+			pos += vel * (dist * g_Config.m_ClAimbotPredict1);
+			//pos_local += vel_local * (dist * g_Config.m_ClAimbotPredict1);
 		}
 		
 		if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
