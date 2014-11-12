@@ -397,13 +397,26 @@ void CPlayers::RenderPlayer(
 				Dir = normalize(Dir);
 			}
 
+			int ClientID = pPlayerInfo->m_ClientID;
+
 			if(Player.m_Weapon == WEAPON_RIFLE || Player.m_Weapon == WEAPON_SHOTGUN)
 			{
 				int Bounces = 0;
 
 				Graphics()->TextureSet(-1);
 				Graphics()->LinesBegin();
-				Graphics()->SetColor(1, 1, 0, 0.5f);
+				vec3 BodyColor;
+
+				if(m_pClient->m_aClients[ClientID].m_UseCustomColor)
+					BodyColor = m_pClient->m_pSkins->GetColorV3(m_pClient->m_aClients[ClientID].m_ColorBody);
+				else
+				{
+					const CSkins::CSkin *s = m_pClient->m_pSkins->Get(m_pClient->m_aClients[ClientID].m_SkinID);
+					if(s)
+						BodyColor = s->m_BloodColor;
+				}
+
+				Graphics()->SetColor(BodyColor.r, BodyColor.g, BodyColor.b, 0.75f);
 
 				int Energy = m_pClient->m_Tuning.m_LaserReach;
 
@@ -414,6 +427,13 @@ void CPlayers::RenderPlayer(
 				while(Energy > 0)
 				{
 					int Res = Collision()->IntersectLine(From, To, &Coltile, &To,false);
+
+				if(m_pClient->IntersectCharacter(From, To, To, 0, ClientID) != -1)
+				{
+					IGraphics::CLineItem LineItem(From.x, From.y, To.x, To.y);
+					Graphics()->LinesDraw(&LineItem, 1);
+					break;
+				}
 
 					if(Res)
 					{
@@ -441,7 +461,6 @@ void CPlayers::RenderPlayer(
 
 					IGraphics::CLineItem LineItem(From.x, From.y, Coltile.x, Coltile.y);
 					Graphics()->LinesDraw(&LineItem, 1);
-					Graphics()->SetColor(0, 1, 1, 0.5f);
 
 					if(!Res)
 						break;
@@ -483,7 +502,9 @@ void CPlayers::RenderPlayer(
 					vec2 pos = CalcPos(ProjStartPos, Dir, curvature, speed, i/Client()->GameTickSpeed());
 					if (Collision()->IntersectLine(prevpos, pos, &BOOM_POS, 0, false))
 						break;
-					
+					if(m_pClient->IntersectCharacter(prevpos, pos, BOOM_POS, 0, ClientID) != -1)
+						break;
+
 					if(prevpos != pos)
 					{
 						IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, pos.x, pos.y);
