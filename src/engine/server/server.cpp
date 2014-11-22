@@ -896,8 +896,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				return; // no map w/o password, sorry guys
 
 			int Chunk = Unpacker.GetInt();
-			int ChunkSize = 1024-128;
-			int Offset = Chunk * ChunkSize;
+			unsigned int ChunkSize = 1024-128;
+			unsigned int Offset = Chunk * ChunkSize;
 			int Last = 0;
 
 			lastask[ClientID] = Chunk;
@@ -908,14 +908,12 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			}
 
 			// drop faulty map data requests
-			if(Chunk < 0 || Offset > m_CurrentMapSize)
+			if(Chunk < 0 || Offset > (unsigned)m_CurrentMapSize)
 				return;
 
-			if(Offset+ChunkSize >= m_CurrentMapSize)
+			if(Offset+ChunkSize >= (unsigned)m_CurrentMapSize)
 			{
 				ChunkSize = m_CurrentMapSize-Offset;
-				if(ChunkSize < 0)
-					ChunkSize = 0;
 				Last = 1;
 			}
 
@@ -933,7 +931,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			if(g_Config.m_Debug)
 			{
 				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "sending chunk %d with size %d", Chunk, ChunkSize);
+				str_format(aBuf, sizeof(aBuf), "sending chunk %u with size %u", Chunk, ChunkSize);
 				Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 			}
 		}
@@ -1338,18 +1336,16 @@ void CServer::PumpNetwork()
 				continue;
 	
 			int Chunk = lastsent[i]++;
-			int ChunkSize = 1024-128;
-			int Offset = Chunk * ChunkSize;
+			unsigned int ChunkSize = 1024-128;
+			unsigned int Offset = Chunk * ChunkSize;
 			int Last = 0;
 	
 			// drop faulty map data requests
-			if(Chunk < 0 || Offset > m_CurrentMapSize)
+			if(Chunk < 0 || Offset > (unsigned)m_CurrentMapSize)
 				continue;
-			if(Offset+ChunkSize >= m_CurrentMapSize)
+			if(Offset+ChunkSize >= (unsigned)m_CurrentMapSize)
 			{
 				ChunkSize = m_CurrentMapSize-Offset;
-				if(ChunkSize < 0)
-					ChunkSize = 0;
 				Last = 1;
 			}
 	
@@ -1364,7 +1360,7 @@ void CServer::PumpNetwork()
 			if(g_Config.m_Debug)
 			{
 				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "sending chunk %d with size %d", Chunk, ChunkSize);
+				str_format(aBuf, sizeof(aBuf), "sending chunk %u with size %u", Chunk, ChunkSize);
 				Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 			}
 		}
