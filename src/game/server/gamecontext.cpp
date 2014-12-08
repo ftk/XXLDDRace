@@ -1069,7 +1069,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					SendChatTarget(ClientID, "Server does not allow voting to move players to spectators");
 					return;
 				}
-	
+
 				int SpectateID = str_toint(pMsg->m_Value);
 				if(SpectateID < 0 || SpectateID >= MAX_CLIENTS || !m_apPlayers[SpectateID] || m_apPlayers[SpectateID]->GetTeam() == TEAM_SPECTATORS)
 				{
@@ -1081,7 +1081,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					SendChatTarget(ClientID, "You can't move yourself");
 					return;
 				}
-	
+
 				if(g_Config.m_SvPauseable && g_Config.m_SvVotePause)
 				{
 					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to pause '%s' for %d seconds (%s)", Server()->ClientName(ClientID), Server()->ClientName(SpectateID), g_Config.m_SvVotePauseTime, pReason);
@@ -1094,6 +1094,24 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					str_format(aDesc, sizeof(aDesc), "move '%s' to spectators", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "set_team %d -1 %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay);
 				}
+			}
+			else if(str_comp_nocase(pMsg->m_Type, "mute") == 0)
+			{
+				int MuteID = str_toint(pMsg->m_Value);
+				if(MuteID < 0 || MuteID >= MAX_CLIENTS || !m_apPlayers[MuteID])
+				{
+					SendChatTarget(ClientID, "Invalid client id to mute");
+					return;
+				}
+				if(MuteID == ClientID)
+				{
+					SendChatTarget(ClientID, "You can't mute yourself");
+					return;
+				}
+
+				str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s' for %d seconds (%s)", Server()->ClientName(ClientID), Server()->ClientName(MuteID), g_Config.m_SvSpamMuteDuration, pReason);
+				str_format(aDesc, sizeof(aDesc), "Mute '%s' (%ds)", ProcessSpamProtection(MuteID), g_Config.m_SvSpamMuteDuration);
+				str_format(aCmd, sizeof(aCmd), "muteid %d %d", MuteID, g_Config.m_SvSpamMuteDuration);
 			}
 	
 			if(aCmd[0])
