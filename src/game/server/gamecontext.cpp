@@ -1110,7 +1110,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 
 				str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s' for %d seconds (%s)", Server()->ClientName(ClientID), Server()->ClientName(MuteID), g_Config.m_SvSpamMuteDuration, pReason);
-				str_format(aDesc, sizeof(aDesc), "Mute '%s' (%ds)", ProcessSpamProtection(MuteID), g_Config.m_SvSpamMuteDuration);
+				str_format(aDesc, sizeof(aDesc), "Mute '%s' (%ds)", Server()->ClientName(MuteID), g_Config.m_SvSpamMuteDuration);
 				str_format(aCmd, sizeof(aCmd), "muteid %d %d", MuteID, g_Config.m_SvSpamMuteDuration);
 			}
 	
