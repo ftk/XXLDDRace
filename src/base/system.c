@@ -893,7 +893,7 @@ static int priv_net_close_all_sockets(NETSOCKET sock)
 
 static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, int sockaddrlen)
 {
-	int sock, e=0, optval = 1;
+	int sock, e = 0, optval;
 
 	/* create socket */
 	sock = socket(domain, type, 0);
@@ -920,22 +920,23 @@ static int priv_net_create_socket(int domain, int type, struct sockaddr *addr, i
 	}
 #endif
 
-	unsigned dscp=0xb8; //DSCP(QoS) flag
-	switch (domain) {
-            case AF_INET6:
-		e=setsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS, &dscp, sizeof dscp);
-                break;
-            case AF_INET:
-		e=setsockopt(sock, IPPROTO_IP, IP_TOS, &dscp, sizeof dscp);
-                break;
-        }
-	if(e != 0){
-		dbg_msg("net", "failed to set QoS flag %d (%d '%s')", e, errno, strerror(errno));
-	}else{
-		dbg_msg("net", "QoS flag %d successfully set", dscp);
+	/* DSCP(QoS) flag */
+	optval = 0xb8;
+	switch(domain)
+	{
+	case AF_INET6:
+		e = setsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS, (const char*)&optval, sizeof optval);
+		break;
+	case AF_INET:
+		e = setsockopt(sock, IPPROTO_IP, IP_TOS, (const char*)&optval, sizeof optval);
+		break;
 	}
-	/* bind the socket */
+	if(e != 0)
+		dbg_msg("net", "failed to set QoS flag %d (%d '%s')", e, errno, strerror(errno));
+	/* reuse_addr */
+	optval = 1;
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&optval, sizeof(optval));
+	/* bind the socket */
 	e = bind(sock, addr, sockaddrlen);
 	if(e != 0)
 	{
