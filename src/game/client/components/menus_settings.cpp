@@ -1156,7 +1156,6 @@ void CMenus::RenderSettingsDDRace(CUIRect MainView)
 
 		int PrevColor = *pColor;
 		int Color = 0;
-		static float s_FadeScroll[6][3] = {{0}};
 		for(int s = 0; s < 3; s++)
 		{
 			MapBckgCol.HSplitTop(20.0f, &Label, &MapBckgCol);
