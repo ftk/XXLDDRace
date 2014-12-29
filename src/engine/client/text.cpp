@@ -592,7 +592,7 @@ public:
 		pSizeData = GetSize(pFont, ActualSize);
 		RenderSetup(pFont, ActualSize);
 
-		float Scale = 1/pSizeData->m_FontSize;
+		float Scale = 1.f/pSizeData->m_FontSize;
 
 		// set length
 		if(Length < 0)
