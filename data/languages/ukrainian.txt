@@ -1,6 +1,9 @@
 
 ##### translated strings #####
 
+%d Bytes
+== %d Байт
+
 %d of %d servers, %d players
 == %d/%d серверів, %d гравців
 
@@ -10,8 +13,32 @@
 %ds left
 == залишилось %d сек.
 
+%i minute left
+== залишилась %i хвилина
+
+%i minutes left
+== залишилось %i хвилин
+
+%i second left
+== залишилась %i секунда
+
+%i seconds left
+== залишилось %i секунд
+
+%s wins!
+== %s перемогли!
+
+-Page %d-
+== -Сторінка %d-
+
 Abort
 == Відміна
+
+Add
+== Додати
+
+Add Friend
+== Додати Друга
 
 Address
 == Адреса
@@ -28,11 +55,20 @@ Always show name plates
 Are you sure that you want to delete the demo?
 == Ви впевнені, що хочете видалити демо?
 
+Are you sure that you want to remove the player from your friends list?
+== Чи впевнені ви що хочете видалити гравця з вашого списку друзів?
+
 Are you sure that you want to quit?
 == Ви дійсно бажаєте вийти?
 
 As this is the first time you launch the game, please enter your nick name below. It's recommended that you check the settings to adjust them to your liking before joining a server.
 == Так як це ваш перший запуск гри, будь ласка, введіть свій нік у полі нижче. Також рекомендуємо перевірити налаштування гри і змінити деякі з них, перед тим, як почати грати.
+
+Automatically record demos
+== Автоматично записувати демо
+
+Automatically take game over screenshot
+== Автоматично робити скріншот у кинці гри
 
 Blue team
 == Сині
@@ -43,11 +79,23 @@ Blue team wins!
 Body
 == Тіло
 
+Borderless window
+== Безмежне вікно
+
 Call vote
 == Голосувати
 
+Change settings
+== Змінити налаштування
+
 Chat
 == Чат
+
+Clan
+== Клан
+
+Client
+== Кліент
 
 Close
 == Зачинити
@@ -70,6 +118,15 @@ Console
 Controls
 == Управління
 
+Count players only
+== Рахувати лише гравців
+
+Country
+== Країна
+
+Created:
+== Створив:
+
 Current
 == Поточний
 
@@ -81,6 +138,15 @@ Custom colors
 
 Delete
 == Видалити
+
+Delete demo
+== Видалити демо
+
+Demo details
+== Інформація
+
+Demofile: %s
+== Демо файл: %s
 
 Demos
 == Демо
@@ -105,6 +171,9 @@ Dynamic Camera
 
 Emoticon
 == Емоція
+
+Enable chat sound
+== Звуки повідомленнь в чаті
 
 Enter
 == Вхід
@@ -139,6 +208,12 @@ Folder
 Force vote
 == Форсувати
 
+Free-View
+== Вільний-Перегляд
+
+Friends
+== Друзі
+
 Fullscreen
 == Повноекранний режим
 
@@ -150,6 +225,9 @@ Game info
 
 Game over
 == Гра закінчена
+
+Game paused
+== Гра зупинена
 
 Game type
 == Тип гри
@@ -211,6 +289,9 @@ LAN
 Language
 == Мова
 
+Length:
+== Довжина:
+
 Lht.
 == Яскравість
 
@@ -222,6 +303,15 @@ MOTD
 
 Map
 == Карта
+
+Map:
+== Карта:
+
+Max Screenshots
+== Макс. Скріншотів
+
+Max demos
+== Макс. Демо
 
 Maximum ping:
 == Макс. пінг:
@@ -246,6 +336,12 @@ Mute when not active
 
 Name
 == Ім'я
+
+Name plates size
+== Розмір імен
+
+New name:
+== Нове ім'я:
 
 News
 == Новини
@@ -274,6 +370,9 @@ Ok
 Open
 == Відкрити
 
+Parent Folder
+== Батьківська тека
+
 Password
 == Пароль
 
@@ -289,8 +388,17 @@ Pistol
 Play
 == Перегляд
 
+Play background music
+== Програвати фонову музику
+
 Player
 == Гравець
+
+Player country:
+== Країна гравця:
+
+Player options
+== Налаштування гравця
 
 Players
 == Гравці
@@ -309,6 +417,9 @@ Quick search:
 
 Quit
 == Вихід
+
+Quit anyway?
+== Всеодно вийти?
 
 Reason:
 == Причина:
@@ -331,11 +442,26 @@ Refreshing master servers
 Remote console
 == Консоль сервера
 
+Remove
+== Видалити
+
+Remove friend
+== Видалити друга
+
+Rename
+== Перейменувати
+
+Rename demo
+== Перейменутвати демо
+
 Reset filter
 == Скинути фільтри
 
 Reset to defaults
 == Скинути налаштування
+
+Respawn
+== Респаун
 
 Rifle
 == Лазер
@@ -364,8 +490,14 @@ Scoreboard
 Screenshot
 == Скріншот
 
+Server address:
+== Адреса серверу:
+
 Server details
 == Деталі сервера
+
+Server filter
+== Фільтр серверів
 
 Server info
 == Інформація
@@ -382,11 +514,23 @@ Shotgun
 Show chat
 == Показати чат
 
+Show friends only
+== Відображати лише друзів
+
+Show ingame HUD
+== Відображати ігровий HUD
+
 Show name plates
 == Показувати ніки гравців
 
+Show only chat messages from friends
+== Показувати лише повидомлення друзів
+
 Show only supported
 == Тільки підтримувані режими
+
+Size:
+== Розмір:
 
 Skins
 == Скіни
@@ -394,10 +538,22 @@ Skins
 Sound
 == Звук
 
+Sound error
+== Помилка звуку
+
 Sound volume
 == Гучність звуку
 
 Spectate
+== Спостерігати
+
+Spectate next
+== Спост. за наст.
+
+Spectate previous
+== Спост. за поп.
+
+Spectator mode
 == Спостерігати
 
 Spectators
@@ -411,6 +567,9 @@ Standard map
 
 Stop record
 == Зупинити запис
+
+Strict gametype filter
+== Суворий фільтр режимів
 
 Sudden Death
 == Швидка смерть
@@ -430,8 +589,20 @@ Teeworlds %s is out! Download it at www.teeworlds.com!
 Texture Compression
 == Стиснення текстур
 
+The audio device couldn't be initialised.
+== Аудіо пристрій не може бути проініціалізований
+
 The server is running a non-standard tuning on a pure game type.
 == Сервер запущено з нестандартними налаштуваннями на стандартному типі гри.
+
+There's an unsaved map in the editor, you might want to save it before you quit the game.
+== В редакторі є незбережена мапа, можливо ви хочете зберегти зміни перед виходом з гри.
+
+Threaded sound loading
+== Потокове завантаження звуків
+
+Threaded rendering
+== Потоковий рендерінг
 
 Time limit
 == Ліміт часу
@@ -446,16 +617,28 @@ Type
 == Тип
 
 UI Color
-== колір інтерфейсу
+== Колір інтерфейсу
+
+Unable to delete the demo
+== Неможливо видалити запис
+
+Unable to rename the demo
+== Неможливо перейменувати запис
 
 Use sounds
 == Використовувати звуки
+
+Use team colors for name plates
+== Використовувати кольори для імен
 
 V-Sync
 == Вертикальна синхронізація
 
 Version
 == Версія
+
+Version:
+== Версія:
 
 Vote no
 == Проти
@@ -484,204 +667,86 @@ You must restart the game for all settings to take effect.
 Your skin
 == Ваш скін
 
+no limit
+== немає ліміту
+
+##### mkRace translation #####
+
+Bind free keys with DDRace pre-configured binds
+== Застосувати вільні кнопки для пред-налаштованих DDRace команд
+
+Blue
+== Синій
+
+Cheat: Shows entities in game (can also be toggled via console cl_show_entities)
+== Чіт: Відображає ігровий шар (також може бути включений через консоль cl_show_entities)
+
+Cute!!! Minitees
+== Милота!!! Мінігравці
+
+Enable ghost
+== Привид проходження
+
+Enable save ghost
+== Зберігати привид проходження
+
+Enable save the best demo of each race
+== Зберігати демо найшвидшого проходження race мапи
+
+Enable save the player name within the demo
+== Зберігати ім'я гравця у демо
+
+Enable show ghost
+== Відображати привид проходження
+
+Green
+== Зелений
+
+HUD: Show health + ammo
+== HUD: Відображати здоров'я та патрони
+
+HUD: Show score
+== HUD: Відображати міні табло
+
+Map background
+== Колір фону мап
+
+Red
+== Червоний
+
+Show client IDs in Scoreboard
+== Відображати ID гравців у таблі
+
+Show players in other teams
+== Відображати гравців в інших командах
+
+Use DDRace Scoreboard
+== Використовувати DDRace Табло
+
 ##### needs translation #####
 
-%d Bytes
-== 
-
-%i minute left
-== 
-
-%i minutes left
-== 
-
-%i second left
-== 
-
-%i seconds left
-== 
-
-%s wins!
-== 
-
--Page %d-
-== 
-
-Add
-== 
-
-Add Friend
-== 
-
-Are you sure that you want to remove the player from your friends list?
-== 
-
-Automatically record demos
-== 
-
-Automatically take game over screenshot
-== 
-
-Change settings
-== 
-
-Clan
-== 
-
-Client
-== 
-
-Count players only
-== 
-
-Country
-== 
-
 Crc:
-== 
-
-Created:
-== 
-
-Delete demo
-== 
-
-Demo details
-== 
-
-Demofile: %s
-== 
-
-Free-View
-== 
-
-Friends
-== 
-
-Game paused
 == 
 
 Kick player
 == 
 
-Length:
-== 
-
-Map:
-== 
-
-Max Screenshots
-== 
-
-Max demos
-== 
-
 Move player to spectators
-== 
-
-Name plates size
 == 
 
 Netversion:
 == 
 
-New name:
-== 
-
-Parent Folder
-== 
-
-Play background music
-== 
-
-Player country:
-== 
-
-Player options
-== 
-
-Quit anyway?
-== 
-
 REC %3d:%02d
 == 
 
-Remove
-== 
-
-Remove friend
-== 
-
-Rename
-== 
-
-Rename demo
-== 
-
-Respawn
-== 
-
-Server address:
-== 
-
-Server filter
-== 
-
-Show friends only
-== 
-
-Show ingame HUD
-== 
-
-Show only chat messages from friends
-== 
-
-Size:
-== 
-
-Sound error
-== 
-
-Spectate next
-== 
-
-Spectate previous
-== 
-
-Spectator mode
-== 
-
-Strict gametype filter
-== 
-
-The audio device couldn't be initialised.
-== 
-
-There's an unsaved map in the editor, you might want to save it before you quit the game.
-== 
-
 Type:
-== 
-
-Unable to delete the demo
-== 
-
-Unable to rename the demo
-== 
-
-Use team colors for name plates
-== 
-
-Version:
 == 
 
 Vote command:
 == 
 
 Vote description:
-== 
-
-no limit
 == 
 
 ##### old translations #####
