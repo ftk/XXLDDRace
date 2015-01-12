@@ -24,72 +24,20 @@
  *
  */
 
-//static LOCK gs_FileLock = 0;
-
-
 static FILE * gs_File = 0;
 
-/*
-static struct LogArguments
-{
-    int id;
-    char name[64];
-    int team;
-    char clan[64];
-    int start_tick;
-    int current_tick;
-
-} gs_Args;
-*/
 void CScoreLogger::Init(IServer * pServer)
 {
     m_pServer = pServer;
-    gs_File = fopen("records.txt", "a");
     if(!gs_File)
-        dbg_msg("scorelogger", "Unable to open records.txt");
-}
-
-/*
-static void LogThread(void * ptype)
-{
-    int type = reinterpret_cast<int>(ptype);
-    if(type == 1) // finish
     {
-        // ....
-        fprintf(gs_File, "finish %u %d %d %d %d \"%s\" \"%s\"\n"
-                unixtime, gs_Args.id, gs_Args.team,
-                gs_Args.start_tick, gs_Args.current_tick,
-                gs_Args.name, gs_Args.clan);
-    }
-    else if(type == 2) // checkpoint
-    {
-
+        gs_File = fopen("records.txt", "a");
+        if(!gs_File)
+            dbg_msg("scorelogger", "Unable to open records.txt");
     }
 }
 
 
-void CScoreLogger::LogFinish(int ClientID, int Team, int StartTick)
-{
-    void *pLogThread = thread_create(LogThread, (void*)1);
-#if defined(CONF_FAMILY_UNIX)
-    pthread_detach((pthread_t)pLogThread);
-#endif
-    (void)pLogThread;
-
-}
-
-void CScoreLogger::LogCheckpoint(int ClientID, int Team, int StartTick, int Checkpoint)
-{
-    void *pLogThread = thread_create(LogThread, (void*)2);
-#if defined(CONF_FAMILY_UNIX)
-    pthread_detach((pthread_t)pLogThread);
-#endif
-    (void)pLogThread;
-
-}
-*/
-
-//template <typename InputInterator>
 static void enquote(const char * in_first, char * out_first, char * out_end)
 {
     out_end--; // \0
@@ -122,6 +70,7 @@ void CScoreLogger::LogFinish(int ClientID, int Team, int StartTick)
             Name, Clan);
     fflush(gs_File);
 }
+
 void CScoreLogger::LogCheckpoint(int ClientID, int Team, int StartTick, int Checkpoint)
 {
     int CurTick = Server()->Tick();

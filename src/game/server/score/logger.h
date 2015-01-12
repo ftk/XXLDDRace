@@ -17,7 +17,7 @@ class CScoreLogger
     }
 public:
 
-	void Init(IServer * pServer);
+    void Init(IServer * pServer);
 
     void LogFinish(int ClientID, int Team, int StartTick);
     void LogCheckpoint(int ClientID, int Team, int StartTick, int Checkpoint);
