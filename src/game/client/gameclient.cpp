@@ -714,7 +714,7 @@ void CGameClient::OnNewSnapshot()
 		for(int Index = 0; Index < Num; Index++)
 		{
 			IClient::CSnapItem Item;
-			void *pData = Client()->SnapGetItem(IClient::SNAP_CURRENT, Index, &Item);
+			const void *pData = Client()->SnapGetItem(IClient::SNAP_CURRENT, Index, &Item);
 			if(m_NetObjHandler.ValidateObj(Item.m_Type, pData, Item.m_DataSize) != 0)
 			{
 				if(g_Config.m_Debug)
@@ -1036,10 +1036,10 @@ void CGameClient::OnPredict()
 			if(m_Snap.m_LocalClientID == c)
 			{
 				// apply player input
-				int *pInput = Client()->GetInput(Tick);
+				const int *pInput = Client()->GetInput(Tick);
 				if(pInput)
-					World.m_apCharacters[c]->m_Input = *((CNetObj_PlayerInput*)pInput);
-				World.m_apCharacters[c]->Tick(true, IsFreezed, m_IsDDRace);
+					World.m_apCharacters[c]->m_Input = *((const CNetObj_PlayerInput*)pInput);
+				World.m_apCharacters[c]->Tick(true);
 			}
 			else
 				World.m_apCharacters[c]->Tick(false, IsFreezed, m_IsDDRace);

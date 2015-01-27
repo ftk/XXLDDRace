@@ -90,7 +90,7 @@ public:
 	virtual int MapDownloadTotalsize() = 0;
 
 	// input
-	virtual int *GetInput(int Tick) = 0;
+	virtual const int *GetInput(int Tick) const = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;
@@ -110,9 +110,9 @@ public:
 	};
 
 	// TODO: Refactor: should redo this a bit i think, too many virtual calls
-	virtual int SnapNumItems(int SnapID) = 0;
-	virtual void *SnapFindItem(int SnapID, int Type, int ID) = 0;
-	virtual void *SnapGetItem(int SnapID, int Index, CSnapItem *pItem) = 0;
+	virtual int SnapNumItems(int SnapID) const = 0;
+	virtual const void *SnapFindItem(int SnapID, int Type, int ID) const = 0;
+	virtual const void *SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const = 0;
 	virtual void SnapInvalidateItem(int SnapID, int Index) = 0;
 
 	virtual void SnapSetStaticsize(int ItemType, int Size) = 0;

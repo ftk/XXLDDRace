@@ -135,11 +135,11 @@ class CNetObjHandler
 public:
 	CNetObjHandler();
 
-	int ValidateObj(int Type, void *pData, int Size);
-	const char *GetObjName(int Type);
-	int GetObjSize(int Type);
-	int NumObjCorrections();
-	const char *CorrectedObjOn();
+	int ValidateObj(int Type, const void *pData, int Size);
+	const char *GetObjName(int Type) const;
+	int GetObjSize(int Type) const;
+	int NumObjCorrections() const;
+	const char *CorrectedObjOn() const;
 
 	const char *GetMsgName(int Type);
 	void *SecureUnpackMsg(int Type, CUnpacker *pUnpacker);
@@ -166,8 +166,8 @@ if gen_network_source:
 	lines += ['\tm_NumObjCorrections = 0;']
 	lines += ['}']
 	lines += ['']
-	lines += ['int CNetObjHandler::NumObjCorrections() { return m_NumObjCorrections; }']
-	lines += ['const char *CNetObjHandler::CorrectedObjOn() { return m_pObjCorrectedOn; }']
+	lines += ['int CNetObjHandler::NumObjCorrections() const { return m_NumObjCorrections; }']
+	lines += ['const char *CNetObjHandler::CorrectedObjOn() const { return m_pObjCorrectedOn; }']
 	lines += ['const char *CNetObjHandler::FailedMsgOn() { return m_pMsgFailedOn; }']
 	lines += ['']
 	lines += ['']
@@ -203,14 +203,14 @@ if gen_network_source:
 	lines += ['};']
 	lines += ['']
 
-	lines += ['const char *CNetObjHandler::GetObjName(int Type)']
+	lines += ['const char *CNetObjHandler::GetObjName(int Type) const']
 	lines += ['{']
 	lines += ['\tif(Type < 0 || Type >= NUM_NETOBJTYPES) return "(out of range)";']
 	lines += ['\treturn ms_apObjNames[Type];']
 	lines += ['};']
 	lines += ['']
 
-	lines += ['int CNetObjHandler::GetObjSize(int Type)']
+	lines += ['int CNetObjHandler::GetObjSize(int Type) const']
 	lines += ['{']
 	lines += ['\tif(Type < 0 || Type >= NUM_NETOBJTYPES) return 0;']
 	lines += ['\treturn ms_aObjSizes[Type];']
@@ -251,7 +251,7 @@ if gen_network_source:
 		lines += ["};", ""]
 
 	lines = []
-	lines += ['int CNetObjHandler::ValidateObj(int Type, void *pData, int Size)']
+	lines += ['int CNetObjHandler::ValidateObj(int Type, const void *pData, int Size)']
 	lines += ['{']
 	lines += ['\tswitch(Type)']
 	lines += ['\t{']
