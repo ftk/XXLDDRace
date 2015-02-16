@@ -1,5 +1,5 @@
 ARCH ?= 64
-CPPFLAGS := -m$(ARCH) -flto -O3 -mfpmath=both -mavx -pipe -fno-exceptions -fvisibility=internal \
+CPPFLAGS := -m$(ARCH) -flto -O3 -mfpmath=both -pipe -fno-exceptions -fvisibility=internal \
 -Wall -DCONF_RELEASE -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" $(shell sdl-config --cflags) $(shell freetype-config --cflags)
 CXXFLAGS := -std=c++11 -fno-rtti
 CFLAGS :=
