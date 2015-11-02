@@ -43,7 +43,7 @@ CHAT_COMMAND("swap", "?v", CFGFLAG_CHAT|CFGFLAG_SERVER, ConSwap, this, "Request 
 
 CHAT_COMMAND("text", "ffr", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLText, this, "LolText")
 
-CHAT_COMMAND("dot", "ffffi", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLDot, this, "LolText dot")
+CHAT_COMMAND("dot", "ffffi?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConLDot, this, "LolText dot: /dot posx posy velx vely duration mode")
 
 #if defined(CONF_SQL)
 CHAT_COMMAND("times", "?s?i", CFGFLAG_CHAT|CFGFLAG_SERVER, ConTimes, this, "/times ?s?i shows last 5 times of the server or of a player beginning with name s starting with time i (i = 1 by default)")
