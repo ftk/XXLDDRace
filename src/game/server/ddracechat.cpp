@@ -1345,7 +1345,7 @@ void CGameContext::ConLDot(IConsole::IResult *pResult, void *pUserData)
         // /dot posx posy velx vely duration mode
         if((pChar || Mode == 2) && Duration < 50 * 20)
 		new CLolPlasma(&pSelf->m_World, (Mode == 0) ? pChar : NULL,
-			       vec2(pResult->GetFloat(0), pResult->GetFloat(1)) + ((Mode == 1) ? pChar->m_Pos : vec2()),
+			       vec2(pResult->GetFloat(0), pResult->GetFloat(1)) + ((Mode == 1) ? pChar->m_Pos : vec2(0.f, 0.f)),
 			       vec2(pResult->GetFloat(2), pResult->GetFloat(3)),
 			       Duration);
 
