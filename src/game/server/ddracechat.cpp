@@ -9,6 +9,7 @@
 #if defined(CONF_SQL)
 #include <game/server/score/sql_score.h>
 #endif
+#include <game/server/entities/loltext.h>
 
 bool CheckClientID(int ClientID);
 bool CheckRights(int ClientID, int Victim, CGameContext *GameContext);
@@ -1316,4 +1317,34 @@ void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
 		pSelf->m_aSwapRequest[ToSwap] = -1;
 		pSelf->m_aSwapRequest[ClientID] = -1;
 	}
+}
+
+void CGameContext::ConLText(IConsole::IResult *pResult, void *pUserData)
+{
+        CGameContext *pSelf = (CGameContext *) pUserData;
+        const int ClientID = pResult->m_ClientID;
+
+	CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
+
+	// /text posx posy msg
+	if(pChar)
+		pSelf->CreateLolText(pChar, true, vec2(pResult->GetFloat(0), pResult->GetFloat(1)), vec2(0, 0), 150, pResult->GetString(2));
+}
+
+void CGameContext::ConLDot(IConsole::IResult *pResult, void *pUserData)
+{
+        CGameContext *pSelf = (CGameContext *) pUserData;
+        const int ClientID = pResult->m_ClientID;
+
+        CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
+
+	unsigned Duration = pResult->GetInteger(4);
+
+        // /dot posx posy velx vely duration
+        if(pChar && Duration < 50 * 20)
+		new CLolPlasma(&pSelf->m_World, pChar,
+			       vec2(pResult->GetFloat(0), pResult->GetFloat(1)),
+			       vec2(pResult->GetFloat(2), pResult->GetFloat(3)),
+			       Duration);
+
 }
