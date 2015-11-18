@@ -986,12 +986,12 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 		if(pChr->m_RescueFlags & RESCUEFLAG_SOLOOUT)
 		{
 			pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now in a solo part");
-			pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, true);
+			pChr->m_Solo = true;
 		}
 		else if(pChr->m_RescueFlags & RESCUEFLAG_SOLOIN)
 		{
 			pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now out of the solo part");
-			pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, false);
+			pChr->m_Solo = false;
 		}
 		// hit fix
 		if(pChr->m_RescueFlags & RESCUEFLAG_NOHIT)
@@ -1174,9 +1174,8 @@ void CGameContext::ConSolo(IConsole::IResult *pResult, void *pUserData)
 	CCharacter* pChr = pPlayer->GetCharacter();
 	if (pChr)
 	{
-		const bool insolo = pChr->Teams()->m_Core.GetSolo(pResult->m_ClientID);
-		pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, !insolo);
-		pSelf->SendChatTarget(pResult->m_ClientID, insolo ? "You are now out of solo" : "You are now in solo");
+		pChr->m_Solo = !pChr->m_Solo;
+		pSelf->SendChatTarget(pResult->m_ClientID, pChr->m_Solo ? "You are now in solo" : "You are now out of solo");
 	}
 }
 

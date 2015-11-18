@@ -2362,12 +2362,14 @@ CGameContext::CPlayerRescueState CGameContext::GetPlayerState(CCharacter * pChar
 	ST_PARAM(EndlessHook);
 	ST_PARAM(DeepFreeze);
 	ST_PARAM(Hit);
+	ST_PARAM(Solo);
 	ST_PARAM(RescueOverride);
 	ST_PARAM(CpTick);
 	ST_PARAM(CpActive);
 	ST_PARAM(CpLastBroadcast);
 	ST_PARAM(TeleCheckpoint);
 	ST_PARAM(FreezeTime);
+	ST_PARAM(FreezeTick);
 #undef ST_PARAM
 
 	pChar->Core()->Write(&state.Core);
@@ -2394,12 +2396,14 @@ void CGameContext::ApplyPlayerState(const CPlayerRescueState& state, CCharacter 
 	ST_PARAM(EndlessHook);
 	ST_PARAM(DeepFreeze);
 	ST_PARAM(Hit);
+	ST_PARAM(Solo);
 	ST_PARAM(RescueOverride);
 	ST_PARAM(CpTick);
 	ST_PARAM(CpActive);
 	ST_PARAM(CpLastBroadcast);
 	ST_PARAM(TeleCheckpoint);
 	ST_PARAM(FreezeTime);
+	ST_PARAM(FreezeTick);
 #undef ST_PARAM
 
 	pChar->Core()->Read(&state.Core);

@@ -374,6 +374,7 @@ public:
 		bool EndlessHook;
 		bool DeepFreeze;
 		int Hit;
+		bool Solo;
 		int RescueOverride;
 		int CpTick;
 		int CpActive;
@@ -381,6 +382,7 @@ public:
 		int TeleCheckpoint;
 		float CpCurrent[25];
 		int FreezeTime;
+		int FreezeTick;
 		CNetObj_CharacterCore Core;
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;
