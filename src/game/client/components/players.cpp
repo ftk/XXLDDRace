@@ -489,33 +489,35 @@ void CPlayers::RenderPlayer(
 					curvature = m_pClient->m_Tuning.m_GrenadeCurvature;
 					speed = m_pClient->m_Tuning.m_GrenadeSpeed;
 				}
-
-				Graphics()->TextureSet(-1);
-				Graphics()->LinesBegin();
-				Graphics()->SetColor(1, 1, 1, 0.5f);
-
-				vec2 ProjStartPos = Position+Dir*21;
-				vec2 prevpos = ProjStartPos;
-				vec2 BOOM_POS;
-				for(float i = 0;i<Client()->GameTickSpeed()*lifetime;i++)
+				if(lifetime != 0)
 				{
-					vec2 pos = CalcPos(ProjStartPos, Dir, curvature, speed, i/Client()->GameTickSpeed());
-					if (Collision()->IntersectLine(prevpos, pos, &BOOM_POS, 0, false))
-						break;
-					if(m_pClient->IntersectCharacter(prevpos, pos, BOOM_POS, 0, ClientID) != -1)
-						break;
+					Graphics()->TextureSet(-1);
+					Graphics()->LinesBegin();
+					Graphics()->SetColor(1, 1, 1, 0.5f);
 
-					if(prevpos != pos)
+					vec2 ProjStartPos = Position+Dir*21;
+					vec2 prevpos = ProjStartPos;
+					vec2 BOOM_POS;
+					for(float i = 0;i<Client()->GameTickSpeed()*lifetime;i++)
 					{
-						IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, pos.x, pos.y);
-						Graphics()->LinesDraw(&LineItem, 1);
-						prevpos = pos;
+						vec2 pos = CalcPos(ProjStartPos, Dir, curvature, speed, i/Client()->GameTickSpeed());
+						if (Collision()->IntersectLine(prevpos, pos, &BOOM_POS, 0, false))
+							break;
+						if(m_pClient->IntersectCharacter(prevpos, pos, BOOM_POS, 0, ClientID) != -1)
+							break;
+
+						if(prevpos != pos)
+						{
+							IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, pos.x, pos.y);
+							Graphics()->LinesDraw(&LineItem, 1);
+							prevpos = pos;
+						}
 					}
+					Graphics()->SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+					IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, BOOM_POS.x, BOOM_POS.y);
+					Graphics()->LinesDraw(&LineItem, 1);
+					Graphics()->LinesEnd();
 				}
-				Graphics()->SetColor(1.0f, 0.0f, 0.0f, 1.0f);
-				IGraphics::CLineItem LineItem(prevpos.x, prevpos.y, BOOM_POS.x, BOOM_POS.y);
-				Graphics()->LinesDraw(&LineItem, 1);
-				Graphics()->LinesEnd();
 			}
 		}
 		/* AIMLINES END */
