@@ -180,7 +180,7 @@ void CCharacterCore::Tick(bool UseInput, bool Freezed, bool Predict)
 			a = a+pi;
 		*/
 		float a = atan2f(m_Input.m_TargetY, m_Input.m_TargetX);
-		m_Angle = round(a*256.f);
+		m_Angle = round_to_int(a*256.f);
 
 		// handle jump
 		if(m_Input.m_Jump && !Freezed)
@@ -545,17 +545,17 @@ void CCharacterCore::Move()
 
 void CCharacterCore::Write(CNetObj_CharacterCore *pObjCore)
 {
-	pObjCore->m_X = round(m_Pos.x);
-	pObjCore->m_Y = round(m_Pos.y);
+	pObjCore->m_X = round_to_int(m_Pos.x);
+	pObjCore->m_Y = round_to_int(m_Pos.y);
 
-	pObjCore->m_VelX = round(m_Vel.x*256.0f);
-	pObjCore->m_VelY = round(m_Vel.y*256.0f);
+	pObjCore->m_VelX = round_to_int(m_Vel.x*256.0f);
+	pObjCore->m_VelY = round_to_int(m_Vel.y*256.0f);
 	pObjCore->m_HookState = m_HookState;
 	pObjCore->m_HookTick = m_HookTick;
-	pObjCore->m_HookX = round(m_HookPos.x);
-	pObjCore->m_HookY = round(m_HookPos.y);
-	pObjCore->m_HookDx = round(m_HookDir.x*256.0f);
-	pObjCore->m_HookDy = round(m_HookDir.y*256.0f);
+	pObjCore->m_HookX = round_to_int(m_HookPos.x);
+	pObjCore->m_HookY = round_to_int(m_HookPos.y);
+	pObjCore->m_HookDx = round_to_int(m_HookDir.x*256.0f);
+	pObjCore->m_HookDy = round_to_int(m_HookDir.y*256.0f);
 	pObjCore->m_HookedPlayer = m_HookedPlayer;
 	pObjCore->m_Jumped = m_Jumped;
 	pObjCore->m_Direction = m_Direction;

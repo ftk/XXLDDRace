@@ -371,14 +371,14 @@ void CPlayers::RenderPlayer(
 				if(Hit)
 					break;
 
-				NewPos.x = round(NewPos.x);
-				NewPos.y = round(NewPos.y);
+				NewPos.x = round_to_int(NewPos.x);
+				NewPos.y = round_to_int(NewPos.y);
 
 				if (OldPos == NewPos)
 					break;
 
-				ExDirection.x = round(ExDirection.x*256.0f) / 256.0f;
-				ExDirection.y = round(ExDirection.y*256.0f) / 256.0f;
+				ExDirection.x = round_to_int(ExDirection.x*256.0f) / 256.0f;
+				ExDirection.y = round_to_int(ExDirection.y*256.0f) / 256.0f;
 			} while (!doBreak);
 
 			IGraphics::CLineItem LineItem(initPos.x, initPos.y, finishPos.x, finishPos.y);
@@ -392,8 +392,8 @@ void CPlayers::RenderPlayer(
 			vec2 Dir = Direction;
 			if(pInfo.m_Local)
 			{
-				Dir.x = round(m_pClient->m_pControls->m_MousePos.x);
-				Dir.y = round(m_pClient->m_pControls->m_MousePos.y);
+				Dir.x = round_to_int(m_pClient->m_pControls->m_MousePos.x);
+				Dir.y = round_to_int(m_pClient->m_pControls->m_MousePos.y);
 				Dir = normalize(Dir);
 			}
 
@@ -441,14 +441,14 @@ void CPlayers::RenderPlayer(
 						int f;
 						if(Res == -1)
 						{
-							f = Collision()->GetTile(round(Coltile.x), round(Coltile.y));
-							Collision()->SetCollisionAt(round(Coltile.x), round(Coltile.y), CCollision::COLFLAG_SOLID);
+							f = Collision()->GetTile(round_to_int(Coltile.x), round_to_int(Coltile.y));
+							Collision()->SetCollisionAt(round_to_int(Coltile.x), round_to_int(Coltile.y), CCollision::COLFLAG_SOLID);
 						}
 						TempPos = To;
 						Collision()->MovePoint(&TempPos, &TempDir, 1.0f, 0);
 						if(Res == -1)
 						{
-							Collision()->SetCollisionAt(round(Coltile.x), round(Coltile.y), f);
+							Collision()->SetCollisionAt(round_to_int(Coltile.x), round_to_int(Coltile.y), f);
 						}
 						To = TempPos;
 						Dir = normalize(TempDir);

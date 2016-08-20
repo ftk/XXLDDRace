@@ -4,7 +4,7 @@
 #define BASE_MATH_H
 
 #include <stdlib.h>
-#include <cmath> // conflicts with std::round
+#include <math.h>
 
 template <typename T>
 inline T clamp(T val, T min, T max)
@@ -21,7 +21,7 @@ inline float sign(float f)
 	return f<0.0f?-1.0f:1.0f;
 }
 
-inline int round(float f)
+inline int round_to_int(float f)
 {
 	if(f > 0)
 		return (int)(f+0.5f);

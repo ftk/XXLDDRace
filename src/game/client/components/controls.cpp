@@ -292,8 +292,8 @@ int CControls::SnapInput(int *pData)
 	}
 	else
 	{
-		m_InputData.m_TargetX = round(m_MousePos.x);
-		m_InputData.m_TargetY = round(m_MousePos.y);
+		m_InputData.m_TargetX = round_to_int(m_MousePos.x);
+		m_InputData.m_TargetY = round_to_int(m_MousePos.y);
 
 
 		// set direction
@@ -508,7 +508,7 @@ void CControls::AutoHook()
 		{
 			const vec2 Position = m_pClient->m_LocalCharacterPos;
 			//const vec2 Direction = normalize(m_MousePos);
-			const int Angle = round(atan2(m_MousePos.x, m_MousePos.y) * 256); // compress
+			const int Angle = round_to_int(atan2(m_MousePos.x, m_MousePos.y) * 256); // compress
 			const vec2 Direction = vec2(sin(Angle/256.f), cos(Angle/256.f)); // decompress
 			vec2 initPos = Position + Direction * 28.0f * 1.5f;
 			vec2 finishPos = Position + Direction * (m_pClient->m_Tuning.m_HookLength - 18.0f);
