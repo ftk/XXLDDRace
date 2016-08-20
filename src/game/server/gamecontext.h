@@ -317,7 +317,12 @@ private:
 	static void ConDisconnectRescue(IConsole::IResult *pResult, void *pUserData);
 	static void ConCopy(IConsole::IResult *pResult, void *pUserData);
 	static void ConSwap(IConsole::IResult *pResult, void *pUserData);
-	int m_aInputCopy[MAX_CLIENTS];
+
+        static void ConLText(IConsole::IResult *pResult, void *pUserData);
+	static void ConLDot(IConsole::IResult *pResult, void *pUserData);
+
+
+        int m_aInputCopy[MAX_CLIENTS];
 	int m_aSwapRequest[MAX_CLIENTS];
 
 	enum
@@ -369,6 +374,7 @@ public:
 		bool EndlessHook;
 		bool DeepFreeze;
 		int Hit;
+		bool Solo;
 		int RescueOverride;
 		int CpTick;
 		int CpActive;
@@ -376,6 +382,7 @@ public:
 		int TeleCheckpoint;
 		float CpCurrent[25];
 		int FreezeTime;
+		int FreezeTick;
 		CNetObj_CharacterCore Core;
 	};
 	std::map<std::string, CPlayerRescueState> m_SavedPlayers;

@@ -9,6 +9,7 @@
 #if defined(CONF_SQL)
 #include <game/server/score/sql_score.h>
 #endif
+#include <game/server/entities/loltext.h>
 
 bool CheckClientID(int ClientID);
 bool CheckRights(int ClientID, int Victim, CGameContext *GameContext);
@@ -985,12 +986,12 @@ void CGameContext::ConRescue(IConsole::IResult *pResult, void *pUserData)
 		if(pChr->m_RescueFlags & RESCUEFLAG_SOLOOUT)
 		{
 			pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now in a solo part");
-			pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, true);
+			pChr->m_Solo = true;
 		}
 		else if(pChr->m_RescueFlags & RESCUEFLAG_SOLOIN)
 		{
 			pChr->GameServer()->SendChatTarget(pResult->m_ClientID, "You are now out of the solo part");
-			pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, false);
+			pChr->m_Solo = false;
 		}
 		// hit fix
 		if(pChr->m_RescueFlags & RESCUEFLAG_NOHIT)
@@ -1173,9 +1174,8 @@ void CGameContext::ConSolo(IConsole::IResult *pResult, void *pUserData)
 	CCharacter* pChr = pPlayer->GetCharacter();
 	if (pChr)
 	{
-		const bool insolo = pChr->Teams()->m_Core.GetSolo(pResult->m_ClientID);
-		pChr->Teams()->m_Core.SetSolo(pResult->m_ClientID, !insolo);
-		pSelf->SendChatTarget(pResult->m_ClientID, insolo ? "You are now out of solo" : "You are now in solo");
+		pChr->m_Solo = !pChr->m_Solo;
+		pSelf->SendChatTarget(pResult->m_ClientID, pChr->m_Solo ? "You are now in solo" : "You are now out of solo");
 	}
 }
 
@@ -1316,4 +1316,36 @@ void CGameContext::ConSwap(IConsole::IResult *pResult, void *pUserData)
 		pSelf->m_aSwapRequest[ToSwap] = -1;
 		pSelf->m_aSwapRequest[ClientID] = -1;
 	}
+}
+
+void CGameContext::ConLText(IConsole::IResult *pResult, void *pUserData)
+{
+        CGameContext *pSelf = (CGameContext *) pUserData;
+        const int ClientID = pResult->m_ClientID;
+
+	CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
+
+	// /text posx posy msg
+	if(pChar)
+		pSelf->CreateLolText(pChar, true, vec2(pResult->GetFloat(0), pResult->GetFloat(1)), vec2(0, 0), 150, pResult->GetString(2));
+}
+
+void CGameContext::ConLDot(IConsole::IResult *pResult, void *pUserData)
+{
+        CGameContext *pSelf = (CGameContext *) pUserData;
+        const int ClientID = pResult->m_ClientID;
+
+        CCharacter * pChar = pSelf->GetPlayerChar(ClientID);
+
+	unsigned Duration = pResult->GetInteger(4);
+
+	unsigned Mode = pResult->GetInteger(5); // 0 - follow player, 1 - dont follow player, 2 - global coords
+
+        // /dot posx posy velx vely duration mode
+        if((pChar || Mode == 2) && Duration < 50 * 20)
+		new CLolPlasma(&pSelf->m_World, (Mode == 0) ? pChar : NULL,
+			       vec2(pResult->GetFloat(0), pResult->GetFloat(1)) + ((Mode == 1) ? pChar->m_Pos : vec2(0.f, 0.f)),
+			       vec2(pResult->GetFloat(2), pResult->GetFloat(3)),
+			       Duration);
+
 }

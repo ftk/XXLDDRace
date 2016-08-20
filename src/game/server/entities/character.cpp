@@ -129,6 +129,11 @@ void CCharacter::SetWeapon(int W)
 		m_ActiveWeapon = 0;
 }
 
+void CCharacter::SetSolo(bool Solo)
+{
+	Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), Solo);
+}
+
 bool CCharacter::IsGrounded()
 {
 	if(GameServer()->Collision()->CheckPoint(m_Pos.x+m_ProximityRadius/2, m_Pos.y+m_ProximityRadius/2+5))
@@ -1401,19 +1406,19 @@ void CCharacter::HandleTiles(int Index)
 		else
 			m_RescueFlags |= RESCUEFLAG_NOHIT;
 	}
-	if(((m_TileIndex == TILE_SOLO_START) || (m_TileFIndex == TILE_SOLO_START)) && !Teams()->m_Core.GetSolo(m_pPlayer->GetCID()))
+	if(((m_TileIndex == TILE_SOLO_START) || (m_TileFIndex == TILE_SOLO_START)) && !m_Solo)
 	{
 		GameServer()->SendChatTarget(GetPlayer()->GetCID(), "You are now in a solo part.");
-		Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), true);
+		SetSolo(m_Solo = true);
 		if(m_RescueFlags & RESCUEFLAG_SOLOOUT)
 			m_RescueFlags &= ~RESCUEFLAG_SOLOOUT;
 		else
 			m_RescueFlags |= RESCUEFLAG_SOLOIN;
 	}
-	else if(((m_TileIndex == TILE_SOLO_END) || (m_TileFIndex == TILE_SOLO_END)) && Teams()->m_Core.GetSolo(m_pPlayer->GetCID()))
+	else if(((m_TileIndex == TILE_SOLO_END) || (m_TileFIndex == TILE_SOLO_END)) && m_Solo)
 	{
 		GameServer()->SendChatTarget(GetPlayer()->GetCID(), "You are now out of the solo part.");
-		Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), false);
+		SetSolo(m_Solo = false);
 		if(m_RescueFlags & RESCUEFLAG_SOLOIN)
 			m_RescueFlags &= ~RESCUEFLAG_SOLOIN;
 		else
@@ -1960,6 +1965,11 @@ void CCharacter::DDRacePostCoreTick()
 		if (m_Super && m_Core.m_Jumped > 1)
 			m_Core.m_Jumped = 1;
 
+		if(m_Solo)  
+			SetSolo(true);  
+		else  
+			SetSolo(false);  
+
 		int CurrentIndex = GameServer()->Collision()->GetMapIndex(m_Pos);
 		HandleSkippableTiles(CurrentIndex);
 
@@ -2070,6 +2080,7 @@ void CCharacter::DDRaceInit()
 	m_TeleCheckpoint = 0;
 	m_EndlessHook = g_Config.m_SvEndlessDrag;
 	m_Hit = g_Config.m_SvHit ? HIT_ALL : DISABLE_HIT_GRENADE|DISABLE_HIT_HAMMER|DISABLE_HIT_RIFLE|DISABLE_HIT_SHOTGUN;
+	m_Solo = false;
 	//Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), false);
 	//Teams()->SetForceCharacterTeam(m_pPlayer->GetCID(), 0);
 }
