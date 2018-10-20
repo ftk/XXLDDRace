@@ -1,6 +1,6 @@
 ARCH ?= 64
 CPPFLAGS := -m$(ARCH) -flto -O3 -mfpmath=both -pipe -fno-exceptions -fvisibility=internal \
--Wall -DCONF_RELEASE -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" $(shell sdl-config --cflags) $(shell freetype-config --cflags)
+-Wall -DCONF_RELEASE -I "src" -I "other/mysql/include" -I "src/engine/external/zlib" $(shell sdl-config --cflags) $(shell freetype-config --cflags) $(shell pkg-config --cflags xft)
 CXXFLAGS := -std=c++11 -fno-rtti
 CFLAGS :=
 LDFLAGS := -m$(ARCH) -flto -O3 -s
@@ -33,7 +33,7 @@ distclean: clean
 # rules for target files
 
 XXLDDRace: $(client_objs)
-	$(LD) $(LDFLAGS) -o '$@' $^ -lpthread -lX11 -lGL -lGLU $(shell freetype-config --libs) $(shell sdl-config --libs)
+	$(LD) $(LDFLAGS) -o '$@' $^ -lpthread -lX11 -lGL -lGLU $(shell freetype-config --libs) $(shell sdl-config --libs) $(shell pkg-config --libs xft)
 
 XXLDDRace-Server: $(server_objs)
 	$(LD) $(LDFLAGS) -o '$@' $^ -lpthread 
